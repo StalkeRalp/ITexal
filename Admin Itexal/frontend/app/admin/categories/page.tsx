@@ -13,6 +13,9 @@ import {
   Edit02Icon,
   Delete02Icon,
   SparklesIcon,
+  MoreHorizontalIcon,
+  EyeIcon,
+  Cancel01Icon,
 } from "hugeicons-react";
 
 // Palettes de couleurs vibrantes pour différencier chaque catégorie
@@ -22,63 +25,43 @@ const PALETTES_CATEGORIES = [
     badge: "bg-rose-100/80 text-rose-800 border-rose-200",
     borderTop: "border-t-4 border-t-rose-500",
     hoverBorder: "hover:border-rose-400",
-    chip: "bg-rose-50 text-rose-700",
   },
   {
     bgIcon: "bg-indigo-50 border-indigo-200 text-indigo-600",
     badge: "bg-indigo-100/80 text-indigo-800 border-indigo-200",
     borderTop: "border-t-4 border-t-indigo-500",
     hoverBorder: "hover:border-indigo-400",
-    chip: "bg-indigo-50 text-indigo-700",
   },
   {
     bgIcon: "bg-emerald-50 border-emerald-200 text-emerald-600",
     badge: "bg-emerald-100/80 text-emerald-800 border-emerald-200",
     borderTop: "border-t-4 border-t-emerald-500",
     hoverBorder: "hover:border-emerald-400",
-    chip: "bg-emerald-50 text-emerald-700",
   },
   {
     bgIcon: "bg-amber-50 border-amber-200 text-amber-600",
     badge: "bg-amber-100/80 text-amber-900 border-amber-200",
     borderTop: "border-t-4 border-t-amber-500",
     hoverBorder: "hover:border-amber-400",
-    chip: "bg-amber-50 text-amber-800",
   },
   {
     bgIcon: "bg-purple-50 border-purple-200 text-purple-600",
     badge: "bg-purple-100/80 text-purple-800 border-purple-200",
     borderTop: "border-t-4 border-t-purple-500",
     hoverBorder: "hover:border-purple-400",
-    chip: "bg-purple-50 text-purple-700",
   },
   {
     bgIcon: "bg-cyan-50 border-cyan-200 text-cyan-600",
     badge: "bg-cyan-100/80 text-cyan-800 border-cyan-200",
     borderTop: "border-t-4 border-t-cyan-500",
     hoverBorder: "hover:border-cyan-400",
-    chip: "bg-cyan-50 text-cyan-700",
-  },
-  {
-    bgIcon: "bg-teal-50 border-teal-200 text-teal-600",
-    badge: "bg-teal-100/80 text-teal-800 border-teal-200",
-    borderTop: "border-t-4 border-t-teal-500",
-    hoverBorder: "hover:border-teal-400",
-    chip: "bg-teal-50 text-teal-700",
-  },
-  {
-    bgIcon: "bg-orange-50 border-orange-200 text-orange-600",
-    badge: "bg-orange-100/80 text-orange-900 border-orange-200",
-    borderTop: "border-t-4 border-t-orange-500",
-    hoverBorder: "hover:border-orange-400",
-    chip: "bg-orange-50 text-orange-800",
   },
 ];
 
 export default function PageCategoriesAdmin() {
   const { categories, produits, creerCategorie, modifierCategorie, supprimerCategorie } = useProduits();
 
-  // Mapping des catégories centralisées vers le type CategorieVue
+  // Mapping des catégories centralisées
   const categoriesVues: CategorieVue[] = useMemo(() => {
     return categories.map((c) => {
       const countProds = produits.filter((p) => p.categorieId === c.id).length;
@@ -98,6 +81,10 @@ export default function PageCategoriesAdmin() {
   const [recherche, setRecherche] = useState("");
   const [modalOuvert, setModalOuvert] = useState(false);
   const [categorieAEditer, setCategorieAEditer] = useState<CategorieVue | null>(null);
+
+  // Popover d'action & Modal "Toutes les infos (+)" pour catégorie
+  const [popoverId, setPopoverId] = useState<string | null>(null);
+  const [categorieDetaillee, setCategorieDetaillee] = useState<CategorieVue | null>(null);
 
   const categoriesFiltrees = categoriesVues.filter((c) => {
     return (
@@ -134,25 +121,25 @@ export default function PageCategoriesAdmin() {
   const totalProduits = produits.length;
 
   return (
-    <div className="space-y-8 animate-fadeIn max-w-7xl mx-auto pb-12">
-      {/* Hero Header */}
+    <div className="space-y-8 animate-fadeIn max-w-[1600px] mx-auto pb-12">
+      {/* Hero Header matching Design Mockup */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-            Gestion des Catégories ({categoriesVues.length})
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            Categories List ({categoriesVues.length})
           </h1>
-          <p className="text-xs text-slate-500 font-medium mt-1">
-            Classification visuelle et personnalisée des gammes de soins cosmétiques.
+          <p className="text-xs text-slate-400 font-medium mt-1">
+            Classification et thématisation des gammes cosmétiques.
           </p>
         </div>
 
         <button
           type="button"
           onClick={ouvrirCreation}
-          className="px-6 py-3 bg-[#4880FF] hover:bg-blue-600 text-white font-bold text-xs rounded-2xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 self-start sm:self-auto"
+          className="px-6 py-3 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 self-start sm:self-auto"
         >
           <Add01Icon size={18} strokeWidth={2.5} />
-          <span>Nouvelle Catégorie</span>
+          <span>+ Add Category</span>
         </button>
       </div>
 
@@ -165,7 +152,7 @@ export default function PageCategoriesAdmin() {
             </span>
             <h3 className="text-2xl font-black text-slate-800 mt-1">{categoriesVues.length}</h3>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#4880FF] flex items-center justify-center font-bold">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#5B63F6] flex items-center justify-center font-bold">
             <Tag01Icon size={24} />
           </div>
         </div>
@@ -185,11 +172,11 @@ export default function PageCategoriesAdmin() {
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Produits Classés
+              Produits Rattachés
             </span>
             <h3 className="text-2xl font-black text-slate-800 mt-1">{totalProduits}</h3>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+          <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
             <PackageIcon size={24} />
           </div>
         </div>
@@ -206,16 +193,18 @@ export default function PageCategoriesAdmin() {
             type="text"
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
-            placeholder="Rechercher une catégorie par nom ou description..."
-            className="w-full pl-11 pr-4 py-3 bg-[#F8F9FD] border border-slate-200/60 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#4880FF] focus:bg-white transition-all"
+            placeholder="Rechercher une catégorie..."
+            className="w-full pl-11 pr-4 py-3 bg-[#F8F9FD] border border-slate-200/60 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#5B63F6] focus:bg-white transition-all"
           />
         </div>
       </div>
 
-      {/* Grid of Distinct Colored Categories Cards */}
+      {/* Grid of Distinct Colored Categories Cards with Popover Menu */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {categoriesFiltrees.map((cat, idx) => {
           const palette = PALETTES_CATEGORIES[idx % PALETTES_CATEGORIES.length];
+          const estPopoverOuvert = popoverId === cat.id;
+
           return (
             <div
               key={cat.id}
@@ -228,29 +217,72 @@ export default function PageCategoriesAdmin() {
                   <SparklesIcon size={22} />
                 </div>
 
-                <div className="flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
+                <div className="relative">
                   <button
                     type="button"
-                    onClick={() => ouvrirEdition(cat)}
-                    className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-[#4880FF] text-slate-600 transition-colors flex items-center justify-center"
-                    title="Modifier"
+                    onClick={() => setPopoverId(estPopoverOuvert ? null : cat.id)}
+                    className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold transition-colors inline-flex items-center justify-center"
                   >
-                    <Edit02Icon size={16} />
+                    <MoreHorizontalIcon size={18} />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => verifierSuppression(cat.id)}
-                    className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 transition-colors flex items-center justify-center"
-                    title="Supprimer"
-                  >
-                    <Delete02Icon size={16} />
-                  </button>
+
+                  {/* Interactive Popover Menu (Details / Edit / Delete) */}
+                  {estPopoverOuvert && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-0 top-10 z-20 w-36 bg-white rounded-2xl p-1.5 shadow-xl border border-slate-100 animate-fadeIn text-left"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPopoverId(null);
+                          setCategorieDetaillee(cat);
+                        }}
+                        className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 transition-colors"
+                      >
+                        <EyeIcon size={14} className="text-[#5B63F6]" />
+                        <span>Voir tout (+)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPopoverId(null);
+                          ouvrirEdition(cat);
+                        }}
+                        className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 transition-colors"
+                      >
+                        <Edit02Icon size={14} className="text-amber-500" />
+                        <span>Modifier</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPopoverId(null);
+                          verifierSuppression(cat.id);
+                        }}
+                        className="w-full px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl flex items-center gap-2 transition-colors border-t border-slate-100 mt-1"
+                      >
+                        <Delete02Icon size={14} />
+                        <span>Supprimer</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between">
                   <h3 className="font-extrabold text-base text-slate-900">{cat.nom}</h3>
+                  <button
+                    type="button"
+                    onClick={() => setCategorieDetaillee(cat)}
+                    className="w-6 h-6 rounded-full bg-indigo-50 hover:bg-[#5B63F6] text-[#5B63F6] hover:text-white font-black text-xs flex items-center justify-center transition-all"
+                    title="Voir toutes les informations (+)"
+                  >
+                    +
+                  </button>
                 </div>
                 <p className="text-xs text-slate-500 font-medium mt-1 line-clamp-2 leading-relaxed">
                   {cat.description}
@@ -267,6 +299,79 @@ export default function PageCategoriesAdmin() {
           );
         })}
       </div>
+
+      {/* Modal Toutes les infos de la Catégorie (+) */}
+      {categorieDetaillee && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden space-y-6 p-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#5B63F6] font-black flex items-center justify-center">
+                  <SparklesIcon size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-extrabold text-slate-900">{categorieDetaillee.nom}</h2>
+                  <p className="text-xs text-slate-400 font-medium">Slug : {categorieDetaillee.slug}</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setCategorieDetaillee(null)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 font-extrabold flex items-center justify-center transition-colors"
+              >
+                <Cancel01Icon size={16} />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs text-slate-700">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
+                <span className="font-bold text-slate-400 uppercase text-[10px]">Description complète</span>
+                <p className="font-medium text-slate-800 text-sm">{categorieDetaillee.description}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 text-center">
+                  <span className="font-bold text-slate-500 uppercase text-[10px]">Produits Rattachés</span>
+                  <p className="text-2xl font-black text-[#5B63F6] mt-1">{categorieDetaillee.nombreProduits}</p>
+                </div>
+
+                <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 text-center">
+                  <span className="font-bold text-slate-500 uppercase text-[10px]">Date de création</span>
+                  <p className="text-sm font-black text-emerald-700 mt-1">{categorieDetaillee.creeLe}</p>
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-2">
+                <h4 className="font-extrabold text-slate-800">
+                  Liste des produits rattachés à cette catégorie :
+                </h4>
+                <div className="max-h-48 overflow-y-auto space-y-2 border border-slate-100 rounded-2xl p-2">
+                  {produits.filter(p => p.categorieId === categorieDetaillee.id).map(prod => (
+                    <div key={prod.id} className="p-2.5 bg-white rounded-xl border border-slate-100 flex items-center justify-between">
+                      <span className="font-bold text-slate-800">{prod.nom}</span>
+                      <span className="font-extrabold text-[#5B63F6]">{prod.prix} FCFA</span>
+                    </div>
+                  ))}
+                  {produits.filter(p => p.categorieId === categorieDetaillee.id).length === 0 && (
+                    <p className="text-slate-400 text-center py-4">Aucun produit dans cette catégorie.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end border-t border-slate-100 pt-4">
+              <button
+                type="button"
+                onClick={() => setCategorieDetaillee(null)}
+                className="px-6 py-2.5 bg-[#5B63F6] text-white font-extrabold rounded-xl shadow-md"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {modalOuvert && (
         <ModalCategorieFormulaire

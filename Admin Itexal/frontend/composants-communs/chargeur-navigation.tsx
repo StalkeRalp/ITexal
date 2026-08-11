@@ -54,11 +54,11 @@ export const ChargeurNavigation: React.FC = () => {
           </div>
 
           <div className="mt-12 text-center space-y-2 animate-pulse">
-            <h1 className="text-xl font-black text-white tracking-widest uppercase">
-              ITEXAL <span className="text-[#4880FF]">COSMÉCEUTIQUES</span>
+            <h1 className="text-2xl font-black text-white tracking-widest uppercase">
+              COSMETIC <span className="text-[#4880FF]">ADMIN</span>
             </h1>
-            <p className="text-[11px] font-bold text-slate-400 tracking-wider uppercase">
-              Initialisation du Back-Office Administrateur...
+            <p className="text-[11px] font-extrabold text-blue-400/90 tracking-widest uppercase">
+              Tableau de bord • Gestion • Performance
             </p>
           </div>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ViewIcon, ViewOffIcon, LockKeyIcon } from "hugeicons-react";
+import { ViewIcon, ViewOffIcon } from "hugeicons-react";
 
 interface ChampMotDePasseProps extends React.InputHTMLAttributes<HTMLInputElement> {
   etiquette?: string;
@@ -14,12 +14,13 @@ export const ChampMotDePasse: React.FC<ChampMotDePasseProps> = ({
   etiquette,
   label,
   valeur,
-  afficherIconeVerrou = true,
+  afficherIconeVerrou = false,
   className = "",
   value,
   onChange,
   placeholder = "••••••••",
   required,
+  id,
   ...props
 }) => {
   const [masque, setMasque] = useState(true);
@@ -27,47 +28,36 @@ export const ChampMotDePasse: React.FC<ChampMotDePasseProps> = ({
   const valeurInput = valeur !== undefined ? valeur : value;
 
   return (
-    <div className="w-full space-y-1">
+    <div className="w-full">
       {labelTexte && (
-        <label className="block text-xs font-bold text-slate-700">
+        <label htmlFor={id} className="block text-xs font-extrabold text-slate-700 mb-1">
           {labelTexte} {required && <span className="text-rose-500">*</span>}
         </label>
       )}
 
       <div className="relative w-full">
-        {afficherIconeVerrou && (
-          <LockKeyIcon
-            size={18}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-          />
-        )}
-
         <input
           {...props}
+          id={id}
           type={masque ? "password" : "text"}
           value={valeurInput}
           onChange={onChange}
           placeholder={placeholder}
           required={required}
-          className={`w-full ${
-            afficherIconeVerrou ? "pl-10" : "pl-4"
-          } pr-11 py-2.5 bg-[#F8F9FD] border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#4880FF] transition-all font-mono ${className}`}
+          className={`w-full px-3.5 pr-11 py-2.5 bg-[#F4F6FA] border border-slate-200/90 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#4880FF] focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-all font-medium ${className}`}
         />
 
         <button
           type="button"
           onClick={() => setMasque(!masque)}
           aria-label={masque ? "Afficher le mot de passe" : "Masquer le mot de passe"}
-          title={masque ? "Afficher le mot de passe" : "Masquer le mot de passe"}
-          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#4880FF] transition-colors rounded-lg"
+          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#4880FF] transition-colors p-1 rounded-md"
         >
-          {masque ? (
-            <ViewOffIcon size={18} strokeWidth={2} />
-          ) : (
-            <ViewIcon size={18} strokeWidth={2} />
-          )}
+          {masque ? <ViewIcon size={18} /> : <ViewOffIcon size={18} />}
         </button>
       </div>
     </div>
   );
 };
+
+export const PasswordInput = ChampMotDePasse;

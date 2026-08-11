@@ -22,6 +22,8 @@ import {
 } from "hugeicons-react";
 
 import { useNotifications } from "@/lib/context/NotificationContext";
+import { useProfil } from "@/lib/context/ProfilContext";
+import { useAuth } from "@/lib/context/AuthContext";
 
 export type Langue = "fr" | "en" | "ar";
 
@@ -57,6 +59,8 @@ export function setLangue(l: Langue) {
 export const BarreLaterale: React.FC = () => {
   const pathname = usePathname();
   const { nombreNonLues } = useNotifications();
+  const { profil, nomComplet, initiales } = useProfil();
+  const { seDeconnecter } = useAuth();
   const [langue, setLangueState] = useState<Langue>("fr");
 
   useEffect(() => {
@@ -78,7 +82,7 @@ export const BarreLaterale: React.FC = () => {
         <Link href="/admin" className="flex items-center justify-center w-full group">
           <img
             src="/Admin Cosmetic.png"
-            alt="ITexal Admin"
+            alt="Cosmetic Admin"
             className="h-[72px] w-auto max-w-[230px] object-contain transition-transform duration-300 group-hover:scale-[1.04] drop-shadow-xs"
           />
         </Link>
@@ -157,29 +161,47 @@ export const BarreLaterale: React.FC = () => {
 
         <div className="flex-1" />
 
-        <div className="pt-3 border-t border-slate-100 flex flex-col gap-0.5">
+        {/* Profil Admin Card */}
+        <div className="pt-3 border-t border-slate-100 space-y-1">
           <Link
             href="/admin/parametres"
-            className={`group flex items-center gap-3 px-3 py-2.5 rounded-2xl text-[13px] font-semibold transition-all duration-200 ${
-              pathname === "/admin/parametres"
-                ? "bg-[#4880FF] text-white shadow-lg shadow-blue-500/25"
-                : "text-slate-600 hover:text-[#4880FF] hover:bg-blue-50/70"
-            }`}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-blue-50/70 transition-all duration-200 group"
           >
-            <span className="w-7 h-7 rounded-xl bg-slate-100 text-slate-600 group-hover:bg-blue-100 group-hover:text-[#4880FF] flex items-center justify-center shrink-0 transition-all duration-200">
-              <Settings02Icon size={20} strokeWidth={2} />
-            </span>
-            <span>{langue === "en" ? "Settings" : langue === "ar" ? "الإعدادات" : "Paramètres"}</span>
+            <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-blue-100 shadow-sm shrink-0 bg-gradient-to-tr from-rose-400 to-[#4880FF]">
+              {profil.photoProfil ? (
+                <img
+                  src={profil.photoProfil}
+                  alt={nomComplet}
+                  className="w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-white font-black text-xs">
+                  {initiales}
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-bold text-slate-800 truncate leading-tight group-hover:text-[#4880FF] transition-colors">
+                {nomComplet}
+              </p>
+              <p className="text-[10px] text-slate-400 font-medium truncate">
+                {profil.role}
+              </p>
+            </div>
+            <Settings02Icon size={16} className="text-slate-400 group-hover:text-[#4880FF] shrink-0 transition-colors" strokeWidth={2} />
           </Link>
-          <Link
-            href="/connexion"
-            className="group flex items-center gap-3 px-3 py-2.5 rounded-2xl text-[13px] font-semibold text-rose-500 hover:bg-rose-50 transition-all duration-200"
+
+          <button
+            type="button"
+            onClick={seDeconnecter}
+            className="w-full text-left group flex items-center gap-3 px-3 py-2 rounded-2xl text-[13px] font-semibold text-rose-500 hover:bg-rose-50 transition-all duration-200 cursor-pointer"
           >
             <span className="w-7 h-7 rounded-xl bg-rose-50 text-rose-500 group-hover:bg-rose-100 flex items-center justify-center shrink-0 transition-all duration-200">
-              <Logout01Icon size={20} strokeWidth={2} />
+              <Logout01Icon size={18} strokeWidth={2} />
             </span>
             <span>{langue === "en" ? "Sign Out" : langue === "ar" ? "تسجيل الخروج" : "Déconnexion"}</span>
-          </Link>
+          </button>
         </div>
       </nav>
     </aside>

@@ -8,6 +8,7 @@ import { NotificationProvider } from "@/lib/context/NotificationContext";
 import { FavorisProvider } from "@/lib/context/FavorisContext";
 import { ToastProvider } from "@/lib/context/ToastContext";
 import { ProduitsProvider } from "@/lib/context/ProduitsContext";
+import { ProfilProvider } from "@/lib/context/ProfilContext";
 
 export default function LayoutAdmin({
   children,
@@ -19,23 +20,25 @@ export default function LayoutAdmin({
       <NotificationProvider>
         <FavorisProvider>
           <ProduitsProvider>
-            <ToastProvider>
-            <div className="flex min-h-screen bg-[#F5F6FA] text-slate-800 font-sans">
-              {/* Sidebar navigation */}
-              <BarreLaterale />
+            <ProfilProvider>
+              <ToastProvider>
+                <div className="flex h-screen overflow-hidden bg-[#F5F6FA] text-slate-800 font-sans">
+                  {/* Sidebar navigation */}
+                  <BarreLaterale />
 
-              {/* Zone principale */}
-              <div className="flex-1 flex flex-col min-w-0">
-                <EnTete />
-                <main className="flex-1 p-6 md:p-8 overflow-y-auto animate-page-entrance">
-                  {children}
-                </main>
-              </div>
-            </div>
-          </ToastProvider>
-        </ProduitsProvider>
-      </FavorisProvider>
-    </NotificationProvider>
+                  {/* Zone principale */}
+                  <div className="flex-1 flex flex-col min-w-0">
+                    <EnTete />
+                    <main className="flex-1 p-6 md:p-8 overflow-y-auto animate-page-entrance">
+                      {children}
+                    </main>
+                  </div>
+                </div>
+              </ToastProvider>
+            </ProfilProvider>
+          </ProduitsProvider>
+        </FavorisProvider>
+      </NotificationProvider>
     </LanguageProvider>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   UserIcon,
   Settings02Icon,
@@ -12,24 +12,40 @@ import {
   LockIcon,
   SparklesIcon,
   CheckmarkCircle02Icon,
+  Camera01Icon,
 } from "hugeicons-react";
 import { ChampMotDePasse } from "@/composants-communs/champ-mot-de-passe";
 import { useToast } from "@/lib/context/ToastContext";
+import { useProfil } from "@/lib/context/ProfilContext";
 
 export default function PageParametresAdmin() {
   const toast = useToast();
+  const { profil, mettreAJourProfil } = useProfil();
   const [ongletActif, setOngletActif] = useState<"profil" | "general" | "securite" | "notifications">("profil");
 
-  // State Profil Administrateur (matching exact mockup!)
-  const [firstName, setFirstName] = useState("Kame");
-  const [lastName, setLastName] = useState("Williamson");
-  const [emailAddress, setEmailAddress] = useState("kamewilliamson@gmail.com");
-  const [dateOfBirth, setDateOfBirth] = useState("25/01/2001");
-  const [ville, setVille] = useState("Douala, Cameroun");
-  const [role, setRole] = useState("Administrateur");
-  const [sexe, setSexe] = useState("Homme");
-  const [pays, setPays] = useState("Cameroun");
-  const [photoProfil, setPhotoProfil] = useState("https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80");
+  // State Profil Administrateur — initialisé depuis le contexte global
+  const [firstName, setFirstName] = useState(profil.prenom);
+  const [lastName, setLastName] = useState(profil.nom);
+  const [emailAddress, setEmailAddress] = useState(profil.email);
+  const [dateOfBirth, setDateOfBirth] = useState(profil.dateNaissance);
+  const [ville, setVille] = useState(profil.ville);
+  const [role, setRole] = useState(profil.role);
+  const [sexe, setSexe] = useState(profil.sexe);
+  const [pays, setPays] = useState(profil.pays);
+  const [photoProfil, setPhotoProfil] = useState(profil.photoProfil);
+
+  // Synchronisation avec les données du contexte
+  useEffect(() => {
+    setFirstName(profil.prenom);
+    setLastName(profil.nom);
+    setEmailAddress(profil.email);
+    setDateOfBirth(profil.dateNaissance);
+    setVille(profil.ville);
+    setRole(profil.role);
+    setSexe(profil.sexe);
+    setPays(profil.pays);
+    setPhotoProfil(profil.photoProfil);
+  }, [profil]);
 
   // State Configuration Générale
   const [nomBoutique, setNomBoutique] = useState("ITexal Cosméceutiques & Bio");
@@ -56,6 +72,18 @@ export default function PageParametresAdmin() {
 
   const sauvegarderProfil = (e: React.FormEvent) => {
     e.preventDefault();
+    mettreAJourProfil({
+      prenom: firstName,
+      nom: lastName,
+      email: emailAddress,
+      dateNaissance: dateOfBirth,
+      ville,
+      role,
+      sexe,
+      pays,
+      photoProfil,
+    });
+    toast.succes("Profil administrateur mis à jour avec succès !");
     setMessageSucces("Votre profil administrateur a été enregistré avec succès !");
     setTimeout(() => setMessageSucces(""), 4000);
   };

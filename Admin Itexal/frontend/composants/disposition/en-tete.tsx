@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { MenuProfil } from "./menu-profil";
 import { type Langue, getLangue, setLangue } from "./barre-laterale";
 import { useNotifications } from "@/lib/context/NotificationContext";
@@ -70,6 +70,7 @@ export const EnTete: React.FC = () => {
   const langRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     setLangueState(getLangue());
@@ -77,6 +78,16 @@ export const EnTete: React.FC = () => {
     window.addEventListener("itexal_lang_change", handler);
     return () => window.removeEventListener("itexal_lang_change", handler);
   }, []);
+
+  useEffect(() => {
+    const route = ROUTES.find((r) => r.href === pathname);
+    if (route) {
+      const pageTitle = route.label[langue] || route.label.fr;
+      document.title = `${pageTitle} | Cosmetic Admin`;
+    } else if (pathname === "/admin") {
+      document.title = "Dashboard | Cosmetic Admin";
+    }
+  }, [pathname, langue]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {

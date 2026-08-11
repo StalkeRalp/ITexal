@@ -15,6 +15,7 @@ interface ToastContextType {
   succes: (message: string, titre?: string) => void;
   erreur: (message: string, titre?: string) => void;
   info: (message: string, titre?: string) => void;
+  avertissement: (message: string, titre?: string) => void;
 }
 
 const ToastContext = createContext<ToastContextType>({
@@ -22,6 +23,7 @@ const ToastContext = createContext<ToastContextType>({
   succes: () => {},
   erreur: () => {},
   info: () => {},
+  avertissement: () => {},
 });
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -53,8 +55,12 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     ajouterToast({ type: "info", titre, message });
   };
 
+  const avertissement = (message: string, titre = "Attention") => {
+    ajouterToast({ type: "warning", titre, message });
+  };
+
   return (
-    <ToastContext.Provider value={{ ajouterToast, succes, erreur, info }}>
+    <ToastContext.Provider value={{ ajouterToast, succes, erreur, info, avertissement }}>
       {children}
 
       {/* Render Toast Floating Container */}
@@ -100,7 +106,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             <button
               type="button"
               onClick={() => supprimerToast(t.id)}
-              className="text-slate-400 hover:text-slate-600 p-1"
+              className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
             >
               <Cancel01Icon size={14} />
             </button>

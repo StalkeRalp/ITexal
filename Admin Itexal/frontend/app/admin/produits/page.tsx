@@ -13,22 +13,9 @@ import { useToast } from "@/lib/context/ToastContext";
 import { Search01Icon, PackageIcon, Add01Icon } from "hugeicons-react";
 
 export default function PageProduitsAdmin() {
-  const { produits, creerProduit, modifierProduit, supprimerProduit } = useProduits();
+  const { produits, categories, marques, modifierProduit, supprimerProduit } = useProduits();
   const { t } = useLanguage();
   const toast = useToast();
-
-  const categoriesMock = [
-    { id: "cat-1", nom: "Soin du Visage" },
-    { id: "cat-2", nom: "Gamme Capillaire" },
-    { id: "cat-3", nom: "Soin du Corps" },
-    { id: "cat-4", nom: "Huiles Essentielles" },
-  ];
-
-  const marquesMock = [
-    { id: "mar-1", nom: "ITexal Cosméceutiques" },
-    { id: "mar-2", nom: "Karité Gold Africa" },
-    { id: "mar-3", nom: "Argan Bio Luxe" },
-  ];
 
   const [modalFormulaireOuvert, setModalFormulaireOuvert] = useState(false);
   const [produitAEditer, setProduitAEditer] = useState<Produit | null>(null);
@@ -38,7 +25,34 @@ export default function PageProduitsAdmin() {
   const [termeRecherche, setTermeRecherche] = useState("");
   const [filtreCategorie, setFiltreCategorie] = useState<string>("Toutes");
 
-  const produitsFiltres = produits.filter((p) => {
+  // Conversion du Produit centralisé vers le type Produit du module (compatible)
+  const produitsModules: Produit[] = produits.map((p) => ({
+    id: p.id,
+    nom: p.nom,
+    reference: p.reference,
+    categorieId: p.categorieId,
+    nomCategorie: p.nomCategorie,
+    marqueId: p.marqueId,
+    nomMarque: p.nomMarque,
+    description: p.description || "",
+    prix: p.prix,
+    prixPromotionnel: p.prixPromotionnel,
+    stock: p.stock,
+    disponible: p.disponible,
+    images: p.images,
+    caracteristiques: Array.isArray(p.caracteristiques)
+      ? (p.caracteristiques as string[]).join(", ")
+      : (p.caracteristiques as string | undefined),
+    composition: p.composition,
+    typeDePeau: p.typeDePeau,
+    contenance: p.contenance,
+    origine: p.origine,
+    conseilsUtilisation: p.conseilsUtilisation,
+    creeLe: p.creeLe,
+    miseAJourLe: p.misAJourLe,
+  }));
+
+  const produitsFiltres = produitsModules.filter((p) => {
     const correspondRecherche =
       p.nom.toLowerCase().includes(termeRecherche.toLowerCase()) ||
       p.reference.toLowerCase().includes(termeRecherche.toLowerCase());
@@ -58,13 +72,8 @@ export default function PageProduitsAdmin() {
   };
 
   const sauvegarderProduitHandler = (p: Produit) => {
-    if (produitAEditer) {
-      modifierProduit(p.id, p);
-      toast.succes("Produit mis à jour avec succès.");
-    } else {
-      creerProduit(p);
-      toast.succes("Nouveau produit créé et ajouté au catalogue.");
-    }
+    modifierProduit(p.id, p as any);
+    toast.succes("Produit mis à jour avec succès.");
     setModalFormulaireOuvert(false);
   };
 
@@ -76,16 +85,20 @@ export default function PageProduitsAdmin() {
     }
   };
 
+  // Catégories locales pour les modals
+  const categoriesLocales = categories.map((c) => ({ id: c.id, nom: c.nom }));
+  const marquesLocales = marques.map((m) => ({ id: m.id, nom: m.nom }));
+
   return (
     <div className="space-y-8 animate-fadeIn max-w-7xl mx-auto">
       {/* Title & Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-            Catalogue Produits Cosmétiques
+            Catalogue Produits Cosmétiques ({produits.length})
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Gérez vos soins du visage, corps, et gammes capillaires ITexal.
+            Gérez vos produits cosmétiques normalisés issus de BDjson/makeup_data.json.
           </p>
         </div>
 
@@ -99,7 +112,7 @@ export default function PageProduitsAdmin() {
         </button>
       </div>
 
-      {/* Hero Banner Carousel (5s auto-scroll, freeze on hover) */}
+      {/* Hero Banner Carousel */}
       <BanniereHeroProduits />
 
       {/* Search & Filter Bar */}
@@ -119,7 +132,7 @@ export default function PageProduitsAdmin() {
         </div>
 
         {/* Category Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto text-xs font-bold py-1">
+        <div className="flex items-center gap-2 overflow-x-auto text-xs font-bold py-1 max-w-xl">
           <button
             type="button"
             onClick={() => setFiltreCategorie("Toutes")}
@@ -129,9 +142,9 @@ export default function PageProduitsAdmin() {
                 : "text-slate-600 hover:bg-slate-100"
             }`}
           >
-            Toutes les catégories
+            Toutes ({produits.length})
           </button>
-          {categoriesMock.map((cat) => (
+          {categoriesLocales.slice(0, 6).map((cat) => (
             <button
               key={cat.id}
               type="button"
@@ -148,62 +161,68 @@ export default function PageProduitsAdmin() {
         </div>
       </div>
 
-      {/* Products Grid / Detail View */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className={`lg:col-span-${produitAInspecter ? "2" : "3"} space-y-6`}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {produitsFiltres.map((p) => (
-              <CarteProduitDashStack
-                key={p.id}
-                produit={p}
-                onVoirDetail={(prod) => setProduitAInspecter(prod)}
-                onEditer={(prod) => ouvrirEdition(prod)}
-                onSupprimer={(id) => setIdASupprimer(id)}
-              />
-            ))}
-          </div>
-
-          {produitsFiltres.length === 0 && (
-            <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 text-slate-400 text-xs space-y-2">
-              <PackageIcon size={36} className="mx-auto text-slate-300" />
-              <p className="font-bold">Aucun produit ne correspond à votre recherche.</p>
-            </div>
-          )}
-        </div>
-
-        {/* Side Panel for Detail */}
-        {produitAInspecter && (
-          <div className="lg:col-span-1">
-            <FicheDetailProduit
-              produit={produitAInspecter}
-              onFermer={() => setProduitAInspecter(null)}
-              onEditer={(prod) => ouvrirEdition(prod)}
-              onSupprimer={(id) => setIdASupprimer(id)}
-            />
-          </div>
-        )}
+      {/* Grid of Product Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {produitsFiltres.map((p) => (
+          <CarteProduitDashStack
+            key={p.id}
+            produit={p}
+            onVoirDetail={() => setProduitAInspecter(p)}
+            onEditer={() => ouvrirEdition(p)}
+            onSupprimer={() => setIdASupprimer(p.id)}
+          />
+        ))}
       </div>
 
-      {/* Product Form Modal */}
-      <ModalProduitFormulaire
-        ouvert={modalFormulaireOuvert}
-        produitAEditer={produitAEditer}
-        categories={categoriesMock}
-        marques={marquesMock}
-        onFermer={() => setModalFormulaireOuvert(false)}
-        onEnregistrer={sauvegarderProduitHandler}
-      />
+      {produitsFiltres.length === 0 && (
+        <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#4880FF] flex items-center justify-center mx-auto">
+            <PackageIcon size={24} />
+          </div>
+          <h3 className="text-base font-bold text-slate-800">Aucun produit trouvé</h3>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            Essayer de modifier votre terme de recherche ou de réinitialiser le filtre.
+          </p>
+        </div>
+      )}
 
-      {/* Modal Confirmation Supprimer */}
-      <ModalConfirmation
-        ouvert={!!idASupprimer}
-        titre="Supprimer le produit"
-        message="Êtes-vous sûr de vouloir supprimer définitivement ce produit du catalogue ITexal ?"
-        texteConfirmer="Supprimer"
-        variante="danger"
-        onConfirmer={confirmerSuppression}
-        onAnnuler={() => setIdASupprimer(null)}
-      />
+      {/* Modal Formulaire Creation / Edition */}
+      {modalFormulaireOuvert && (
+        <ModalProduitFormulaire
+          ouvert={modalFormulaireOuvert}
+          onFermer={() => setModalFormulaireOuvert(false)}
+          produitAEditer={produitAEditer}
+          categories={categoriesLocales}
+          marques={marquesLocales}
+          onEnregistrer={sauvegarderProduitHandler}
+        />
+      )}
+
+      {/* Drawer Fiche Detail Produit */}
+      {produitAInspecter && (
+        <FicheDetailProduit
+          produit={produitAInspecter}
+          onFermer={() => setProduitAInspecter(null)}
+          onEditer={() => {
+            const target = produitAInspecter;
+            setProduitAInspecter(null);
+            ouvrirEdition(target);
+          }}
+        />
+      )}
+
+      {/* Modal Confirmation de Suppression */}
+      {idASupprimer && (
+        <ModalConfirmation
+          ouvert={!!idASupprimer}
+          titre="Retirer du Catalogue"
+          message="Êtes-vous sûr de vouloir supprimer définitivement ce produit ? Cette action est irréversible."
+          texteConfirmer="Oui, supprimer"
+          variante="danger"
+          onConfirmer={confirmerSuppression}
+          onAnnuler={() => setIdASupprimer(null)}
+        />
+      )}
     </div>
   );
 }

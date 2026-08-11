@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { formatPrix } from "@/lib/formatteur";
 import { useFavoris } from "@/lib/context/FavorisContext";
-import { PRODUITS_INITIALS } from "@/lib/context/ProduitsContext";
+import { useProduits } from "@/lib/context/ProduitsContext";
 import { Produit } from "@/modules/produits/types/produit";
 import { ModalDetailProduit } from "@/modules/produits/composants/modal-detail-produit";
 import {
@@ -19,25 +19,42 @@ import {
 
 export const SectionDealsHome: React.FC = () => {
   const [chargement, setChargement] = useState(true);
-  const [produits, setProduits] = useState<Produit[]>([]);
   const [produitSelectionne, setProduitSelectionne] = useState<Produit | null>(null);
   const { estFavori, basculerFavori } = useFavoris();
+  const { produits: produitsSource } = useProduits();
+
+  // Produits en promotion depuis le contexte centralisé
+  const produits: Produit[] = produitsSource
+    .filter((p) => p.prixPromotionnel && p.prixPromotionnel < p.prix)
+    .map((p) => ({
+      id: p.id,
+      nom: p.nom,
+      reference: p.reference,
+      categorieId: p.categorieId,
+      nomCategorie: p.nomCategorie,
+      marqueId: p.marqueId,
+      nomMarque: p.nomMarque,
+      description: p.description || "",
+      prix: p.prix,
+      prixPromotionnel: p.prixPromotionnel,
+      stock: p.stock,
+      disponible: p.disponible,
+      images: p.images,
+      caracteristiques: Array.isArray(p.caracteristiques)
+        ? (p.caracteristiques as string[]).join(", ")
+        : (p.caracteristiques as string | undefined),
+      composition: p.composition,
+      typeDePeau: p.typeDePeau,
+      contenance: p.contenance,
+      origine: p.origine,
+      creeLe: p.creeLe,
+    }));
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const local = localStorage.getItem("itexal_produits");
-      let dataset: Produit[] = PRODUITS_INITIALS;
-      if (local) {
-        try {
-          dataset = JSON.parse(local);
-        } catch (e) {}
-      }
-      setProduits(dataset.filter((p) => p.prixPromotionnel && p.prixPromotionnel < p.prix));
-      setChargement(false);
-    }, 400);
-
+    const timer = setTimeout(() => setChargement(false), 300);
     return () => clearTimeout(timer);
   }, []);
+
 
   return (
     <section id="deals" className="py-20 bg-slate-900/60 border-t border-slate-800/80">

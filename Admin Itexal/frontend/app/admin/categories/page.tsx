@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import { Categorie } from "@/modules/categories/types/categorie";
+import React, { useState, useMemo } from "react";
+import { Categorie as CategorieVue } from "@/modules/categories/types/categorie";
 import { ModalCategorieFormulaire } from "@/modules/categories/composants/modal-categorie-formulaire";
+import { useProduits } from "@/lib/context/ProduitsContext";
 import {
   Add01Icon,
   Tag01Icon,
@@ -14,84 +15,95 @@ import {
   SparklesIcon,
 } from "hugeicons-react";
 
+// Palettes de couleurs vibrantes pour différencier chaque catégorie
+const PALETTES_CATEGORIES = [
+  {
+    bgIcon: "bg-rose-50 border-rose-200 text-rose-600",
+    badge: "bg-rose-100/80 text-rose-800 border-rose-200",
+    borderTop: "border-t-4 border-t-rose-500",
+    hoverBorder: "hover:border-rose-400",
+    chip: "bg-rose-50 text-rose-700",
+  },
+  {
+    bgIcon: "bg-indigo-50 border-indigo-200 text-indigo-600",
+    badge: "bg-indigo-100/80 text-indigo-800 border-indigo-200",
+    borderTop: "border-t-4 border-t-indigo-500",
+    hoverBorder: "hover:border-indigo-400",
+    chip: "bg-indigo-50 text-indigo-700",
+  },
+  {
+    bgIcon: "bg-emerald-50 border-emerald-200 text-emerald-600",
+    badge: "bg-emerald-100/80 text-emerald-800 border-emerald-200",
+    borderTop: "border-t-4 border-t-emerald-500",
+    hoverBorder: "hover:border-emerald-400",
+    chip: "bg-emerald-50 text-emerald-700",
+  },
+  {
+    bgIcon: "bg-amber-50 border-amber-200 text-amber-600",
+    badge: "bg-amber-100/80 text-amber-900 border-amber-200",
+    borderTop: "border-t-4 border-t-amber-500",
+    hoverBorder: "hover:border-amber-400",
+    chip: "bg-amber-50 text-amber-800",
+  },
+  {
+    bgIcon: "bg-purple-50 border-purple-200 text-purple-600",
+    badge: "bg-purple-100/80 text-purple-800 border-purple-200",
+    borderTop: "border-t-4 border-t-purple-500",
+    hoverBorder: "hover:border-purple-400",
+    chip: "bg-purple-50 text-purple-700",
+  },
+  {
+    bgIcon: "bg-cyan-50 border-cyan-200 text-cyan-600",
+    badge: "bg-cyan-100/80 text-cyan-800 border-cyan-200",
+    borderTop: "border-t-4 border-t-cyan-500",
+    hoverBorder: "hover:border-cyan-400",
+    chip: "bg-cyan-50 text-cyan-700",
+  },
+  {
+    bgIcon: "bg-teal-50 border-teal-200 text-teal-600",
+    badge: "bg-teal-100/80 text-teal-800 border-teal-200",
+    borderTop: "border-t-4 border-t-teal-500",
+    hoverBorder: "hover:border-teal-400",
+    chip: "bg-teal-50 text-teal-700",
+  },
+  {
+    bgIcon: "bg-orange-50 border-orange-200 text-orange-600",
+    badge: "bg-orange-100/80 text-orange-900 border-orange-200",
+    borderTop: "border-t-4 border-t-orange-500",
+    hoverBorder: "hover:border-orange-400",
+    chip: "bg-orange-50 text-orange-800",
+  },
+];
+
 export default function PageCategoriesAdmin() {
-  const [categories, setCategories] = useState<Categorie[]>([
-    {
-      id: "cat-1",
-      nom: "Soin du Visage",
-      slug: "soin-du-visage",
-      description: "Sérums, crèmes hydratantes, masques et nettoyants bio pour le visage.",
-      icone: "Soin Visage",
-      statut: "Actif",
-      nombreProduits: 24,
-      creeLe: "01/08/2026",
-    },
-    {
-      id: "cat-2",
-      nom: "Gamme Capillaire",
-      slug: "gamme-capillaire",
-      description: "Shampooings, baumes, huiles pousse et masques pour cheveux crépus & frisés.",
-      icone: "Capillaire",
-      statut: "Actif",
-      nombreProduits: 18,
-      creeLe: "02/08/2026",
-    },
-    {
-      id: "cat-3",
-      nom: "Soin du Corps",
-      slug: "soin-du-corps",
-      description: "Laits corporels, beurres de karité purs, gommages et savons exfoliants.",
-      icone: "Corps",
-      statut: "Actif",
-      nombreProduits: 32,
-      creeLe: "03/08/2026",
-    },
-    {
-      id: "cat-4",
-      nom: "Huiles Essentielles",
-      slug: "huiles-essentielles",
-      description: "Huiles végétales pures extraites à froid, aromathérapie et élixirs.",
-      icone: "Huiles",
-      statut: "Actif",
-      nombreProduits: 12,
-      creeLe: "05/08/2026",
-    },
-    {
-      id: "cat-5",
-      nom: "Parfums & Senteurs",
-      slug: "parfums-senteurs",
-      description: "Fragrances naturelles, eaux de parfum et brumes parfumées corporelles.",
-      icone: "Parfums",
-      statut: "Actif",
-      nombreProduits: 15,
-      creeLe: "10/08/2026",
-    },
-    {
-      id: "cat-6",
-      nom: "Coffrets Cadeaux",
-      slug: "coffrets-cadeaux",
-      description: "Ensembles cadeaux de soins complets sous emballage éco-responsable.",
-      icone: "Coffrets",
-      statut: "Inactif",
-      nombreProduits: 8,
-      creeLe: "11/08/2026",
-    },
-  ]);
+  const { categories, produits, creerCategorie, modifierCategorie, supprimerCategorie } = useProduits();
+
+  // Mapping des catégories centralisées vers le type CategorieVue
+  const categoriesVues: CategorieVue[] = useMemo(() => {
+    return categories.map((c) => {
+      const countProds = produits.filter((p) => p.categorieId === c.id).length;
+      return {
+        id: c.id,
+        nom: c.nom,
+        slug: c.slug,
+        description: c.description || `Gamme de soins et cosmétiques ${c.nom}`,
+        icone: c.nom.split(" ")[0],
+        statut: "Actif",
+        nombreProduits: countProds || c.nombreProduits || 0,
+        creeLe: c.creeLe,
+      };
+    });
+  }, [categories, produits]);
 
   const [recherche, setRecherche] = useState("");
-  const [filtreStatut, setFiltreStatut] = useState<"Tous" | "Actif" | "Inactif">("Tous");
   const [modalOuvert, setModalOuvert] = useState(false);
-  const [categorieAEditer, setCategorieAEditer] = useState<Categorie | null>(null);
+  const [categorieAEditer, setCategorieAEditer] = useState<CategorieVue | null>(null);
 
-  const categoriesFiltrees = categories.filter((c) => {
-    const matchTexte =
+  const categoriesFiltrees = categoriesVues.filter((c) => {
+    return (
       c.nom.toLowerCase().includes(recherche.toLowerCase()) ||
-      (c.icone && c.icone.toLowerCase().includes(recherche.toLowerCase())) ||
-      c.description.toLowerCase().includes(recherche.toLowerCase());
-
-    const matchStatut = filtreStatut === "Tous" ? true : c.statut === filtreStatut;
-
-    return matchTexte && matchStatut;
+      c.description.toLowerCase().includes(recherche.toLowerCase())
+    );
   });
 
   const ouvrirCreation = () => {
@@ -99,242 +111,171 @@ export default function PageCategoriesAdmin() {
     setModalOuvert(true);
   };
 
-  const ouvrirEdition = (c: Categorie) => {
+  const ouvrirEdition = (c: CategorieVue) => {
     setCategorieAEditer(c);
     setModalOuvert(true);
   };
 
-  const basculerStatut = (id: string) => {
-    setCategories((prev) =>
-      prev.map((c) =>
-        c.id === id
-          ? { ...c, statut: c.statut === "Actif" ? "Inactif" : "Actif" }
-          : c
-      )
-    );
-  };
-
-  const supprimerCategorie = (id: string) => {
+  const verifierSuppression = (id: string) => {
     if (confirm("Voulez-vous vraiment supprimer cette catégorie ?")) {
-      setCategories((prev) => prev.filter((c) => c.id !== id));
+      supprimerCategorie(id);
     }
   };
 
-  const enregistrerCategorie = (cat: Categorie) => {
-    setCategories((prev) => {
-      const existe = prev.some((c) => c.id === cat.id);
-      if (existe) {
-        return prev.map((c) => (c.id === cat.id ? cat : c));
-      } else {
-        return [cat, ...prev];
-      }
-    });
+  const enregistrerCategorieHandler = (cat: CategorieVue) => {
+    if (categorieAEditer) {
+      modifierCategorie(cat.id, cat.nom, cat.description);
+    } else {
+      creerCategorie(cat.nom, cat.description);
+    }
+    setModalOuvert(false);
   };
 
-  const totalProduits = categories.reduce((sum, c) => sum + c.nombreProduits, 0);
-  const totalActives = categories.filter((c) => c.statut === "Actif").length;
+  const totalProduits = produits.length;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fadeIn max-w-7xl mx-auto pb-12">
       {/* Hero Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-            Gestion des Catégories
+            Gestion des Catégories ({categoriesVues.length})
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Classification et organisation des gammes cosmétiques et soins ITexal.
+            Classification visuelle et personnalisée des gammes de soins cosmétiques.
           </p>
         </div>
 
         <button
           type="button"
           onClick={ouvrirCreation}
-          className="px-6 py-3 bg-[#4880FF] hover:bg-blue-600 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-blue-500/20 transition-all self-start sm:self-auto flex items-center gap-2"
+          className="px-6 py-3 bg-[#4880FF] hover:bg-blue-600 text-white font-bold text-xs rounded-2xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 self-start sm:self-auto"
         >
-          <Add01Icon size={18} strokeWidth={2.5} /> Nouvelle Catégorie
+          <Add01Icon size={18} strokeWidth={2.5} />
+          <span>Nouvelle Catégorie</span>
         </button>
       </div>
 
-      {/* KPI Cards Bar */}
+      {/* KPI Cards Header */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Total Catégories
             </span>
-            <h3 className="text-2xl font-extrabold text-slate-800 mt-1">
-              {categories.length}
-            </h3>
+            <h3 className="text-2xl font-black text-slate-800 mt-1">{categoriesVues.length}</h3>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#4880FF] flex items-center justify-center font-bold">
-            <Tag01Icon size={24} strokeWidth={2} />
+            <Tag01Icon size={24} />
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Catégories Actives
             </span>
-            <h3 className="text-2xl font-extrabold text-emerald-600 mt-1">
-              {totalActives}
-            </h3>
+            <h3 className="text-2xl font-black text-slate-800 mt-1">{categoriesVues.length}</h3>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-            <Tick01Icon size={24} strokeWidth={2.5} />
+            <Tick01Icon size={24} />
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Produits Catalogués
+              Produits Classés
             </span>
-            <h3 className="text-2xl font-extrabold text-[#4880FF] mt-1">
-              {totalProduits}
-            </h3>
+            <h3 className="text-2xl font-black text-slate-800 mt-1">{totalProduits}</h3>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#4880FF] flex items-center justify-center font-bold">
-            <PackageIcon size={24} strokeWidth={2} />
+          <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+            <PackageIcon size={24} />
           </div>
         </div>
       </div>
 
-      {/* Filter & Search Bar */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold text-slate-600">
-        <div className="relative w-full sm:w-80">
+      {/* Search Bar */}
+      <div className="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex items-center gap-4">
+        <div className="relative flex-1">
+          <Search01Icon
+            size={18}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+          />
           <input
             type="text"
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
-            placeholder="Rechercher une catégorie..."
-            className="w-full pl-10 pr-4 py-2.5 bg-[#F8F9FD] border border-slate-200 rounded-xl focus:outline-none focus:border-[#4880FF] text-slate-800"
+            placeholder="Rechercher une catégorie par nom ou description..."
+            className="w-full pl-11 pr-4 py-3 bg-[#F8F9FD] border border-slate-200/60 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#4880FF] focus:bg-white transition-all"
           />
-          <Search01Icon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
         </div>
+      </div>
 
-        <div className="flex items-center gap-2">
-          {(["Tous", "Actif", "Inactif"] as const).map((st) => (
-            <button
-              key={st}
-              type="button"
-              onClick={() => setFiltreStatut(st)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                filtreStatut === st
-                  ? "bg-[#4880FF] text-white shadow-md shadow-blue-500/20"
-                  : "bg-[#F8F9FD] text-slate-600 hover:bg-slate-200/60"
-              }`}
+      {/* Grid of Distinct Colored Categories Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {categoriesFiltrees.map((cat, idx) => {
+          const palette = PALETTES_CATEGORIES[idx % PALETTES_CATEGORIES.length];
+          return (
+            <div
+              key={cat.id}
+              className={`bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-4 transition-all duration-300 relative overflow-hidden group ${palette.borderTop} ${palette.hoverBorder} hover:shadow-md`}
             >
-              {st}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Grid of Category Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categoriesFiltrees.map((cat) => (
-          <div
-            key={cat.id}
-            className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-blue-100 transition-all space-y-4 flex flex-col justify-between group"
-          >
-            <div className="space-y-3">
-              {/* Header Icon/Image + Status Pill */}
-              <div className="flex items-center justify-between">
-                {cat.image ? (
-                  <img
-                    src={cat.image}
-                    alt={cat.nom}
-                    className="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-xs group-hover:scale-105 transition-transform"
-                  />
-                ) : (
-                  <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#4880FF] flex items-center justify-center border border-blue-100 shadow-xs group-hover:scale-105 transition-transform">
-                    <SparklesIcon size={24} strokeWidth={2} />
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => basculerStatut(cat.id)}
-                  className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all ${
-                    cat.statut === "Actif"
-                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                      : "bg-slate-100 text-slate-500 border border-slate-200"
-                  }`}
-                  title="Cliquer pour changer le statut"
+              <div className="flex items-start justify-between">
+                <div
+                  className={`w-12 h-12 rounded-2xl ${palette.bgIcon} font-black flex items-center justify-center text-sm border shadow-xs transition-transform group-hover:scale-105`}
                 >
-                  <span
-                    className={`w-2 h-2 rounded-full ${
-                      cat.statut === "Actif" ? "bg-emerald-500 animate-pulse" : "bg-slate-400"
-                    }`}
-                  />
-                  <span>{cat.statut}</span>
-                </button>
+                  <SparklesIcon size={22} />
+                </div>
+
+                <div className="flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    onClick={() => ouvrirEdition(cat)}
+                    className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-[#4880FF] text-slate-600 transition-colors flex items-center justify-center"
+                    title="Modifier"
+                  >
+                    <Edit02Icon size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => verifierSuppression(cat.id)}
+                    className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 transition-colors flex items-center justify-center"
+                    title="Supprimer"
+                  >
+                    <Delete02Icon size={16} />
+                  </button>
+                </div>
               </div>
 
-              {/* Title & Gamme */}
               <div>
-                <h3 className="font-extrabold text-slate-800 text-lg group-hover:text-[#4880FF] transition-colors">
-                  {cat.nom}
-                </h3>
-                <span className="text-[11px] text-[#4880FF] font-bold bg-blue-50 px-2.5 py-0.5 rounded-md inline-block mt-1">
-                  {cat.icone || "Gamme Cosmétique"}
+                <div className="flex items-center gap-2">
+                  <h3 className="font-extrabold text-base text-slate-900">{cat.nom}</h3>
+                </div>
+                <p className="text-xs text-slate-500 font-medium mt-1 line-clamp-2 leading-relaxed">
+                  {cat.description}
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
+                <span className={`px-3 py-1 rounded-xl text-xs font-extrabold border ${palette.badge}`}>
+                  {cat.nombreProduits} produit(s)
                 </span>
-              </div>
-
-              {/* Description */}
-              <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">
-                {cat.description}
-              </p>
-            </div>
-
-            {/* Card Footer */}
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-700 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
-                <PackageIcon size={14} className="text-[#4880FF]" />
-                <span>{cat.nombreProduits} Produits</span>
-              </span>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => ouvrirEdition(cat)}
-                  aria-label="Éditer la catégorie"
-                  className="w-9 h-9 rounded-xl bg-slate-50 hover:bg-[#4880FF] text-slate-600 hover:text-white flex items-center justify-center text-xs font-bold transition-all border border-slate-200/60"
-                  title="Éditer la catégorie"
-                >
-                  <Edit02Icon size={16} strokeWidth={2} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => supprimerCategorie(cat.id)}
-                  aria-label="Supprimer la catégorie"
-                  className="w-9 h-9 rounded-xl bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white flex items-center justify-center text-xs font-bold transition-all border border-rose-100"
-                  title="Supprimer la catégorie"
-                >
-                  <Delete02Icon size={16} strokeWidth={2} />
-                </button>
+                <span className="text-slate-400 font-mono text-[11px]">Créé le {cat.creeLe}</span>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {categoriesFiltrees.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-3xl border border-slate-100 text-slate-400 text-xs font-medium">
-          Aucune catégorie ne correspond à votre recherche.
-        </div>
+      {modalOuvert && (
+        <ModalCategorieFormulaire
+          ouvert={modalOuvert}
+          onFermer={() => setModalOuvert(false)}
+          onEnregistrer={enregistrerCategorieHandler}
+          categorieAEditer={categorieAEditer}
+        />
       )}
-
-      {/* Modal Formulaire Catégorie */}
-      <ModalCategorieFormulaire
-        ouvert={modalOuvert}
-        categorieAEditer={categorieAEditer}
-        onFermer={() => setModalOuvert(false)}
-        onEnregistrer={enregistrerCategorie}
-      />
     </div>
   );
 }

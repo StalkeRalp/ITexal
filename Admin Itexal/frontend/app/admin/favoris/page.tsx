@@ -12,34 +12,51 @@ import { useToast } from "@/lib/context/ToastContext";
 import { FavouriteIcon, PackageIcon, ArrowRight01Icon } from "hugeicons-react";
 
 export default function PageFavorisAdmin() {
-  const { produits, modifierProduit } = useProduits();
+  const { produits, categories, marques, modifierProduit } = useProduits();
   const { favorisIds, basculerFavori } = useFavoris();
   const toast = useToast();
 
   const [produitAInspecter, setProduitAInspecter] = useState<Produit | null>(null);
   const [produitAEditer, setProduitAEditer] = useState<Produit | null>(null);
 
-  const categoriesMock = [
-    { id: "cat-1", nom: "Soin du Visage" },
-    { id: "cat-2", nom: "Gamme Capillaire" },
-    { id: "cat-3", nom: "Soin du Corps" },
-    { id: "cat-4", nom: "Huiles Essentielles" },
-  ];
-
-  const marquesMock = [
-    { id: "mar-1", nom: "ITexal Cosméceutiques" },
-    { id: "mar-2", nom: "Karité Gold Africa" },
-    { id: "mar-3", nom: "Argan Bio Luxe" },
-  ];
+  // Conversion du type centralisé vers le type module
+  const produitsModules: Produit[] = produits.map((p) => ({
+    id: p.id,
+    nom: p.nom,
+    reference: p.reference,
+    categorieId: p.categorieId,
+    nomCategorie: p.nomCategorie,
+    marqueId: p.marqueId,
+    nomMarque: p.nomMarque,
+    description: p.description || "",
+    prix: p.prix,
+    prixPromotionnel: p.prixPromotionnel,
+    stock: p.stock,
+    disponible: p.disponible,
+    images: p.images,
+    caracteristiques: Array.isArray(p.caracteristiques)
+      ? (p.caracteristiques as string[]).join(", ")
+      : (p.caracteristiques as string | undefined),
+    composition: p.composition,
+    typeDePeau: p.typeDePeau,
+    contenance: p.contenance,
+    origine: p.origine,
+    conseilsUtilisation: p.conseilsUtilisation,
+    creeLe: p.creeLe,
+    miseAJourLe: p.misAJourLe,
+  }));
 
   // Produits réellement ajoutés aux favoris
-  const produitsFavoris = produits.filter((p) => favorisIds.includes(p.id));
+  const produitsFavoris = produitsModules.filter((p) => favorisIds.includes(p.id));
 
   const sauvegarderProduitHandler = (p: Produit) => {
-    modifierProduit(p.id, p);
+    modifierProduit(p.id, p as any);
     toast.succes("Produit mis à jour avec succès.");
     setProduitAEditer(null);
   };
+
+  const categoriesLocales = categories.map((c) => ({ id: c.id, nom: c.nom }));
+  const marquesLocales = marques.map((m) => ({ id: m.id, nom: m.nom }));
 
   return (
     <div className="space-y-8 animate-fadeIn max-w-7xl mx-auto">
@@ -60,7 +77,7 @@ export default function PageFavorisAdmin() {
         </div>
       </div>
 
-      {/* Grid des produits favoris réels */}
+      {/* Grid des produits favoris */}
       {produitsFavoris.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className={`lg:col-span-${produitAInspecter ? "2" : "3"} space-y-6`}>
@@ -80,7 +97,6 @@ export default function PageFavorisAdmin() {
             </div>
           </div>
 
-          {/* Panneau de détail latéral si sélectionné */}
           {produitAInspecter && (
             <div className="lg:col-span-1">
               <FicheDetailProduit
@@ -97,7 +113,6 @@ export default function PageFavorisAdmin() {
           )}
         </div>
       ) : (
-        /* État vide si aucun favori */
         <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm max-w-md mx-auto space-y-4 my-12">
           <div className="w-16 h-16 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center mx-auto text-rose-500 shadow-sm">
             <FavouriteIcon size={32} />
@@ -119,13 +134,13 @@ export default function PageFavorisAdmin() {
         </div>
       )}
 
-      {/* Modal d'édition si besoin */}
+      {/* Modal d'édition */}
       {produitAEditer && (
         <ModalProduitFormulaire
           ouvert={!!produitAEditer}
           produitAEditer={produitAEditer}
-          categories={categoriesMock}
-          marques={marquesMock}
+          categories={categoriesLocales}
+          marques={marquesLocales}
           onFermer={() => setProduitAEditer(null)}
           onEnregistrer={sauvegarderProduitHandler}
         />

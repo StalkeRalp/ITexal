@@ -1,151 +1,253 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { Produit } from "@/modules/produits/types/produit";
-
-export const PRODUITS_INITIALS: Produit[] = [
-  {
-    id: "prod-1",
-    nom: "Sérum Visage Éclat Bio Karité",
-    reference: "REF-1001",
-    categorieId: "cat-1",
-    nomCategorie: "Soin du Visage",
-    marqueId: "mar-1",
-    nomMarque: "ITexal Cosméceutiques",
-    description:
-      "Sérum concentré en acide hyaluronique et vitamine C naturelle pour un teint éclatant.",
-    prix: 15000,
-    prixPromotionnel: 10500,
-    stock: 42,
-    disponible: true,
-    images: [
-      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop&q=80",
-      "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80",
-    ],
-    composition: "Aqua, Vitamin C, Hyaluronic Acid, Aloe Vera",
-    typeDePeau: "Toutes peaux",
-    contenance: "50ml",
-    origine: "Cameroun",
-    conseilsUtilisation: "Appliquer 3 gouttes le matin avant la crème.",
-    creeLe: "01/08/2026",
-  },
-  {
-    id: "prod-2",
-    nom: "Crème Hydratante Onctueuse Karité Gold",
-    reference: "REF-1002",
-    categorieId: "cat-3",
-    nomCategorie: "Soin du Corps",
-    marqueId: "mar-2",
-    nomMarque: "Karité Gold Africa",
-    description:
-      "Nourrit intensément les peaux sèches et déshydratées. Enrichie en beurre de karité brut.",
-    prix: 18500,
-    prixPromotionnel: 13875,
-    stock: 28,
-    disponible: true,
-    images: [
-      "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80",
-    ],
-    typeDePeau: "Peaux sèches",
-    contenance: "200ml",
-    origine: "Cameroun",
-    creeLe: "03/08/2026",
-  },
-  {
-    id: "prod-3",
-    nom: "Lotion Tonique Équilibrante Bio",
-    reference: "REF-1003",
-    categorieId: "cat-1",
-    nomCategorie: "Soin du Visage",
-    marqueId: "mar-1",
-    nomMarque: "ITexal Cosméceutiques",
-    description: "Lotion rafraîchissante aux extraits de camomille et de rose sauvage.",
-    prix: 15000,
-    prixPromotionnel: 12000,
-    stock: 19,
-    disponible: true,
-    images: [
-      "https://images.unsplash.com/photo-1608248597261-e4d091444d32?w=600&auto=format&fit=crop&q=80",
-    ],
-    contenance: "150ml",
-    origine: "Cameroun",
-    creeLe: "04/08/2026",
-  },
-  {
-    id: "prod-4",
-    nom: "Masque Capillaire Nourrissant Argan Luxe",
-    reference: "REF-1004",
-    categorieId: "cat-2",
-    nomCategorie: "Gamme Capillaire",
-    marqueId: "mar-3",
-    nomMarque: "Argan Bio Luxe",
-    description: "Soin réparateur intense pour cheveux très secs, frisés et crépus.",
-    prix: 22500,
-    stock: 35,
-    disponible: true,
-    images: [
-      "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=600&auto=format&fit=crop&q=80",
-    ],
-    contenance: "300ml",
-    origine: "Maroc",
-    creeLe: "05/08/2026",
-  },
-];
+import { Produit } from "@/types/produit";
+import { Categorie } from "@/types/categorie";
+import { Marque } from "@/types/marque";
+import { Promotion } from "@/types/promotion";
+import {
+  genererProduitsInitiaux,
+  genererCategoriesInitiales,
+  genererMarquesInitiales,
+  genererPromotionsInitiales,
+} from "@/lib/data/initial-seed";
 
 interface ProduitsContextType {
   produits: Produit[];
+  categories: Categorie[];
+  marques: Marque[];
+  promotions: Promotion[];
+  estCharge: boolean;
+  
+  // Actions Produits
   creerProduit: (nouveau: Omit<Produit, "id" | "creeLe">) => void;
   modifierProduit: (id: string, modifs: Partial<Produit>) => void;
   supprimerProduit: (id: string) => void;
+  modifierStockProduit: (id: string, nouveauStock: number) => void;
+  
+  // Actions Catégories
+  creerCategorie: (nom: string, description?: string) => void;
+  modifierCategorie: (id: string, nom: string, description?: string) => void;
+  supprimerCategorie: (id: string) => void;
+
+  // Actions Marques
+  creerMarque: (nom: string, description?: string, paysOrigine?: string) => void;
+  modifierMarque: (id: string, nom: string, description?: string) => void;
+  supprimerMarque: (id: string) => void;
+
+  // Actions Promotions
+  creerPromotion: (promo: Omit<Promotion, "id" | "creeLe" | "nombreUtilisations">) => void;
+  modifierPromotion: (id: string, modifs: Partial<Promotion>) => void;
+  supprimerPromotion: (id: string) => void;
+  
+  rechargerDonnees: () => void;
 }
 
 const ProduitsContext = createContext<ProduitsContextType>({
-  produits: PRODUITS_INITIALS,
+  produits: [],
+  categories: [],
+  marques: [],
+  promotions: [],
+  estCharge: false,
   creerProduit: () => {},
   modifierProduit: () => {},
   supprimerProduit: () => {},
+  modifierStockProduit: () => {},
+  creerCategorie: () => {},
+  modifierCategorie: () => {},
+  supprimerCategorie: () => {},
+  creerMarque: () => {},
+  modifierMarque: () => {},
+  supprimerMarque: () => {},
+  creerPromotion: () => {},
+  modifierPromotion: () => {},
+  supprimerPromotion: () => {},
+  rechargerDonnees: () => {},
 });
 
 export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [produits, setProduits] = useState<Produit[]>(PRODUITS_INITIALS);
+  const [produits, setProduits] = useState<Produit[]>([]);
+  const [categories, setCategories] = useState<Categorie[]>([]);
+  const [marques, setMarques] = useState<Marque[]>([]);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [charge, setCharge] = useState(false);
+
+  const initialiserDonnees = () => {
+    const initProds = genererProduitsInitiaux();
+    const initCats = genererCategoriesInitiales(initProds);
+    const initMars = genererMarquesInitiales(initProds);
+    const initProms = genererPromotionsInitiales();
+
+    const localProds = localStorage.getItem("itexal_produits");
+    const localCats = localStorage.getItem("itexal_categories");
+    const localMars = localStorage.getItem("itexal_marques");
+    const localProms = localStorage.getItem("itexal_promotions");
+
+    const prodsFinal = localProds ? JSON.parse(localProds) : initProds;
+    const catsFinal = localCats ? JSON.parse(localCats) : initCats;
+    const marsFinal = localMars ? JSON.parse(localMars) : initMars;
+    const promsFinal = localProms ? JSON.parse(localProms) : initProms;
+
+    setProduits(prodsFinal);
+    setCategories(catsFinal);
+    setMarques(marsFinal);
+    setPromotions(promsFinal);
+    
+    if (!localProds) localStorage.setItem("itexal_produits", JSON.stringify(initProds));
+    if (!localCats) localStorage.setItem("itexal_categories", JSON.stringify(initCats));
+    if (!localMars) localStorage.setItem("itexal_marques", JSON.stringify(initMars));
+    if (!localProms) localStorage.setItem("itexal_promotions", JSON.stringify(initProms));
+    
+    setCharge(true);
+  };
 
   useEffect(() => {
-    const local = localStorage.getItem("itexal_produits");
-    if (local) {
-      try {
-        setProduits(JSON.parse(local));
-      } catch (e) {
-        console.error("Erreur chargement produits local", e);
-      }
-    }
+    initialiserDonnees();
   }, []);
 
-  const sauvegarder = (nouveaux: Produit[]) => {
+  const sauvegarderProds = (nouveaux: Produit[]) => {
     setProduits(nouveaux);
     localStorage.setItem("itexal_produits", JSON.stringify(nouveaux));
   };
 
+  const sauvegarderCats = (nouvelles: Categorie[]) => {
+    setCategories(nouvelles);
+    localStorage.setItem("itexal_categories", JSON.stringify(nouvelles));
+  };
+
+  const sauvegarderMars = (nouvelles: Marque[]) => {
+    setMarques(nouvelles);
+    localStorage.setItem("itexal_marques", JSON.stringify(nouvelles));
+  };
+
+  const sauvegarderProms = (nouvelles: Promotion[]) => {
+    setPromotions(nouvelles);
+    localStorage.setItem("itexal_promotions", JSON.stringify(nouvelles));
+  };
+
+  // Actions Produits
   const creerProduit = (nouveauData: Omit<Produit, "id" | "creeLe">) => {
     const nouveau: Produit = {
       ...nouveauData,
       id: `prod-${Date.now()}`,
       creeLe: new Date().toLocaleDateString("fr-FR"),
     };
-    sauvegarder([nouveau, ...produits]);
+    sauvegarderProds([nouveau, ...produits]);
   };
 
   const modifierProduit = (id: string, modifs: Partial<Produit>) => {
-    sauvegarder(
-      produits.map((p) => (p.id === id ? { ...p, ...modifs } : p))
+    sauvegarderProds(
+      produits.map((p) => (p.id === id ? { ...p, ...modifs, misAJourLe: new Date().toLocaleDateString("fr-FR") } : p))
     );
   };
 
   const supprimerProduit = (id: string) => {
-    sauvegarder(produits.filter((p) => p.id !== id));
+    sauvegarderProds(produits.filter((p) => p.id !== id));
+  };
+
+  const modifierStockProduit = (id: string, nouveauStock: number) => {
+    sauvegarderProds(
+      produits.map((p) =>
+        p.id === id ? { ...p, stock: Math.max(0, nouveauStock), disponible: nouveauStock > 0 } : p
+      )
+    );
+  };
+
+  // Actions Catégories
+  const creerCategorie = (nom: string, description?: string) => {
+    const id = `cat-${nom.toLowerCase().replace(/[^a-z0-9]/g, "-")}`;
+    const nouvelle: Categorie = {
+      id,
+      nom,
+      slug: id,
+      description,
+      nombreProduits: 0,
+      ordreAffichage: categories.length + 1,
+      creeLe: new Date().toLocaleDateString("fr-FR"),
+    };
+    sauvegarderCats([...categories, nouvelle]);
+  };
+
+  const modifierCategorie = (id: string, nom: string, description?: string) => {
+    sauvegarderCats(
+      categories.map((c) => (c.id === id ? { ...c, nom, description } : c))
+    );
+  };
+
+  const supprimerCategorie = (id: string) => {
+    sauvegarderCats(categories.filter((c) => c.id !== id));
+  };
+
+  // Actions Marques
+  const creerMarque = (nom: string, description?: string, paysOrigine?: string) => {
+    const id = `mar-${nom.toLowerCase().replace(/[^a-z0-9]/g, "-")}`;
+    const nouvelle: Marque = {
+      id,
+      nom,
+      slug: id,
+      description,
+      paysOrigine,
+      nombreProduits: 0,
+      creeLe: new Date().toLocaleDateString("fr-FR"),
+    };
+    sauvegarderMars([...marques, nouvelle]);
+  };
+
+  const modifierMarque = (id: string, nom: string, description?: string) => {
+    sauvegarderMars(
+      marques.map((m) => (m.id === id ? { ...m, nom, description } : m))
+    );
+  };
+
+  const supprimerMarque = (id: string) => {
+    sauvegarderMars(marques.filter((m) => m.id !== id));
+  };
+
+  // Actions Promotions
+  const creerPromotion = (promo: Omit<Promotion, "id" | "creeLe" | "nombreUtilisations">) => {
+    const nouvelle: Promotion = {
+      ...promo,
+      id: `promo-${Date.now()}`,
+      nombreUtilisations: 0,
+      creeLe: new Date().toLocaleDateString("fr-FR"),
+    };
+    sauvegarderProms([nouvelle, ...promotions]);
+  };
+
+  const modifierPromotion = (id: string, modifs: Partial<Promotion>) => {
+    sauvegarderProms(
+      promotions.map((pr) => (pr.id === id ? { ...pr, ...modifs } : pr))
+    );
+  };
+
+  const supprimerPromotion = (id: string) => {
+    sauvegarderProms(promotions.filter((p) => p.id !== id));
   };
 
   return (
-    <ProduitsContext.Provider value={{ produits, creerProduit, modifierProduit, supprimerProduit }}>
+    <ProduitsContext.Provider
+      value={{
+        produits,
+        categories,
+        marques,
+        promotions,
+        estCharge: charge,
+        creerProduit,
+        modifierProduit,
+        supprimerProduit,
+        modifierStockProduit,
+        creerCategorie,
+        modifierCategorie,
+        supprimerCategorie,
+        creerMarque,
+        modifierMarque,
+        supprimerMarque,
+        creerPromotion,
+        modifierPromotion,
+        supprimerPromotion,
+        rechargerDonnees: initialiserDonnees,
+      }}
+    >
       {children}
     </ProduitsContext.Provider>
   );

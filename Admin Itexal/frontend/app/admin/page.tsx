@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 import { CarteStatDashStack } from "@/modules/dashboard/composants/carte-stat-dashstack";
 import { GraphiqueVentes } from "@/modules/dashboard/composants/graphique-ventes";
 import { TableauTransactionsRecentes } from "@/modules/dashboard/composants/tableau-transactions-recentes";
 import { useProduits } from "@/lib/context/ProduitsContext";
+import { useCommandes } from "@/lib/context/CommandesContext";
 import { useNotifications } from "@/lib/context/NotificationContext";
+import { StatistiqueService } from "@/lib/services/statistique-service";
 import { formatPrix } from "@/lib/formatteur";
 import {
   UserGroupIcon,
@@ -21,65 +23,35 @@ import {
 } from "hugeicons-react";
 
 export default function PageDashboardAdmin() {
-  const { produits } = useProduits();
-  const { notifications } = useNotifications();
+  const { produits, modifierStockProduit } = useProduits();
+  const { commandes, clients, modifierStatutCommande } = useCommandes();
+  const { notifications, nombreNonLues: notifNonLues } = useNotifications();
 
-  // Stocks critiques : produits dont le stock est <= seuil d'alerte ou très faible (< 15)
-  const stocksCritiques = useMemo(() =>
-    produits
-      .filter((p) => p.stock !== undefined && p.stock < 15)
-      .sort((a, b) => (a.stock ?? 0) - (b.stock ?? 0))
-      .slice(0, 4)
-      .map((p) => ({
-        id: p.id,
-        nom: p.nom,
-        stock: p.stock ?? 0,
-        seuil: 15,
-        categorie: p.nomCategorie ?? "Produit",
-        image:
-          p.images && p.images.length > 0
-            ? p.images[0]
-            : "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&auto=format&fit=crop&q=80",
-      })),
+  // Calculs statistiques en temps réel depuis la source unique de vérité
+  const kpi = useMemo(
+    () => StatistiqueService.calculerKPIsGlobaux(commandes, produits, clients),
+    [commandes, produits, clients]
+  );
+
+  // Stocks critiques : produits dont le stock est <= 15
+  const stocksCritiques = useMemo(
+    () =>
+      produits
+        .filter((p) => p.stock < 15)
+        .sort((a, b) => a.stock - b.stock)
+        .slice(0, 5),
     [produits]
   );
 
-  const [stocksTraites, setStocksTraites] = useState<string[]>([]);
-  const stocksAffiches = stocksCritiques.filter((s) => !stocksTraites.includes(s.id));
+  // Commandes urgentes (en attente ou en préparation)
+  const commandesUrgentes = useMemo(
+    () =>
+      commandes
+        .filter((c) => c.statut === "en_attente" || c.statut === "en_preparation")
+        .slice(0, 5),
+    [commandes]
+  );
 
-  const [commandesUrgentes, setCommandesUrgentes] = useState([
-    {
-      id: "CMD-00008",
-      client: "Marcelle Ondo",
-      montant: 48500,
-      articles: 3,
-      date: "Aujourd'hui 14:10",
-      priorite: "Haute",
-      statut: "En attente",
-    },
-    {
-      id: "CMD-00005",
-      client: "Jean-Philippe Kuate",
-      montant: 89000,
-      articles: 5,
-      date: "Aujourd'hui 12:45",
-      priorite: "Urgent VIP",
-      statut: "En traitement",
-    },
-  ]);
-
-  const reapprovisionnerStock = (id: string) => {
-    setStocksTraites((prev) => [...prev, id]);
-  };
-
-  const validerCommandeUrgente = (id: string) => {
-    setCommandesUrgentes((prev) => prev.filter((cmd) => cmd.id !== id));
-  };
-
-  // Stats dynamiques depuis le contexte
-  const totalProduits = produits.length;
-  const totalVentes = produits.reduce((acc, p) => acc + (p.stock !== undefined ? 0 : 0), 0);
-  const notifNonLues = notifications.filter((n) => !n.lue).length;
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -90,7 +62,7 @@ export default function PageDashboardAdmin() {
             Dashboard
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Vue d'ensemble en temps réel des ventes, stocks et expéditions ITexal.
+            Vue d'ensemble en temps réel des ventes, stocks et expéditions Cosmetic Admin.
           </p>
         </div>
 
@@ -110,39 +82,39 @@ export default function PageDashboardAdmin() {
         </div>
       </div>
 
-      {/* Grid des 4 Cartes Statistiques */}
+      {/* Grid des 4 Cartes Statistiques Centralisées */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <CarteStatDashStack
-          titre="Total User"
-          valeur="40,689"
+          titre="Clients Enregistrés"
+          valeur={kpi.nombreClientsTotal.toLocaleString("fr-FR")}
           icone={<UserGroupIcon size={24} strokeWidth={2} />}
           couleurFondIcone="#E5E5FF"
           couleurTexteIcone="#4880FF"
-          variation="8.5%"
+          variation={`+${kpi.croissanceClients}%`}
           estPositive={true}
-          textePeriode="Up from yesterday"
+          textePeriode="Base clients active"
         />
 
         <CarteStatDashStack
           titre="Produits Catalogue"
-          valeur={String(totalProduits)}
+          valeur={kpi.nombreProduitsActifs.toLocaleString("fr-FR")}
           icone={<PackageIcon size={24} strokeWidth={2} />}
           couleurFondIcone="#FFF2D8"
           couleurTexteIcone="#FEC53D"
-          variation={`${stocksAffiches.length} stock(s) critique(s)`}
-          estPositive={stocksAffiches.length === 0}
-          textePeriode="Produits actifs"
+          variation={`${kpi.nombreStocksFaibles} stock(s) faible(s)`}
+          estPositive={kpi.nombreStocksFaibles === 0}
+          textePeriode="Produits réels en stock"
         />
 
         <CarteStatDashStack
-          titre="Total Sales"
-          valeur="89,000,000 FCFA"
+          titre="Chiffre d'Affaires"
+          valeur={`${formatPrix(kpi.chiffreAffairesTotal)} FCFA`}
           icone={<Chart01Icon size={24} strokeWidth={2} />}
           couleurFondIcone="#E4F8F0"
           couleurTexteIcone="#4AD991"
-          variation="4.3%"
-          estPositive={false}
-          textePeriode="Down from yesterday"
+          variation={`+${kpi.croissanceChiffreAffaires}%`}
+          estPositive={true}
+          textePeriode="Revenus cumulés"
         />
 
         <CarteStatDashStack
@@ -151,9 +123,9 @@ export default function PageDashboardAdmin() {
           icone={<Clock01Icon size={24} strokeWidth={2} />}
           couleurFondIcone="#FFEDEC"
           couleurTexteIcone="#FF907A"
-          variation={notifNonLues > 0 ? `${notifNonLues} non lue(s)` : "Tout est lu"}
+          variation={notifNonLues > 0 ? `${notifNonLues} non lue(s)` : "À jour"}
           estPositive={notifNonLues === 0}
-          textePeriode="Notifications actives"
+          textePeriode="Alertes système"
         />
       </div>
 
@@ -180,12 +152,12 @@ export default function PageDashboardAdmin() {
               href="/admin/stocks"
               className="text-xs font-bold text-[#4880FF] hover:underline flex items-center gap-1"
             >
-              Voir tout ({stocksAffiches.length}) <ArrowRight01Icon size={14} />
+              Voir tout ({stocksCritiques.length}) <ArrowRight01Icon size={14} />
             </Link>
           </div>
 
           <div className="space-y-3">
-            {stocksAffiches.map((item) => (
+            {stocksCritiques.map((item) => (
               <div
                 key={item.id}
                 className="p-3.5 bg-[#F8F9FD] rounded-2xl border border-slate-200/70 flex items-center justify-between gap-3 transition-all hover:bg-slate-100/60"
@@ -193,7 +165,7 @@ export default function PageDashboardAdmin() {
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-12 h-12 rounded-xl bg-white overflow-hidden border border-slate-200 shrink-0">
                     <img
-                      src={item.image}
+                      src={item.images[0] || "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&auto=format&fit=crop&q=80"}
                       alt={item.nom}
                       className="w-full h-full object-cover"
                     />
@@ -203,7 +175,7 @@ export default function PageDashboardAdmin() {
                       {item.nom}
                     </h4>
                     <span className="text-[10px] text-slate-500 block">
-                      Catégorie : {item.categorie}
+                      Catégorie : {item.nomCategorie}
                     </span>
                   </div>
                 </div>
@@ -213,16 +185,13 @@ export default function PageDashboardAdmin() {
                     <span className="px-2.5 py-1 bg-rose-100 text-rose-700 font-black text-xs rounded-lg block">
                       Reste : {item.stock} u.
                     </span>
-                    <span className="text-[9px] text-slate-400 font-medium block mt-0.5">
-                      Seuil: {item.seuil}
-                    </span>
                   </div>
 
                   <button
                     type="button"
-                    onClick={() => reapprovisionnerStock(item.id)}
+                    onClick={() => modifierStockProduit(item.id, item.stock + 20)}
                     className="px-3 py-1.5 bg-[#4880FF] hover:bg-blue-600 text-white font-bold text-xs rounded-xl shadow-xs transition-all"
-                    title="Lancer un réapprovisionnement"
+                    title="Lancer un réapprovisionnement de 20 unités"
                   >
                     + Stock
                   </button>
@@ -230,7 +199,7 @@ export default function PageDashboardAdmin() {
               </div>
             ))}
 
-            {stocksAffiches.length === 0 && (
+            {stocksCritiques.length === 0 && (
               <div className="flex items-center justify-center gap-2 text-xs text-slate-400 font-medium py-4">
                 <Tick01Icon size={16} className="text-emerald-500" />
                 <span>Aucun stock critique à signaler actuellement.</span>
@@ -239,7 +208,7 @@ export default function PageDashboardAdmin() {
           </div>
         </div>
 
-        {/* Widget 2: Commandes Urgentes a Traiter */}
+        {/* Widget 2: Commandes Urgentes à Traiter */}
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2.5">
@@ -273,26 +242,26 @@ export default function PageDashboardAdmin() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="font-mono font-bold text-xs text-[#4880FF]">
-                      {cmd.id}
+                      {cmd.reference}
                     </span>
-                    <span className="px-2 py-0.5 rounded bg-rose-500 text-white font-extrabold text-[9px]">
-                      {cmd.priorite}
+                    <span className="px-2 py-0.5 rounded bg-amber-500 text-white font-extrabold text-[9px] uppercase">
+                      {cmd.statut.replace("_", " ")}
                     </span>
                   </div>
-                  <p className="font-bold text-xs text-slate-800">{cmd.client}</p>
+                  <p className="font-bold text-xs text-slate-800">{cmd.clientNom}</p>
                   <p className="text-[10px] text-slate-400">
-                    {cmd.articles} articles • {cmd.date}
+                    {cmd.totalArticles} articles • {cmd.dateCommande}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
                   <span className="font-black text-xs text-slate-900">
-                    {formatPrix(cmd.montant)} FCFA
+                    {formatPrix(cmd.montantTotal)} FCFA
                   </span>
 
                   <button
                     type="button"
-                    onClick={() => validerCommandeUrgente(cmd.id)}
+                    onClick={() => modifierStatutCommande(cmd.id, "validee")}
                     className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all"
                   >
                     Valider

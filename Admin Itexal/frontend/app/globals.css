@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Loader Uiverse.io by SchawnnahJ */ 
+.loader {
+  position: relative;
+  width: 2.5em;
+  height: 2.5em;
+  transform: rotate(165deg);
+}
+.loader:before, .loader:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 0.25em;
+  transform: translate(-50%, -50%);
+}
+.loader:before {
+  animation: before8 2s infinite;
+}
+.loader:after {
+  animation: after6 2s infinite;
+}
+@keyframes before8 {
+  0% {
+    width: 0.5em;
+    box-shadow: 1em -0.5em rgba(72, 128, 255, 0.75), -1em 0.5em rgba(255, 255, 255, 0.75);
+  }
+  35% {
+    width: 2.5em;
+    box-shadow: 0 -0.5em rgba(72, 128, 255, 0.75), 0 0.5em rgba(255, 255, 255, 0.75);
+  }
+  70% {
+    width: 0.5em;
+    box-shadow: -1em -0.5em rgba(72, 128, 255, 0.75), 1em 0.5em rgba(255, 255, 255, 0.75);
+  }
+  100% {
+    box-shadow: 1em -0.5em rgba(72, 128, 255, 0.75), -1em 0.5em rgba(255, 255, 255, 0.75);
+  }
+}
+@keyframes after6 {
+  0% {
+    height: 0.5em;
+    box-shadow: 0.5em 1em rgba(255, 255, 255, 0.75), -0.5em -1em rgba(72, 128, 255, 0.75);
+  }
+  35% {
+    height: 2.5em;
+    box-shadow: 0.5em 0 rgba(255, 255, 255, 0.75), -0.5em 0 rgba(72, 128, 255, 0.75);
+  }
+  70% {
+    height: 0.5em;
+    box-shadow: 0.5em -1em rgba(255, 255, 255, 0.75), -0.5em 1em rgba(72, 128, 255, 0.75);
+  }
+  100% {
+    box-shadow: 0.5em 1em rgba(255, 255, 255, 0.75), -0.5em -1em rgba(72, 128, 255, 0.75);
+  }
+}
+.loader {
+  position: absolute;
+  top: calc(50% - 1.25em);
+  left: calc(50% - 1.25em);
+}
+
+/* Animations de transition de page */
+@keyframes pageEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-page-entrance {
+  animation: pageEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes topProgressBar {
+  0% { width: 0%; opacity: 1; }
+  50% { width: 70%; opacity: 1; }
+  100% { width: 100%; opacity: 0; }
+}
+
+.animate-top-bar {
+  animation: topProgressBar 0.45s ease-out forwards;
+}
+
+/* ── Character Offline Loader (Uiverse.io by AatreyuShau) ── */
+.loader-character {
+  scale: 0.75;
+  position: relative;
+  width: 200px;
+  height: 200px;
+  translate: 10px -20px;
+}
+.loader-character svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.loader-character .head {
+  translate: 27px -30px;
+  z-index: 3;
+  animation: bob 1s infinite ease-in;
+}
+.loader-character .bod {
+  translate: 0px 30px;
+  z-index: 3;
+  animation: bob 1s infinite ease-in-out;
+}
+.loader-character .legr {
+  translate: 75px 135px;
+  z-index: 0;
+  animation: rstep 1s infinite ease-in;
+  animation-delay: 0.45s;
+}
+.loader-character .legl {
+  translate: 30px 155px;
+  z-index: 3;
+  animation: lstep 1s infinite ease-in;
+}
+@keyframes bob {
+  0% { transform: translateY(0) rotate(3deg); }
+  5% { transform: translateY(0) rotate(3deg); }
+  25% { transform: translateY(5px) rotate(0deg); }
+  50% { transform: translateY(0px) rotate(-3deg); }
+  70% { transform: translateY(5px) rotate(0deg); }
+  100% { transform: translateY(0) rotate(3deg); }
+}
+@keyframes lstep {
+  0% { transform: translateY(0) rotate(-5deg); }
+  33% { transform: translateY(-15px) translate(32px) rotate(35deg); }
+  66% { transform: translateY(0) translate(25px) rotate(-25deg); }
+  100% { transform: translateY(0) rotate(-5deg); }
+}
+@keyframes rstep {
+  0% { transform: translateY(0) translate(0px) rotate(-5deg); }
+  33% { transform: translateY(-10px) translate(30px) rotate(35deg); }
+  66% { transform: translateY(0) translate(20px) rotate(-25deg); }
+  100% { transform: translateY(0) translate(0px) rotate(-5deg); }
+}
+#gnd {
+  translate: -140px 0;
+  rotate: 10deg;
+  z-index: -1;
+  filter: blur(0.5px) drop-shadow(1px 3px 5px #000000);
+  opacity: 0.25;
+  animation: scroll 5s infinite linear;
+}
+@keyframes scroll {
+  0% { transform: translateY(25px) translate(50px); opacity: 0; }
+  33% { opacity: 0.25; }
+  66% { opacity: 0.25; }
+  to { transform: translateY(-50px) translate(-100px); opacity: 0; }
+}

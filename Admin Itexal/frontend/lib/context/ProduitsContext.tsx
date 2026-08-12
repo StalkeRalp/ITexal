@@ -35,8 +35,8 @@ interface ProduitsContextType {
   supprimerCategorie: (id: string) => void;
 
   // Actions Marques
-  creerMarque: (nom: string, description?: string, paysOrigine?: string) => void;
-  modifierMarque: (id: string, nom: string, description?: string) => void;
+  creerMarque: (nom: string, description?: string, paysOrigine?: string, logo?: string) => void;
+  modifierMarque: (id: string, nom: string, description?: string, logo?: string) => void;
   supprimerMarque: (id: string) => void;
 
   // Actions Promotions
@@ -287,7 +287,7 @@ export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   // Actions Marques
-  const creerMarque = (nom: string, description?: string, paysOrigine?: string) => {
+  const creerMarque = (nom: string, description?: string, paysOrigine?: string, logo?: string) => {
     const nomClean = nettoyerChaineXSS(nom.trim());
     const descClean = description ? nettoyerChaineXSS(description.trim()) : undefined;
 
@@ -296,6 +296,7 @@ export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       nom: nomClean,
       slug: nomClean.toLowerCase().replace(/[\s\W]+/g, "-"),
       description: descClean,
+      logo: logo || undefined,
       paysOrigine: paysOrigine || "Cameroun",
       nombreProduits: 0,
       statut: "Active",
@@ -304,10 +305,14 @@ export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     sauvegarderMars([...marques, nouvelle]);
   };
 
-  const modifierMarque = (id: string, nom: string, description?: string) => {
+  const modifierMarque = (id: string, nom: string, description?: string, logo?: string) => {
     const nomClean = nettoyerChaineXSS(nom.trim());
     sauvegarderMars(
-      marques.map((m) => (m.id === id ? { ...m, nom: nomClean, description: description ? nettoyerChaineXSS(description) : m.description } : m))
+      marques.map((m) => (
+        m.id === id
+          ? { ...m, nom: nomClean, description: description ? nettoyerChaineXSS(description) : m.description, logo: logo !== undefined ? logo : m.logo }
+          : m
+      ))
     );
   };
 

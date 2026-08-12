@@ -2,16 +2,21 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ParametresService {
-  async obtenirParametres() {
-    return {
-      succes: true,
-      donnees: {
-        nomBoutique: 'ITexal Cosmétiques',
-        emailContact: 'contact@itexal.cm',
-        telephoneContact: '+237 000 000 000',
-        devise: 'FCFA',
-        seuilStockAlerteParDefaut: 5,
-      },
-    };
+  private parametres = {
+    nomSite: 'ITexal Admin Portal',
+    devise: 'FCFA',
+    tva: 19.25,
+    emailSupport: 'support@itexal.cm',
+    telephoneSupport: '+237 699 00 11 22',
+    notificationsEmail: true,
+  };
+
+  async obtenir() {
+    return { succes: true, donnees: this.parametres };
+  }
+
+  async modifier(nouveauxParametres: any) {
+    this.parametres = { ...this.parametres, ...nouveauxParametres };
+    return { succes: true, message: 'Paramètres enregistrés avec succès', donnees: this.parametres };
   }
 }

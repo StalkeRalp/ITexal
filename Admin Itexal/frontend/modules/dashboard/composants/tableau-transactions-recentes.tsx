@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { useProduits } from "@/lib/context/ProduitsContext";
 import { useCommandes } from "@/lib/context/CommandesContext";
-import { formaterPrix } from "@/lib/utilitaires/formatage";
+import { formaterPrix, obtenirImageSecurisee, gererErreurChargementImage } from "@/lib/utilitaires/formatage";
 import { Tag01Icon, PackageIcon, AlertCircleIcon, ArrowDown01Icon } from "hugeicons-react";
 
 export const TableauTransactionsRecentes: React.FC = () => {
@@ -153,12 +153,10 @@ export const TableauTransactionsRecentes: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden relative shrink-0">
                       <img
-                        src={deal.produit.image || deal.produit.images?.[0] || "/images/placeholder.png"}
+                        src={obtenirImageSecurisee(deal.produit.image || deal.produit.images?.[0], deal.categorie)}
                         alt={deal.produit.nom}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = "none";
-                        }}
+                        onError={(e) => gererErreurChargementImage(e, deal.categorie)}
                       />
                     </div>
                     <div>

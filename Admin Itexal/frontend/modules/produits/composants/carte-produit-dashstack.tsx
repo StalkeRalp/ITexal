@@ -115,10 +115,10 @@ export const CarteProduitDashStack: React.FC<CarteProduitDashStackProps> = ({
                 {produit.nom}
               </h3>
               <p className="text-xs font-extrabold text-[#4880FF] mt-1">
-                {formatPrix(produit.prixPromotionnel || produit.prix)} FCFA
+                {formatPrix(produit.prixPromotionnel || produit.prix)}
                 {produit.prixPromotionnel && (
                   <span className="text-[10px] line-through text-slate-400 font-medium ml-2">
-                    {formatPrix(produit.prix)} FCFA
+                    {formatPrix(produit.prix)}
                   </span>
                 )}
               </p>

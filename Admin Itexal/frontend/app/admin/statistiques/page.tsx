@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { formatPrix, formatNombre } from "@/lib/formatteur";
+import { obtenirImageSecurisee, gererErreurChargementImage } from "@/lib/utilitaires/formatage";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { useProduits } from "@/lib/context/ProduitsContext";
 import { useCommandes } from "@/lib/context/CommandesContext";
@@ -355,8 +356,9 @@ export default function PageStatistiquesAdmin() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <img
-                  src={p.images?.[0] || p.image}
+                  src={obtenirImageSecurisee(p.images?.[0] || p.image, p.nomCategorie)}
                   alt={p.nom}
+                  onError={(e) => gererErreurChargementImage(e, p.nomCategorie)}
                   className="w-9 h-9 rounded-xl object-cover shrink-0 border border-white/40"
                 />
                 <div className="overflow-hidden">
@@ -370,7 +372,7 @@ export default function PageStatistiquesAdmin() {
               </div>
 
               <div className="flex items-center justify-between text-[10px] pt-1 border-t border-white/10 text-white/90 font-bold">
-                <span>{formatPrix(p.prix)} FCFA</span>
+                <span>{formatPrix(p.prix)}</span>
                 <span className="text-amber-300 font-extrabold">Stats →</span>
               </div>
             </button>
@@ -568,8 +570,9 @@ export default function PageStatistiquesAdmin() {
                   </span>
 
                   <img
-                    src={p.imageProduit}
+                    src={obtenirImageSecurisee(p.imageProduit)}
                     alt={p.nomProduit}
+                    onError={(e) => gererErreurChargementImage(e)}
                     className="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0"
                   />
 
@@ -586,7 +589,7 @@ export default function PageStatistiquesAdmin() {
                 <div className="flex items-center gap-3">
                   <div className="text-right">
                     <span className="text-xs font-black text-slate-900 block">
-                      {formatPrix(p.chiffreAffaires)} FCFA
+                      {formatPrix(p.chiffreAffaires)}
                     </span>
                     <span className="text-[10px] font-bold text-[#5B63F6] group-hover:underline">
                       Voir stats →

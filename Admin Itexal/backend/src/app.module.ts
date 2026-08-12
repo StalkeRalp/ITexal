@@ -12,6 +12,7 @@ import { ContenusModule } from './modules/contenus/contenus.module';
 import { UtilisateursModule } from './modules/utilisateurs/utilisateurs.module';
 import { JournalModule } from './modules/journal/journal.module';
 import { ParametresModule } from './modules/parametres/parametres.module';
+import { UploadModule } from './modules/upload/upload.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ParametresModule } from './modules/parametres/parametres.module';
     UtilisateursModule,
     JournalModule,
     ParametresModule,
+    UploadModule,
   ],
   controllers: [],
   providers: [],

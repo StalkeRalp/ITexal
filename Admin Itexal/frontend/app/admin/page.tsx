@@ -10,6 +10,7 @@ import { useCommandes } from "@/lib/context/CommandesContext";
 import { useNotifications } from "@/lib/context/NotificationContext";
 import { useLanguage } from "@/lib/context/LanguageContext";
 import { StatistiqueService } from "@/lib/services/statistique-service";
+import { obtenirImageSecurisee, gererErreurChargementImage } from "@/lib/utilitaires/formatage";
 import {
   UserGroupIcon,
   PackageIcon,
@@ -169,8 +170,9 @@ export default function PageDashboardAdmin() {
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <img
-                      src={prod.images?.[0] || prod.image || "/placeholder.png"}
+                      src={obtenirImageSecurisee(prod.images?.[0] || prod.image, prod.nomCategorie)}
                       alt={prod.nom}
+                      onError={(e) => gererErreurChargementImage(e, prod.nomCategorie)}
                       className="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0"
                     />
                     <div className="min-w-0">

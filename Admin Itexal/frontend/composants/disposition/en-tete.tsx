@@ -4,9 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { MenuProfil } from "./menu-profil";
-import { type Langue, getLangue, setLangue } from "./barre-laterale";
 import { useNotifications } from "@/lib/context/NotificationContext";
-import { useLanguage } from "@/lib/context/LanguageContext";
+import { useLanguage, type Langue } from "@/lib/context/LanguageContext";
 import {
   Search01Icon,
   Notification01Icon,
@@ -29,41 +28,15 @@ import {
   ArrowRight01Icon,
 } from "hugeicons-react";
 
-// ── Language configs ───────────────────────────────────────────────────────────
+// ── Only 2 languages: FR and EN ──────────────────────────────────────────────
 const LANGUES: { code: Langue; label: string; flag: string; natif: string }[] = [
-  { code: "fr", label: "Français",  flag: "🇫🇷", natif: "Français" },
-  { code: "en", label: "English",   flag: "🇬🇧", natif: "English" },
-  { code: "ar", label: "العربية",   flag: "🇸🇦", natif: "العربية" },
+  { code: "fr", label: "Français", flag: "🇫🇷", natif: "Français" },
+  { code: "en", label: "English",  flag: "🇬🇧", natif: "English" },
 ];
-
-// ── Searchable routes with HugeIcons ──────────────────────────────────────────
-const ROUTES = [
-  { label: { fr: "Dashboard", en: "Dashboard", ar: "لوحة التحكم" }, href: "/admin", Icon: DashboardSquare01Icon },
-  { label: { fr: "Produits", en: "Products", ar: "المنتجات" }, href: "/admin/produits", Icon: PackageIcon },
-  { label: { fr: "Commandes", en: "Orders", ar: "الطلبات" }, href: "/admin/commandes", Icon: ShoppingCart01Icon },
-  { label: { fr: "Clients", en: "Customers", ar: "العملاء" }, href: "/admin/clients", Icon: UserGroupIcon },
-  { label: { fr: "Stocks", en: "Stocks", ar: "المخزون" }, href: "/admin/stocks", Icon: Store01Icon },
-  { label: { fr: "Catégories", en: "Categories", ar: "الفئات" }, href: "/admin/categories", Icon: Folder01Icon },
-  { label: { fr: "Marques", en: "Brands", ar: "العلامات" }, href: "/admin/marques", Icon: Tag01Icon },
-  { label: { fr: "Promotions", en: "Promotions", ar: "العروض" }, href: "/admin/promotions", Icon: Discount01Icon },
-  { label: { fr: "Statistiques", en: "Statistics", ar: "الإحصاءات" }, href: "/admin/statistiques", Icon: Chart01Icon },
-  { label: { fr: "Notifications", en: "Notifications", ar: "الإشعارات" }, href: "/admin/notifications", Icon: Notification01Icon },
-  { label: { fr: "Paramètres", en: "Settings", ar: "الإعدادات" }, href: "/admin/parametres", Icon: Settings02Icon },
-  { label: { fr: "Journal", en: "Activity Log", ar: "السجل" }, href: "/admin/journal", Icon: ClipboardIcon },
-  { label: { fr: "Utilisateurs", en: "Users", ar: "المستخدمون" }, href: "/admin/utilisateurs", Icon: User02Icon },
-  { label: { fr: "Contenus", en: "Contents", ar: "المحتوى" }, href: "/admin/contenus", Icon: File01Icon },
-];
-
-const PLACEHOLDERS: Record<Langue, string> = {
-  fr: "Rechercher une page, un module…",
-  en: "Search a page or module…",
-  ar: "ابحث عن صفحة أو وحدة…",
-};
 
 export const EnTete: React.FC = () => {
   const { nombreNonLues } = useNotifications();
-  const { langue: currentGlobalLang, changerLangue: setGlobalLang } = useLanguage();
-  const [langue, setLangueState] = useState<Langue>("fr");
+  const { langue, changerLangue, t } = useLanguage();
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -72,22 +45,31 @@ export const EnTete: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    setLangueState(getLangue());
-    const handler = () => setLangueState(getLangue());
-    window.addEventListener("itexal_lang_change", handler);
-    return () => window.removeEventListener("itexal_lang_change", handler);
-  }, []);
+  const routes = [
+    { key: "navigation.dashboard", defaultLabel: "Dashboard", href: "/admin", Icon: DashboardSquare01Icon },
+    { key: "navigation.products", defaultLabel: "Produits", href: "/admin/produits", Icon: PackageIcon },
+    { key: "navigation.orders", defaultLabel: "Commandes", href: "/admin/commandes", Icon: ShoppingCart01Icon },
+    { key: "navigation.clients", defaultLabel: "Clients", href: "/admin/clients", Icon: UserGroupIcon },
+    { key: "navigation.stocks", defaultLabel: "Stocks", href: "/admin/stocks", Icon: Store01Icon },
+    { key: "navigation.categories", defaultLabel: "Catégories", href: "/admin/categories", Icon: Folder01Icon },
+    { key: "navigation.marques", defaultLabel: "Marques", href: "/admin/marques", Icon: Tag01Icon },
+    { key: "navigation.promotions", defaultLabel: "Promotions", href: "/admin/promotions", Icon: Discount01Icon },
+    { key: "navigation.statistics", defaultLabel: "Statistiques", href: "/admin/statistiques", Icon: Chart01Icon },
+    { key: "navigation.notifications", defaultLabel: "Notifications", href: "/admin/notifications", Icon: Notification01Icon },
+    { key: "navigation.parametres", defaultLabel: "Paramètres", href: "/admin/parametres", Icon: Settings02Icon },
+    { key: "navigation.journal", defaultLabel: "Journal", href: "/admin/journal", Icon: ClipboardIcon },
+    { key: "navigation.utilisateurs", defaultLabel: "Utilisateurs", href: "/admin/utilisateurs", Icon: User02Icon },
+    { key: "navigation.contenus", defaultLabel: "Contenus", href: "/admin/contenus", Icon: File01Icon },
+  ];
 
   useEffect(() => {
-    const route = ROUTES.find((r) => r.href === pathname);
+    const route = routes.find((r) => r.href === pathname);
     if (route) {
-      const pageTitle = route.label[langue] || route.label.fr;
-      document.title = `${pageTitle} | Cosmetic Admin`;
+      document.title = `${t(route.key)} | Cosmetic Admin`;
     } else if (pathname === "/admin") {
-      document.title = "Dashboard | Cosmetic Admin";
+      document.title = `${t("navigation.dashboard")} | Cosmetic Admin`;
     }
-  }, [pathname, langue]);
+  }, [pathname, langue, t]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -98,20 +80,11 @@ export const EnTete: React.FC = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const changerLangue = (code: Langue) => {
-    setLangue(code);
-    setLangueState(code);
-    if (code === "fr" || code === "en") {
-      setGlobalLang(code);
-    }
-    setLangMenuOpen(false);
-  };
-
-  const currentLang = LANGUES.find((l) => l.code === langue)!;
+  const currentLang = LANGUES.find((l) => l.code === langue) || LANGUES[0];
 
   const suggestions = query.trim()
-    ? ROUTES.filter((r) =>
-        r.label[langue].toLowerCase().includes(query.toLowerCase()) ||
+    ? routes.filter((r) =>
+        t(r.key).toLowerCase().includes(query.toLowerCase()) ||
         r.href.toLowerCase().includes(query.toLowerCase())
       ).slice(0, 6)
     : [];
@@ -138,9 +111,8 @@ export const EnTete: React.FC = () => {
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSearchOpen(true); }}
             onFocus={() => setSearchOpen(true)}
-            placeholder={PLACEHOLDERS[langue]}
-            className="w-full pl-10 pr-9 py-2.5 bg-[#F5F6FA] border border-transparent rounded-2xl text-[13px] font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#4880FF]/40 focus:shadow-xs transition-all duration-200"
-            dir={langue === "ar" ? "rtl" : "ltr"}
+            placeholder={t("navigation.searchPlaceholder")}
+            className="w-full pl-10 pr-9 py-2.5 bg-[#F5F6FA] border border-transparent rounded-2xl text-[13px] font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#5B63F6]/40 focus:shadow-xs transition-all duration-200"
           />
           {query && (
             <button
@@ -164,16 +136,16 @@ export const EnTete: React.FC = () => {
                   key={r.href}
                   type="button"
                   onMouseDown={() => handleSuggestion(r.href)}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-blue-50/70 transition-colors text-left group"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-indigo-50/70 transition-colors text-left group"
                 >
-                  <span className="w-7 h-7 rounded-xl bg-slate-100 group-hover:bg-blue-100 text-slate-600 group-hover:text-[#4880FF] flex items-center justify-center shrink-0 transition-colors">
+                  <span className="w-7 h-7 rounded-xl bg-slate-100 group-hover:bg-indigo-100 text-slate-600 group-hover:text-[#5B63F6] flex items-center justify-center shrink-0 transition-colors">
                     <Icon size={18} strokeWidth={2} />
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-bold text-slate-800 group-hover:text-[#4880FF] transition-colors">{r.label[langue]}</p>
+                    <p className="text-[13px] font-bold text-slate-800 group-hover:text-[#5B63F6] transition-colors">{t(r.key)}</p>
                     <p className="text-[11px] text-slate-400 font-mono">{r.href}</p>
                   </div>
-                  <ArrowRight01Icon size={16} className="text-slate-300 group-hover:text-[#4880FF] transition-colors" />
+                  <ArrowRight01Icon size={16} className="text-slate-300 group-hover:text-[#5B63F6] transition-colors" />
                 </button>
               );
             })}
@@ -184,8 +156,7 @@ export const EnTete: React.FC = () => {
         {searchOpen && query.trim() && suggestions.length === 0 && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl p-4 text-center z-50">
             <p className="text-xs text-slate-400 font-medium">
-              {langue === "fr" ? "Aucun résultat pour" : langue === "en" ? "No result for" : "لا نتائج لـ"}{" "}
-              <span className="font-bold text-slate-600">"{query}"</span>
+              {t("common.noResults")} <span className="font-bold text-slate-600">"{query}"</span>
             </p>
           </div>
         )}
@@ -197,9 +168,9 @@ export const EnTete: React.FC = () => {
         {/* Notification bell */}
         <Link
           href="/admin/notifications"
-          className="relative p-2.5 rounded-xl text-slate-500 hover:text-[#4880FF] hover:bg-blue-50/80 transition-all duration-200 group"
+          className="relative p-2.5 rounded-xl text-slate-500 hover:text-[#5B63F6] hover:bg-indigo-50/80 transition-all duration-200 group"
           aria-label="Notifications ITexal"
-          title="Notifications"
+          title={t("navigation.notifications")}
         >
           <Notification01Icon size={20} strokeWidth={2} />
           {nombreNonLues > 0 && (
@@ -219,8 +190,8 @@ export const EnTete: React.FC = () => {
             onClick={() => setLangMenuOpen((v) => !v)}
             className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-[13px] font-bold transition-all duration-200 ${
               langMenuOpen
-                ? "bg-blue-50 border-[#4880FF]/30 text-[#4880FF]"
-                : "bg-white border-slate-200 text-slate-700 hover:border-[#4880FF]/30 hover:bg-blue-50/60"
+                ? "bg-indigo-50 border-[#5B63F6]/30 text-[#5B63F6]"
+                : "bg-white border-slate-200 text-slate-700 hover:border-[#5B63F6]/30 hover:bg-indigo-50/60"
             }`}
           >
             <span className="text-lg leading-none">{currentLang.flag}</span>
@@ -233,10 +204,10 @@ export const EnTete: React.FC = () => {
 
           {/* Language dropdown */}
           {langMenuOpen && (
-            <div className="absolute top-full right-0 mt-2 w-52 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50">
+            <div className="absolute top-full right-0 mt-2 w-52 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50 animate-fadeIn">
               <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
                 <p className="text-[11px] font-black text-slate-500 uppercase tracking-wider">
-                  {langue === "fr" ? "Choisir la langue" : langue === "en" ? "Choose language" : "اختر اللغة"}
+                  {t("navigation.chooseLanguage")}
                 </p>
               </div>
               {LANGUES.map((l) => {
@@ -245,10 +216,13 @@ export const EnTete: React.FC = () => {
                   <button
                     key={l.code}
                     type="button"
-                    onClick={() => changerLangue(l.code)}
+                    onClick={() => {
+                      changerLangue(l.code);
+                      setLangMenuOpen(false);
+                    }}
                     className={`w-full flex items-center gap-3 px-4 py-3 transition-all duration-150 ${
                       isActive
-                        ? "bg-blue-50 text-[#4880FF]"
+                        ? "bg-indigo-50 text-[#5B63F6]"
                         : "hover:bg-slate-50 text-slate-700"
                     }`}
                   >
@@ -258,7 +232,7 @@ export const EnTete: React.FC = () => {
                       <p className="text-[11px] text-slate-400 font-medium mt-0.5">{l.label}</p>
                     </div>
                     {isActive && (
-                      <span className="w-5 h-5 rounded-full bg-[#4880FF] text-white flex items-center justify-center shrink-0">
+                      <span className="w-5 h-5 rounded-full bg-[#5B63F6] text-white flex items-center justify-center shrink-0">
                         <Tick01Icon size={12} strokeWidth={3} />
                       </span>
                     )}

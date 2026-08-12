@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import { BanniereSite, PageStatique } from "@/modules/contenus/types/contenu";
 import { ModalBanniereFormulaire } from "@/modules/contenus/composants/modal-banniere-formulaire";
 import {
@@ -14,6 +15,7 @@ import {
 } from "hugeicons-react";
 
 export default function PageContenusAdmin() {
+  const { t } = useLanguage();
   const [ongletActif, setOngletActif] = useState<"bannieres" | "pages">("bannieres");
 
   const [bannieres, setBannieres] = useState<BanniereSite[]>([
@@ -96,7 +98,7 @@ export default function PageContenusAdmin() {
   };
 
   const supprimerBanniere = (id: string) => {
-    if (confirm("Voulez-vous supprimer cette bannière ?")) {
+    if (confirm(t("contenus.confirmDeleteBanner"))) {
       setBannieres((prev) => prev.filter((b) => b.id !== id));
     }
   };
@@ -119,15 +121,15 @@ export default function PageContenusAdmin() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fadeIn">
       {/* Title & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-            Gestion des Contenus du Site
+            {t("contenus.title")}
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Bannières d'accueil, sliders promotionnels et pages de conseils.
+            {t("contenus.subtitle")}
           </p>
         </div>
 
@@ -138,10 +140,10 @@ export default function PageContenusAdmin() {
               setBanniereAEditer(null);
               setModalBanniereOuvert(true);
             }}
-            className="px-5 py-2.5 bg-[#4880FF] hover:bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 transition-all flex items-center gap-2"
+            className="px-5 py-2.5 bg-[#4880FF] hover:bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 transition-all flex items-center gap-2 cursor-pointer"
           >
             <Add01Icon size={16} strokeWidth={2.5} />
-            <span>Ajouter une Bannière</span>
+            <span>{t("contenus.addBanner")}</span>
           </button>
         )}
       </div>
@@ -151,27 +153,27 @@ export default function PageContenusAdmin() {
         <button
           type="button"
           onClick={() => setOngletActif("bannieres")}
-          className={`pb-3 transition-all flex items-center gap-2 ${
+          className={`pb-3 transition-all flex items-center gap-2 cursor-pointer ${
             ongletActif === "bannieres"
               ? "border-b-2 border-[#4880FF] text-[#4880FF]"
               : "text-slate-500 hover:text-slate-800"
           }`}
         >
           <Image01Icon size={16} />
-          <span>Bannières & Sliders d'Accueil ({bannieres.length})</span>
+          <span>{t("contenus.bannersTitle")} ({bannieres.length})</span>
         </button>
 
         <button
           type="button"
           onClick={() => setOngletActif("pages")}
-          className={`pb-3 transition-all flex items-center gap-2 ${
+          className={`pb-3 transition-all flex items-center gap-2 cursor-pointer ${
             ongletActif === "pages"
               ? "border-b-2 border-[#4880FF] text-[#4880FF]"
               : "text-slate-500 hover:text-slate-800"
           }`}
         >
           <File01Icon size={16} />
-          <span>Pages Statiques & Articles ({pagesStatiques.length})</span>
+          <span>{t("contenus.pagesTitle")} ({pagesStatiques.length})</span>
         </button>
       </div>
 
@@ -197,7 +199,7 @@ export default function PageContenusAdmin() {
                       : "bg-slate-700 text-slate-200"
                   }`}
                 >
-                  {b.actif ? "VISIBLE" : "MASQUÉ"}
+                  {b.actif ? t("contenus.visible") : t("contenus.hidden")}
                 </span>
 
                 <span className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 text-slate-800 font-bold text-[10px] rounded-lg backdrop-blur-xs">
@@ -227,7 +229,7 @@ export default function PageContenusAdmin() {
                       type="button"
                       onClick={() => basculerStatutBanniere(b.id)}
                       aria-label="Masquer ou Afficher"
-                      className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+                      className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
                       title="Masquer/Afficher"
                     >
                       {b.actif ? <ViewIcon size={14} /> : <ViewOffIcon size={14} />}
@@ -238,18 +240,18 @@ export default function PageContenusAdmin() {
                         setBanniereAEditer(b);
                         setModalBanniereOuvert(true);
                       }}
-                      aria-label="Éditer"
-                      className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
-                      title="Éditer"
+                      aria-label={t("common.edit")}
+                      className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+                      title={t("common.edit")}
                     >
                       <Edit02Icon size={14} />
                     </button>
                     <button
                       type="button"
                       onClick={() => supprimerBanniere(b.id)}
-                      aria-label="Supprimer"
-                      className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white transition-colors"
-                      title="Supprimer"
+                      aria-label={t("common.delete")}
+                      className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white transition-colors cursor-pointer"
+                      title={t("common.delete")}
                     >
                       <Delete02Icon size={14} />
                     </button>
@@ -272,8 +274,8 @@ export default function PageContenusAdmin() {
                   <th className="py-4 px-4">SLUG / URL</th>
                   <th className="py-4 px-4">CATÉGORIE</th>
                   <th className="py-4 px-4">DERNIÈRE M.À.J</th>
-                  <th className="py-4 px-4 text-center">STATUT</th>
-                  <th className="py-4 px-4 text-center">ACTIONS</th>
+                  <th className="py-4 px-4 text-center">{t("common.status")}</th>
+                  <th className="py-4 px-4 text-center">{t("common.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs text-slate-700 font-medium">
@@ -300,13 +302,13 @@ export default function PageContenusAdmin() {
                       <button
                         type="button"
                         onClick={() => basculerPublicationPage(p.id)}
-                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
+                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                           p.publie
                             ? "bg-emerald-100 text-emerald-700"
                             : "bg-amber-100 text-amber-800"
                         }`}
                       >
-                        {p.publie ? "Publié" : "Brouillon"}
+                        {p.publie ? t("contenus.published") : t("contenus.draft")}
                       </button>
                     </td>
 
@@ -314,17 +316,17 @@ export default function PageContenusAdmin() {
                       <div className="inline-flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => alert(`Aperçu de la page /${p.slug}`)}
-                          className="px-3 py-1.5 bg-[#F8F9FD] hover:bg-blue-50 text-[#4880FF] font-bold rounded-xl border border-slate-200 flex items-center gap-1"
+                          onClick={() => alert(`Aperçu /${p.slug}`)}
+                          className="px-3 py-1.5 bg-[#F8F9FD] hover:bg-blue-50 text-[#4880FF] font-bold rounded-xl border border-slate-200 flex items-center gap-1 cursor-pointer"
                         >
                           <ViewIcon size={14} />
-                          <span>Aperçu</span>
+                          <span>{t("contenus.preview")}</span>
                         </button>
                         <button
                           type="button"
-                          onClick={() => alert(`Édition de /${p.slug}`)}
-                          aria-label="Éditer la page"
-                          className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center text-xs"
+                          onClick={() => alert(`Édition /${p.slug}`)}
+                          aria-label={t("common.edit")}
+                          className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center text-xs cursor-pointer"
                         >
                           <Edit02Icon size={14} />
                         </button>

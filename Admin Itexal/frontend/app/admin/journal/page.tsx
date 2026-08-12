@@ -7,6 +7,7 @@ import { ModalDetailLog } from "@/modules/journal/composants/modal-detail-log";
 import { ModalExportation } from "@/composants-communs/modal-exportation";
 import { formatNombre } from "@/lib/formatteur";
 import { exporterCSV, exporterRapportPDF } from "@/lib/utilitaires/exportateur";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import {
   File01Icon,
   Download01Icon,
@@ -16,6 +17,7 @@ import {
 } from "hugeicons-react";
 
 export default function PageJournalAdmin() {
+  const { t } = useLanguage();
   const [logs, setLogs] = useState<LogAudit[]>([
     {
       id: "log-109",
@@ -157,7 +159,7 @@ export default function PageJournalAdmin() {
 
     if (format === "csv") {
       exporterCSV("journal_audit_itexal", enTetes, lignes);
-      setMessageAction("Le fichier du journal d'audit CSV a été généré et téléchargé.");
+      setMessageAction(t("common.itemCreated"));
     } else {
       exporterRapportPDF(
         "RAPPORT DU JOURNAL D'AUDIT & SÉCURITÉ",
@@ -170,20 +172,16 @@ export default function PageJournalAdmin() {
         enTetes,
         lignes
       );
-      setMessageAction("Le rapport du journal d'audit PDF a été généré.");
+      setMessageAction(t("common.itemCreated"));
     }
 
     setTimeout(() => setMessageAction(""), 4000);
   };
 
   const purgerLogsAnciens = () => {
-    if (
-      confirm(
-        "Êtes-vous sûr de vouloir archiver et purger les événements d'audit anciens ? Cette action est réservée au Super Admin."
-      )
-    ) {
+    if (confirm(t("journal.purgeConfirm"))) {
       setLogs((prev) => prev.slice(0, 3));
-      setMessageAction("Les anciens logs d'audit ont été archivés avec succès.");
+      setMessageAction(t("journal.archivedSuccess"));
       setTimeout(() => setMessageAction(""), 4000);
     }
   };
@@ -194,10 +192,10 @@ export default function PageJournalAdmin() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-            Journal d'Activités & Log d'Audit
+            {t("journal.title")}
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Traçabilité intégrale des événements administrateurs, accès et modifications système.
+            {t("journal.subtitle")}
           </p>
         </div>
 
@@ -208,16 +206,16 @@ export default function PageJournalAdmin() {
             className="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
           >
             <Download01Icon size={16} className="text-[#4880FF]" />
-            <span>Exporter / Audit (PDF/CSV)</span>
+            <span>{t("journal.exportAudit")}</span>
           </button>
 
           <button
             type="button"
             onClick={purgerLogsAnciens}
-            className="px-4 py-2.5 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white font-bold text-xs rounded-xl border border-rose-200 transition-all flex items-center gap-2"
+            className="px-4 py-2.5 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white font-bold text-xs rounded-xl border border-rose-200 transition-all flex items-center gap-2 cursor-pointer"
           >
             <Delete02Icon size={16} />
-            <span>Purger Anciens Logs</span>
+            <span>{t("journal.purgeLogs")}</span>
           </button>
         </div>
       </div>
@@ -232,7 +230,9 @@ export default function PageJournalAdmin() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         <div className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Événements Audit</span>
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              {t("journal.totalEvents")}
+            </span>
             <h3 className="text-2xl font-black text-slate-800 mt-1">
               {formatNombre(totalLogs)}
             </h3>
@@ -244,7 +244,9 @@ export default function PageJournalAdmin() {
 
         <div className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-rose-500 uppercase tracking-wider">Alertes / Échecs Connexion</span>
+            <span className="text-xs font-semibold text-rose-500 uppercase tracking-wider">
+              {t("journal.securityAlerts")}
+            </span>
             <h3 className="text-2xl font-black text-rose-600 mt-1">
               {totalCritiques}
             </h3>
@@ -256,7 +258,9 @@ export default function PageJournalAdmin() {
 
         <div className="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Modifications Métier</span>
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              {t("journal.businessChanges")}
+            </span>
             <h3 className="text-2xl font-black text-emerald-600 mt-1">
               {totalModifsSensibles}
             </h3>
@@ -279,8 +283,8 @@ export default function PageJournalAdmin() {
       {/* Modal Exportation PDF / CSV */}
       <ModalExportation
         ouvert={modalExportOuvert}
-        titre="Exporter le Journal d'Audit"
-        description="Choisissez le format d'exportation souhaité pour enregistrer les événements et logs d'audit administrateurs."
+        titre={t("journal.exportTitle")}
+        description={t("journal.exportDesc")}
         nombreElements={totalLogs}
         onFermer={() => setModalExportOuvert(false)}
         onExporter={executerExportationLogs}

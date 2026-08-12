@@ -38,10 +38,25 @@ export const ModalStatistiquesProduit: React.FC<ModalStatistiquesProduitProps> =
     setMonte(true);
   }, []);
 
-  if (!ouvert || !produit || !monte) return null;
-
-  // Extraction des statistiques réelles pour ce produit
+  // Extraction des statistiques réelles — doit être avant tout return conditionnel (Rules of Hooks)
   const statsProduit = useMemo(() => {
+    if (!produit) return {
+      quantiteTotaleVendue: 0,
+      caTotalGenere: 0,
+      totalOrdersCount: 0,
+      stockTotalInitial: 0,
+      tauxEcoulement: 0,
+      panierMoyen: 0,
+      commandesAssociees: [] as Array<{
+        reference: string;
+        dateCommande: string;
+        nomClient: string;
+        quantite: number;
+        sousTotal: number;
+        statut: string;
+      }>,
+    };
+
     let quantiteTotaleVendue = 0;
     let caTotalGenere = 0;
     const commandesAssociees: Array<{
@@ -87,6 +102,8 @@ export const ModalStatistiquesProduit: React.FC<ModalStatistiquesProduitProps> =
       commandesAssociees,
     };
   }, [produit, commandes]);
+
+  if (!ouvert || !produit || !monte) return null;
 
   const exporterPDF = () => {
     exporterStatistiquesProduitPDF({

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import { Promotion as PromotionVue } from "@/modules/promotions/types/promotion";
 import { ModalPromotionFormulaire } from "@/modules/promotions/composants/modal-promotion-formulaire";
 import { useProduits } from "@/lib/context/ProduitsContext";
@@ -15,6 +16,7 @@ import {
 } from "hugeicons-react";
 
 export default function PagePromotionsAdmin() {
+  const { t, formaterPrix } = useLanguage();
   const { promotions, creerPromotion, modifierPromotion, supprimerPromotion } = useProduits();
   const [recherche, setRecherche] = useState("");
   const [filtreStatut, setFiltreStatut] = useState<"Tous" | "Actif" | "Expiré">("Tous");
@@ -65,7 +67,7 @@ export default function PagePromotionsAdmin() {
   };
 
   const verifierSuppression = (id: string) => {
-    if (confirm("Voulez-vous vraiment supprimer ce code promotionnel ?")) {
+    if (confirm(t("promotions.confirmDelete"))) {
       supprimerPromotion(id);
     }
   };
@@ -99,20 +101,20 @@ export default function PagePromotionsAdmin() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-            Promotions & Code Promo ({promotionsVues.length})
+            {t("promotions.title")} ({promotionsVues.length})
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Gestion des remises commerciales et coupons de réduction Cosmetic Admin.
+            {t("promotions.subtitle")}
           </p>
         </div>
 
         <button
           type="button"
           onClick={ouvrirCreation}
-          className="px-6 py-3 bg-[#4880FF] hover:bg-blue-600 text-white font-bold text-xs rounded-2xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 self-start sm:self-auto"
+          className="px-6 py-3 bg-[#4880FF] hover:bg-blue-600 text-white font-bold text-xs rounded-2xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 self-start sm:self-auto cursor-pointer"
         >
           <Add01Icon size={18} strokeWidth={2.5} />
-          <span>Créer un Code Promo</span>
+          <span>{t("promotions.createCode")}</span>
         </button>
       </div>
 
@@ -120,7 +122,7 @@ export default function PagePromotionsAdmin() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Codes Actifs</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("promotions.activeCodes")}</span>
             <h3 className="text-2xl font-black text-slate-800 mt-1">{totalActifs}</h3>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
@@ -130,7 +132,7 @@ export default function PagePromotionsAdmin() {
 
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Utilisations</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("promotions.totalUses")}</span>
             <h3 className="text-2xl font-black text-slate-800 mt-1">{totalUtilisations}</h3>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#4880FF] flex items-center justify-center font-bold">
@@ -140,7 +142,7 @@ export default function PagePromotionsAdmin() {
 
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Expirées</span>
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("promotions.expiredCodes")}</span>
             <h3 className="text-2xl font-black text-slate-800 mt-1">{totalExpires}</h3>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
@@ -157,7 +159,7 @@ export default function PagePromotionsAdmin() {
             type="text"
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
-            placeholder="Rechercher par code (ex: SUMMER2026)..."
+            placeholder={t("promotions.searchPlaceholder")}
             className="w-full pl-11 pr-4 py-3 bg-[#F8F9FD] border border-slate-200/60 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#4880FF] focus:bg-white transition-all"
           />
         </div>
@@ -168,13 +170,13 @@ export default function PagePromotionsAdmin() {
               key={f}
               type="button"
               onClick={() => setFiltreStatut(f as typeof filtreStatut)}
-              className={`px-4 py-2.5 rounded-xl transition-all ${
+              className={`px-4 py-2.5 rounded-xl transition-all cursor-pointer ${
                 filtreStatut === f
                   ? "bg-[#4880FF] text-white shadow-md shadow-blue-500/20"
                   : "text-slate-600 hover:bg-slate-100"
               }`}
             >
-              {f}
+              {f === "Tous" ? t("common.all") : f === "Actif" ? t("common.active") : t("promotions.expiredCodes")}
             </button>
           ))}
         </div>
@@ -195,14 +197,14 @@ export default function PagePromotionsAdmin() {
                 <button
                   type="button"
                   onClick={() => ouvrirEdition(p)}
-                  className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-[#4880FF] text-slate-600 transition-colors flex items-center justify-center"
+                  className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-[#4880FF] text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
                 >
                   <Edit02Icon size={16} />
                 </button>
                 <button
                   type="button"
                   onClick={() => verifierSuppression(p.id)}
-                  className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 transition-colors flex items-center justify-center"
+                  className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 transition-colors flex items-center justify-center cursor-pointer"
                 >
                   <Delete02Icon size={16} />
                 </button>
@@ -213,7 +215,7 @@ export default function PagePromotionsAdmin() {
               <h3 className="font-extrabold text-base text-slate-800">{p.titre}</h3>
               <div className="flex items-center gap-2 mt-2">
                 <span className="text-lg font-black text-slate-900">
-                  {p.type === "pourcentage" ? `-${p.valeur}%` : `-${p.valeur} FCFA`}
+                  {p.type === "pourcentage" ? `-${p.valeur}%` : `-${formaterPrix(p.valeur)}`}
                 </span>
               </div>
             </div>
@@ -225,7 +227,7 @@ export default function PagePromotionsAdmin() {
               <span className={`px-2.5 py-1 rounded-lg text-[11px] ${
                 p.statut === "Actif" ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
               }`}>
-                {p.statut}
+                {p.statut === "Actif" ? t("common.active") : t("promotions.expiredCodes")}
               </span>
             </div>
           </div>

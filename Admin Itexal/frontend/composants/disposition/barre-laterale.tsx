@@ -28,40 +28,8 @@ import { useNotifications } from "@/lib/context/NotificationContext";
 import { useProfil } from "@/lib/context/ProfilContext";
 import { useAuth } from "@/lib/context/AuthContext";
 import { useCommandes } from "@/lib/context/CommandesContext";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import { ModalConfirmationDeconnexion } from "@/composants-communs/modal-confirmation-deconnexion";
-
-export type Langue = "fr" | "en" | "ar";
-
-const MENU_PRINCIPAL = [
-  { nom: { fr: "Dashboard", en: "Dashboard", ar: "لوحة التحكم" }, chemin: "/admin", Icone: DashboardSquare01Icon },
-  { nom: { fr: "Statistiques", en: "Stats", ar: "الإحصائيات" }, chemin: "/admin/statistiques", Icone: Chart01Icon },
-  { nom: { fr: "Produits", en: "Products", ar: "المنتجات" }, chemin: "/admin/produits", Icone: PackageIcon },
-  { nom: { fr: "Commandes", en: "Orders", ar: "الطلبات" }, chemin: "/admin/commandes", Icone: ShoppingCart01Icon, aBadge: true },
-  { nom: { fr: "Clients", en: "Customers", ar: "العملاء" }, chemin: "/admin/clients", Icone: UserGroupIcon },
-  { nom: { fr: "Notifications", en: "Notifications", ar: "الإشعارات" }, chemin: "/admin/notifications", Icone: Notification01Icon, estNotification: true },
-  { nom: { fr: "Stocks", en: "Stocks", ar: "المخزون" }, chemin: "/admin/stocks", Icone: Store01Icon },
-];
-
-const MENU_PAGES = [
-  { nom: { fr: "Favoris", en: "Favorites", ar: "المفضلة" }, chemin: "/admin/favoris", Icone: FavouriteIcon },
-  { nom: { fr: "Catégories", en: "Categories", ar: "الفئات" }, chemin: "/admin/categories", Icone: Folder01Icon },
-  { nom: { fr: "Marques", en: "Brands", ar: "العلامات" }, chemin: "/admin/marques", Icone: Tag01Icon },
-  { nom: { fr: "Promotions", en: "Promotions", ar: "العروض" }, chemin: "/admin/promotions", Icone: Discount01Icon },
-  { nom: { fr: "Contenus", en: "Contents", ar: "المحتوى" }, chemin: "/admin/contenus", Icone: File01Icon },
-  { nom: { fr: "Utilisateurs", en: "Users", ar: "المستخدمون" }, chemin: "/admin/utilisateurs", Icone: User02Icon },
-  { nom: { fr: "Journal d'activité", en: "Activity Log", ar: "سجل النشاط" }, chemin: "/admin/journal", Icone: ClipboardIcon },
-];
-
-export function getLangue(): Langue {
-  if (typeof window === "undefined") return "fr";
-  return (localStorage.getItem("itexal_lang") as Langue) ?? "fr";
-}
-
-export function setLangue(l: Langue) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem("itexal_lang", l);
-  window.dispatchEvent(new Event("itexal_lang_change"));
-}
 
 export const BarreLaterale: React.FC = () => {
   const pathname = usePathname();
@@ -69,7 +37,7 @@ export const BarreLaterale: React.FC = () => {
   const { profil, nomComplet, initiales } = useProfil();
   const { seDeconnecter } = useAuth();
   const { commandes } = useCommandes();
-  const [langue, setLangueState] = useState<Langue>("fr");
+  const { t, langue } = useLanguage();
   const [modalDeconnexionOuvert, setModalDeconnexionOuvert] = useState(false);
 
   // Décompte réel des commandes en cours / traitement
@@ -84,10 +52,6 @@ export const BarreLaterale: React.FC = () => {
   const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
 
   useEffect(() => {
-    setLangueState(getLangue());
-    const handler = () => setLangueState(getLangue());
-    window.addEventListener("itexal_lang_change", handler);
-
     if (typeof window !== "undefined") {
       const savedCollapsed = localStorage.getItem("itexal_sidebar_retractee") === "true";
       setEstRetractee(savedCollapsed);
@@ -100,8 +64,6 @@ export const BarreLaterale: React.FC = () => {
         document.documentElement.classList.remove("dark");
       }
     }
-
-    return () => window.removeEventListener("itexal_lang_change", handler);
   }, []);
 
   const toggleRetraction = () => {
@@ -124,7 +86,25 @@ export const BarreLaterale: React.FC = () => {
     }
   };
 
-  const nom = (item: { nom: Record<Langue, string> }) => item.nom[langue];
+  const menuPrincipal = [
+    { key: "navigation.dashboard", defaultNom: "Dashboard", chemin: "/admin", Icone: DashboardSquare01Icon },
+    { key: "navigation.statistics", defaultNom: "Statistiques", chemin: "/admin/statistiques", Icone: Chart01Icon },
+    { key: "navigation.products", defaultNom: "Produits", chemin: "/admin/produits", Icone: PackageIcon },
+    { key: "navigation.orders", defaultNom: "Commandes", chemin: "/admin/commandes", Icone: ShoppingCart01Icon },
+    { key: "navigation.clients", defaultNom: "Clients", chemin: "/admin/clients", Icone: UserGroupIcon },
+    { key: "navigation.notifications", defaultNom: "Notifications", chemin: "/admin/notifications", Icone: Notification01Icon, estNotification: true },
+    { key: "navigation.stocks", defaultNom: "Stocks", chemin: "/admin/stocks", Icone: Store01Icon },
+  ];
+
+  const menuPages = [
+    { key: "navigation.favoris", defaultNom: "Favoris", chemin: "/admin/favoris", Icone: FavouriteIcon },
+    { key: "navigation.categories", defaultNom: "Catégories", chemin: "/admin/categories", Icone: Folder01Icon },
+    { key: "navigation.marques", defaultNom: "Marques", chemin: "/admin/marques", Icone: Tag01Icon },
+    { key: "navigation.promotions", defaultNom: "Promotions", chemin: "/admin/promotions", Icone: Discount01Icon },
+    { key: "navigation.contenus", defaultNom: "Contenus", chemin: "/admin/contenus", Icone: File01Icon },
+    { key: "navigation.utilisateurs", defaultNom: "Utilisateurs", chemin: "/admin/utilisateurs", Icone: User02Icon },
+    { key: "navigation.journal", defaultNom: "Journal d'activité", chemin: "/admin/journal", Icone: ClipboardIcon },
+  ];
 
   return (
     <aside
@@ -133,7 +113,7 @@ export const BarreLaterale: React.FC = () => {
       }`}
       style={{ boxShadow: "4px 0 20px 0 rgba(0,0,0,0.03)" }}
     >
-      {/* Bouton de Rétraction / Agrandissement Flottant sur le bord droit (Inspiré des images) */}
+      {/* Bouton de Rétraction / Agrandissement Flottant sur le bord droit */}
       <button
         type="button"
         onClick={toggleRetraction}
@@ -197,35 +177,34 @@ export const BarreLaterale: React.FC = () => {
         <div className="space-y-1">
           {!estRetractee && (
             <p className="px-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.14em] mb-2">
-              Navigation
+              {t("navigation.navSectionMain")}
             </p>
           )}
 
-          {MENU_PRINCIPAL.map((item) => {
+          {menuPrincipal.map((item) => {
             const actif = pathname === item.chemin;
             const Icon = item.Icone;
             const notificationCount = item.estNotification ? nombreNonLues : 0;
+            const itemNom = t(item.key);
 
             if (estRetractee) {
               return (
                 <Link
                   key={item.chemin}
                   href={item.chemin}
-                  title={nom(item)}
+                  title={itemNom}
                   className={`group relative flex items-center justify-center w-11 h-11 mx-auto rounded-2xl transition-all duration-200 my-1 ${
                     actif
                       ? "bg-[#5B63F6] text-white shadow-md shadow-indigo-500/25"
                       : "text-slate-600 hover:text-[#5B63F6] hover:bg-indigo-50/70"
                   }`}
                 >
-                  {/* Active vertical pill indicator on left edge */}
                   {actif && (
                     <span className="absolute -left-3 top-2 bottom-2 w-1.5 rounded-r-full bg-[#5B63F6]" />
                   )}
 
                   <Icon size={20} strokeWidth={2} />
 
-                  {/* Badge Notif Point ou Badge Commandes */}
                   {notificationCount > 0 ? (
                     <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
                   ) : item.chemin === "/admin/commandes" && commandesEnTraitementCount > 0 ? (
@@ -245,7 +224,6 @@ export const BarreLaterale: React.FC = () => {
                     : "text-slate-600 hover:text-[#5B63F6] hover:bg-slate-50"
                 }`}
               >
-                {/* Active vertical pill bar attached to left edge */}
                 {actif && (
                   <span className="absolute left-0 top-2 bottom-2 w-1.5 rounded-r-full bg-[#5B63F6]" />
                 )}
@@ -260,9 +238,8 @@ export const BarreLaterale: React.FC = () => {
                   <Icon size={18} strokeWidth={2} />
                 </span>
 
-                <span className="flex-1 leading-none truncate">{nom(item)}</span>
+                <span className="flex-1 leading-none truncate">{itemNom}</span>
 
-                {/* Right Indicator: Chevron Arrow or Notification Badge */}
                 {notificationCount > 0 ? (
                   <span
                     className={`px-2 py-0.5 rounded-lg text-[10px] font-black leading-none ${
@@ -292,20 +269,21 @@ export const BarreLaterale: React.FC = () => {
         <div className="space-y-1 pt-2 border-t border-slate-100">
           {!estRetractee && (
             <p className="px-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.14em] mb-2">
-              {langue === "ar" ? "صفحات" : langue === "en" ? "Pages" : "Pages & Outils"}
+              {t("navigation.navSectionPages")}
             </p>
           )}
 
-          {MENU_PAGES.map((item) => {
+          {menuPages.map((item) => {
             const actif = pathname === item.chemin;
             const Icon = item.Icone;
+            const itemNom = t(item.key);
 
             if (estRetractee) {
               return (
                 <Link
                   key={item.chemin}
                   href={item.chemin}
-                  title={nom(item)}
+                  title={itemNom}
                   className={`group relative flex items-center justify-center w-11 h-11 mx-auto rounded-2xl transition-all duration-200 my-1 ${
                     actif
                       ? "bg-[#5B63F6] text-white shadow-md shadow-indigo-500/25"
@@ -344,7 +322,7 @@ export const BarreLaterale: React.FC = () => {
                   <Icon size={18} strokeWidth={2} />
                 </span>
 
-                <span className="flex-1 leading-none truncate">{nom(item)}</span>
+                <span className="flex-1 leading-none truncate">{itemNom}</span>
 
                 <ArrowRight01Icon
                   size={14}
@@ -358,7 +336,7 @@ export const BarreLaterale: React.FC = () => {
         </div>
       </nav>
 
-      {/* Bottom Footer Section (Inspiré des images: Settings, Theme Switcher & Admin Card) */}
+      {/* Bottom Footer Section */}
       <div className="p-3 border-t border-slate-100 shrink-0 space-y-2.5 bg-slate-50/40">
         {/* Settings Item */}
         {!estRetractee ? (
@@ -367,19 +345,19 @@ export const BarreLaterale: React.FC = () => {
             className="flex items-center gap-3 px-3 py-2 rounded-2xl text-[13px] font-semibold text-slate-600 hover:text-[#5B63F6] hover:bg-slate-100/80 transition-all"
           >
             <Settings02Icon size={18} className="text-slate-400 group-hover:text-[#5B63F6]" strokeWidth={2} />
-            <span>Paramètres System</span>
+            <span>{t("navigation.parametres")}</span>
           </Link>
         ) : (
           <Link
             href="/admin/parametres"
-            title="Paramètres"
+            title={t("navigation.parametres")}
             className="w-11 h-11 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-center text-slate-500 hover:text-[#5B63F6] mx-auto transition-all shadow-2xs"
           >
             <Settings02Icon size={18} strokeWidth={2} />
           </Link>
         )}
 
-        {/* Theme Switch Capsule [ Light | Dark ] (Matching Image 2) */}
+        {/* Theme Switch Capsule [ Light | Dark ] */}
         {!estRetractee ? (
           <div className="bg-slate-100 border border-slate-200/80 rounded-2xl p-1 flex items-center gap-1 shadow-inner text-xs font-bold">
             <button
@@ -416,7 +394,7 @@ export const BarreLaterale: React.FC = () => {
           <button
             type="button"
             onClick={() => toggleThemeMode(themeMode === "light" ? "dark" : "light")}
-            title={`Basculer en mode ${themeMode === "light" ? "sombre" : "clair"}`}
+            title={`Mode ${themeMode === "light" ? "sombre" : "clair"}`}
             className="w-11 h-11 rounded-2xl bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-600 hover:text-[#5B63F6] mx-auto transition-all cursor-pointer shadow-2xs"
           >
             {themeMode === "light" ? (
@@ -431,7 +409,7 @@ export const BarreLaterale: React.FC = () => {
           </button>
         )}
 
-        {/* Profil Admin Capsule Card (Matching Image 1 & 2) */}
+        {/* Profil Admin Capsule Card */}
         {!estRetractee ? (
           <div className="bg-white border border-slate-200/80 rounded-2xl p-2 flex items-center gap-2.5 shadow-xs group hover:border-indigo-200 transition-all">
             <Link href="/admin/parametres" className="w-9 h-9 rounded-full overflow-hidden border-2 border-indigo-100 shadow-xs shrink-0 bg-gradient-to-tr from-indigo-500 to-[#5B63F6] flex items-center justify-center text-white font-black text-xs">
@@ -459,7 +437,7 @@ export const BarreLaterale: React.FC = () => {
             <button
               type="button"
               onClick={() => setModalDeconnexionOuvert(true)}
-              title="Déconnexion"
+              title={t("common.logout")}
               className="w-7 h-7 rounded-xl hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center shrink-0 transition-colors cursor-pointer"
             >
               <Logout01Icon size={16} strokeWidth={2} />
@@ -487,7 +465,7 @@ export const BarreLaterale: React.FC = () => {
             <button
               type="button"
               onClick={() => setModalDeconnexionOuvert(true)}
-              title="Déconnexion"
+              title={t("common.logout")}
               className="w-9 h-9 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-100 flex items-center justify-center transition-colors cursor-pointer"
             >
               <Logout01Icon size={16} strokeWidth={2} />

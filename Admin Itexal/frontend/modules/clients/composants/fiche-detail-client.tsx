@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { formatPrix } from "@/lib/formatteur";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import { exporterFicheClientPDF } from "@/lib/utilitaires/exportateur";
 import {
   Add01Icon,
@@ -45,6 +45,7 @@ export const FicheDetailClient: React.FC<FicheDetailClientProps> = ({
   onSupprimer,
   onOuvrirToutesLesInfos,
 }) => {
+  const { t, formaterPrix } = useLanguage();
   const [barSurvolee, setBarSurvolee] = useState<number | null>(1);
 
   if (!client) return null;
@@ -71,19 +72,19 @@ export const FicheDetailClient: React.FC<FicheDetailClientProps> = ({
 
   return (
     <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-6 flex flex-col justify-between animate-fadeIn relative">
-      {/* Top action buttons (Close & View All) */}
+      {/* Top action buttons */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-          Fiche Client
+          {t("clients.customerFile")}
         </span>
         <div className="flex items-center gap-2">
           {onOuvrirToutesLesInfos && (
             <button
               type="button"
               onClick={() => onOuvrirToutesLesInfos(client)}
-              aria-label="Toutes les informations"
-              className="w-7 h-7 rounded-full bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold flex items-center justify-center shadow-sm transition-all hover:scale-105"
-              title="Voir toutes les informations (+)"
+              aria-label={t("clients.viewAllInfos")}
+              className="w-7 h-7 rounded-full bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold flex items-center justify-center shadow-sm transition-all hover:scale-105 cursor-pointer"
+              title={t("clients.viewAllInfos")}
             >
               <Add01Icon size={15} strokeWidth={2.5} />
             </button>
@@ -91,9 +92,9 @@ export const FicheDetailClient: React.FC<FicheDetailClientProps> = ({
           <button
             type="button"
             onClick={onFermer}
-            aria-label="Fermer"
-            className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-extrabold flex items-center justify-center text-xs transition-colors"
-            title="Fermer"
+            aria-label={t("common.close")}
+            className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-extrabold flex items-center justify-center text-xs transition-colors cursor-pointer"
+            title={t("common.close")}
           >
             <Cancel01Icon size={14} strokeWidth={2} />
           </button>
@@ -121,7 +122,7 @@ export const FicheDetailClient: React.FC<FicheDetailClientProps> = ({
             {client.nom}
           </h3>
           <p className="text-xs text-slate-400 font-semibold mt-0.5">
-            {client.metier || "Client Cosmétique VIP"}
+            {client.metier || t("clients.vipClient")}
           </p>
         </div>
 
@@ -136,7 +137,7 @@ export const FicheDetailClient: React.FC<FicheDetailClientProps> = ({
                 : "bg-blue-50 text-blue-600"
             }`}
           >
-            {client.genre === "Female" ? "Female" : "Male"}
+            {client.genre === "Female" ? t("clients.female") : t("clients.male")}
           </span>
         </div>
       </div>
@@ -163,10 +164,10 @@ export const FicheDetailClient: React.FC<FicheDetailClientProps> = ({
       <div className="space-y-3">
         <div className="p-3 bg-indigo-50/50 rounded-2xl border border-indigo-100 text-center">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            Total dépense cumulée
+            {t("clients.totalSpent")}
           </span>
           <p className="text-base font-black text-[#5B63F6]">
-            {formatPrix(depense)} FCFA ({nbCommandes} cmd)
+            {formaterPrix(depense)} ({nbCommandes} cmd)
           </p>
         </div>
       </div>
@@ -179,7 +180,7 @@ export const FicheDetailClient: React.FC<FicheDetailClientProps> = ({
           className="w-full py-2.5 px-3 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold text-xs rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
           <Download01Icon size={16} />
-          <span>Exporter Fiche Client (PDF)</span>
+          <span>{t("orders.downloadPDF")}</span>
         </button>
 
         <div className="flex items-center gap-2">
@@ -187,20 +188,20 @@ export const FicheDetailClient: React.FC<FicheDetailClientProps> = ({
             <button
               type="button"
               onClick={() => onEditer(client)}
-              className="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5"
+              className="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Edit02Icon size={14} />
-              <span>Modifier</span>
+              <span>{t("common.edit")}</span>
             </button>
           )}
           {onSupprimer && (
             <button
               type="button"
               onClick={() => onSupprimer(client.id)}
-              className="flex-1 py-2 px-3 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5"
+              className="flex-1 py-2 px-3 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Delete02Icon size={14} />
-              <span>Supprimer</span>
+              <span>{t("common.delete")}</span>
             </button>
           )}
         </div>

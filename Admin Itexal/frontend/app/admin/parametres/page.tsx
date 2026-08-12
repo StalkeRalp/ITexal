@@ -17,8 +17,10 @@ import {
 import { ChampMotDePasse } from "@/composants-communs/champ-mot-de-passe";
 import { useToast } from "@/lib/context/ToastContext";
 import { useProfil } from "@/lib/context/ProfilContext";
+import { useLanguage } from "@/lib/context/LanguageContext";
 
 export default function PageParametresAdmin() {
+  const { t } = useLanguage();
   const toast = useToast();
   const { profil, mettreAJourProfil } = useProfil();
   const [ongletActif, setOngletActif] = useState<"profil" | "general" | "securite" | "notifications">("profil");
@@ -83,25 +85,25 @@ export default function PageParametresAdmin() {
       pays,
       photoProfil,
     });
-    toast.succes("Profil administrateur mis à jour avec succès !");
-    setMessageSucces("Votre profil administrateur a été enregistré avec succès !");
+    toast.succes(t("parametres.profileUpdatedSuccess"));
+    setMessageSucces(t("parametres.profileUpdatedSuccess"));
     setTimeout(() => setMessageSucces(""), 4000);
   };
 
   const sauvegarderParametresGeneraux = (e: React.FormEvent) => {
     e.preventDefault();
-    setMessageSucces("Configuration générale du site enregistrée avec succès !");
+    setMessageSucces(t("common.itemUpdated"));
     setTimeout(() => setMessageSucces(""), 4000);
   };
 
   const sauvegarderSecurite = (e: React.FormEvent) => {
     e.preventDefault();
     if (nouveauMdp && nouveauMdp !== confirmerMdp) {
-      toast.erreur("Le nouveau mot de passe et la confirmation ne correspondent pas.");
+      toast.erreur(t("parametres.passwordMismatch"));
       return;
     }
-    toast.succes("Votre mot de passe et vos paramètres de sécurité ont été mis à jour.");
-    setMessageSucces("Votre mot de passe et paramètres de sécurité ont été mis à jour.");
+    toast.succes(t("parametres.securityUpdatedSuccess"));
+    setMessageSucces(t("parametres.securityUpdatedSuccess"));
     setAncienMdp("");
     setNouveauMdp("");
     setConfirmerMdp("");
@@ -114,10 +116,10 @@ export default function PageParametresAdmin() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-            Paramètres & Profil
+            {t("parametres.title")}
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Gérez votre profil personnel et la configuration globale de la boutique ITexal.
+            {t("parametres.subtitle")}
           </p>
         </div>
       </div>
@@ -134,53 +136,53 @@ export default function PageParametresAdmin() {
         <button
           type="button"
           onClick={() => setOngletActif("profil")}
-          className={`px-5 py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
+          className={`px-5 py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
             ongletActif === "profil"
               ? "bg-[#4880FF] text-white shadow-md shadow-blue-500/20 font-extrabold"
               : "text-slate-600 hover:bg-slate-100"
           }`}
         >
           <UserIcon size={16} />
-          <span>Profil Administrateur</span>
+          <span>{t("parametres.tabProfil")}</span>
         </button>
 
         <button
           type="button"
           onClick={() => setOngletActif("general")}
-          className={`px-5 py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
+          className={`px-5 py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
             ongletActif === "general"
               ? "bg-[#4880FF] text-white shadow-md shadow-blue-500/20 font-extrabold"
               : "text-slate-600 hover:bg-slate-100"
           }`}
         >
           <Settings02Icon size={16} />
-          <span>Configuration Générale</span>
+          <span>{t("parametres.tabGeneral")}</span>
         </button>
 
         <button
           type="button"
           onClick={() => setOngletActif("securite")}
-          className={`px-5 py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
+          className={`px-5 py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
             ongletActif === "securite"
               ? "bg-[#4880FF] text-white shadow-md shadow-blue-500/20 font-extrabold"
               : "text-slate-600 hover:bg-slate-100"
           }`}
         >
           <LockIcon size={16} />
-          <span>Sécurité & Mot de passe</span>
+          <span>{t("parametres.tabSecurite")}</span>
         </button>
 
         <button
           type="button"
           onClick={() => setOngletActif("notifications")}
-          className={`px-5 py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
+          className={`px-5 py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
             ongletActif === "notifications"
               ? "bg-[#4880FF] text-white shadow-md shadow-blue-500/20 font-extrabold"
               : "text-slate-600 hover:bg-slate-100"
           }`}
         >
           <Notification01Icon size={16} />
-          <span>Notifications & Alertes</span>
+          <span>{t("parametres.tabNotifications")}</span>
         </button>
       </div>
 
@@ -193,7 +195,7 @@ export default function PageParametresAdmin() {
           {/* Centered Top Title */}
           <div className="text-center">
             <h2 className="text-2xl font-black text-slate-800 tracking-wider uppercase">
-              PROFILE
+              {t("parametres.profileTitle")}
             </h2>
           </div>
 
@@ -210,8 +212,8 @@ export default function PageParametresAdmin() {
               <label
                 htmlFor="upload-photo"
                 className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[#4880FF] hover:bg-blue-600 text-white flex items-center justify-center text-xs shadow-md cursor-pointer transition-transform hover:scale-110"
-                title="Changer la photo"
-                aria-label="Changer la photo de profil"
+                title={t("parametres.changePhoto")}
+                aria-label={t("parametres.changePhoto")}
               >
                 <Edit02Icon size={14} />
                 <input
@@ -230,9 +232,9 @@ export default function PageParametresAdmin() {
             </div>
 
             <div>
-              <h3 className="font-bold text-slate-800 text-lg">Profile photo</h3>
+              <h3 className="font-bold text-slate-800 text-lg">{t("parametres.profilePhoto")}</h3>
               <p className="text-xs text-slate-400 font-medium mt-0.5">
-                This will be displayed on your profile.
+                {t("parametres.profilePhotoSub")}
               </p>
             </div>
           </div>
@@ -241,7 +243,7 @@ export default function PageParametresAdmin() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <div>
               <label className="block text-slate-600 font-semibold text-xs mb-2">
-                First name
+                {t("parametres.firstName")}
               </label>
               <input
                 type="text"
@@ -253,7 +255,7 @@ export default function PageParametresAdmin() {
 
             <div>
               <label className="block text-slate-600 font-semibold text-xs mb-2">
-                Last name
+                {t("parametres.lastName")}
               </label>
               <input
                 type="text"
@@ -265,7 +267,7 @@ export default function PageParametresAdmin() {
 
             <div>
               <label className="block text-slate-600 font-semibold text-xs mb-2">
-                Email Address
+                {t("parametres.email")}
               </label>
               <input
                 type="email"
@@ -277,7 +279,7 @@ export default function PageParametresAdmin() {
 
             <div>
               <label className="block text-slate-600 font-semibold text-xs mb-2">
-                Date d'anniversaire
+                {t("parametres.birthdate")}
               </label>
               <input
                 type="date"
@@ -289,7 +291,7 @@ export default function PageParametresAdmin() {
 
             <div>
               <label className="block text-slate-600 font-semibold text-xs mb-2">
-                Ville
+                {t("parametres.city")}
               </label>
               <input
                 type="text"
@@ -301,7 +303,7 @@ export default function PageParametresAdmin() {
 
             <div>
               <label className="block text-slate-600 font-semibold text-xs mb-2">
-                Rôle Administrateur
+                {t("parametres.role")}
               </label>
               <select
                 value={role}
@@ -317,22 +319,22 @@ export default function PageParametresAdmin() {
 
             <div>
               <label className="block text-slate-600 font-semibold text-xs mb-2">
-                Sexe / Genre
+                {t("parametres.gender")}
               </label>
               <select
                 value={sexe}
                 onChange={(e) => setSexe(e.target.value)}
                 className="w-full px-4 py-3.5 bg-[#F8F9FD] border border-slate-200/70 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#4880FF] focus:bg-white transition-all cursor-pointer"
               >
-                <option value="Homme">Homme</option>
-                <option value="Femme">Femme</option>
-                <option value="Non spécifié">Non spécifié</option>
+                <option value="Homme">{t("clients.male")}</option>
+                <option value="Femme">{t("clients.female")}</option>
+                <option value="Non spécifié">N/A</option>
               </select>
             </div>
 
             <div>
               <label className="block text-slate-600 font-semibold text-xs mb-2">
-                Pays
+                {t("parametres.country")}
               </label>
               <input
                 type="text"
@@ -346,9 +348,9 @@ export default function PageParametresAdmin() {
           <div className="flex justify-end pt-4">
             <button
               type="submit"
-              className="px-10 py-3 bg-[#4880FF] hover:bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-blue-500/20 tracking-widest uppercase transition-all"
+              className="px-10 py-3 bg-[#4880FF] hover:bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-blue-500/20 tracking-widest uppercase transition-all cursor-pointer"
             >
-              SAVE
+              {t("parametres.saveProfile")}
             </button>
           </div>
         </form>
@@ -362,23 +364,23 @@ export default function PageParametresAdmin() {
               <div>
                 <h2 className="text-base font-extrabold text-slate-800 flex items-center gap-2">
                   <Store01Icon size={18} className="text-[#4880FF]" />
-                  <span>Identité & Coordonnées Officieuses ITexal</span>
+                  <span>{t("parametres.generalIdentity")}</span>
                 </h2>
                 <p className="text-xs text-slate-400 font-medium mt-0.5">
-                  Informations publiques de la boutique affichées sur l'application client.
+                  {t("parametres.generalIdentitySub")}
                 </p>
               </div>
 
               <span className="px-3 py-1 bg-emerald-50 text-emerald-700 font-bold text-xs rounded-lg border border-emerald-200 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Site En Ligne</span>
+                <span>{t("parametres.siteOnline")}</span>
               </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 mb-1.5">
-                  Nom commercial de la boutique *
+                  {t("parametres.shopName")}
                 </label>
                 <input
                   type="text"
@@ -391,7 +393,7 @@ export default function PageParametresAdmin() {
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1.5">
-                  Slogan officiel
+                  {t("parametres.officialSlogan")}
                 </label>
                 <input
                   type="text"
@@ -403,7 +405,7 @@ export default function PageParametresAdmin() {
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1.5">
-                  E-mail de support client *
+                  {t("parametres.supportEmail")}
                 </label>
                 <input
                   type="email"
@@ -416,7 +418,7 @@ export default function PageParametresAdmin() {
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1.5">
-                  Téléphone Hotline client *
+                  {t("parametres.hotlinePhone")}
                 </label>
                 <input
                   type="text"
@@ -432,13 +434,13 @@ export default function PageParametresAdmin() {
           <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-6">
             <h2 className="text-base font-extrabold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
               <TruckIcon size={18} className="text-[#4880FF]" />
-              <span>Tarification Devise & Forfaits Livraison</span>
+              <span>{t("parametres.pricingHeading")}</span>
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 mb-1.5">
-                  Devise Principale
+                  {t("parametres.mainCurrency")}
                 </label>
                 <input
                   type="text"
@@ -450,7 +452,7 @@ export default function PageParametresAdmin() {
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1.5">
-                  Frais Livraison Douala (FCFA)
+                  {t("parametres.shippingDouala")}
                 </label>
                 <input
                   type="number"
@@ -462,7 +464,7 @@ export default function PageParametresAdmin() {
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1.5">
-                  Frais Livraison Yaoundé & Régions (FCFA)
+                  {t("parametres.shippingYaounde")}
                 </label>
                 <input
                   type="number"
@@ -477,7 +479,7 @@ export default function PageParametresAdmin() {
           <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-6">
             <h2 className="text-base font-extrabold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
               <CreditCardIcon size={18} className="text-[#4880FF]" />
-              <span>Passerelles de Paiement Intégrées</span>
+              <span>{t("parametres.paymentGateways")}</span>
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold text-slate-700">
@@ -538,9 +540,9 @@ export default function PageParametresAdmin() {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="px-8 py-3.5 bg-[#4880FF] hover:bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-blue-500/20 transition-all"
+              className="px-8 py-3.5 bg-[#4880FF] hover:bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-blue-500/20 transition-all cursor-pointer"
             >
-              Enregistrer la Configuration
+              {t("parametres.saveConfig")}
             </button>
           </div>
         </form>
@@ -551,13 +553,13 @@ export default function PageParametresAdmin() {
         <form onSubmit={sauvegarderSecurite} className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-6">
           <h2 className="text-base font-extrabold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
             <LockIcon size={18} className="text-[#4880FF]" />
-            <span>Modification du Mot de Passe Administrateur</span>
+            <span>{t("parametres.changePasswordHeading")}</span>
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
             <div>
               <ChampMotDePasse
-                label="Ancien Mot de Passe"
+                label={t("parametres.oldPassword")}
                 valeur={ancienMdp}
                 onChange={(e) => setAncienMdp(e.target.value)}
                 placeholder="••••••••"
@@ -566,7 +568,7 @@ export default function PageParametresAdmin() {
 
             <div>
               <ChampMotDePasse
-                label="Nouveau Mot de Passe"
+                label={t("parametres.newPassword")}
                 valeur={nouveauMdp}
                 onChange={(e) => setNouveauMdp(e.target.value)}
                 placeholder="••••••••"
@@ -575,7 +577,7 @@ export default function PageParametresAdmin() {
 
             <div>
               <ChampMotDePasse
-                label="Confirmer le Nouveau Mot de Passe"
+                label={t("parametres.confirmPassword")}
                 valeur={confirmerMdp}
                 onChange={(e) => setConfirmerMdp(e.target.value)}
                 placeholder="••••••••"
@@ -586,9 +588,9 @@ export default function PageParametresAdmin() {
           <div className="flex justify-end pt-4">
             <button
               type="submit"
-              className="px-8 py-3.5 bg-[#4880FF] hover:bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-blue-500/20 transition-all"
+              className="px-8 py-3.5 bg-[#4880FF] hover:bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-blue-500/20 transition-all cursor-pointer"
             >
-              Mettre à Jour la Sécurité
+              {t("parametres.updateSecurity")}
             </button>
           </div>
         </form>
@@ -599,30 +601,30 @@ export default function PageParametresAdmin() {
         <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-6">
           <h2 className="text-base font-extrabold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
             <Notification01Icon size={18} className="text-[#4880FF]" />
-            <span>Alertes e-mails & Notifications Système</span>
+            <span>{t("parametres.systemNotificationsHeading")}</span>
           </h2>
 
           <div className="space-y-4 text-xs text-slate-700 font-bold">
             <label className="p-4 bg-[#F8F9FD] rounded-2xl border border-slate-200 flex items-center justify-between cursor-pointer">
               <div>
-                <p className="font-extrabold text-slate-800">Alertes Nouvelles Commandes</p>
-                <p className="text-slate-400 font-normal text-[11px]">Recevoir un e-mail instantané à chaque commande client validée.</p>
+                <p className="font-extrabold text-slate-800">{t("parametres.newOrderAlerts")}</p>
+                <p className="text-slate-400 font-normal text-[11px]">{t("parametres.newOrderAlertsSub")}</p>
               </div>
               <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-[#4880FF]" />
             </label>
 
             <label className="p-4 bg-[#F8F9FD] rounded-2xl border border-slate-200 flex items-center justify-between cursor-pointer">
               <div>
-                <p className="font-extrabold text-slate-800">Alertes Stock Faible</p>
-                <p className="text-slate-400 font-normal text-[11px]">Alerte quand le stock d'un produit passe sous 5 unités.</p>
+                <p className="font-extrabold text-slate-800">{t("parametres.lowStockAlerts")}</p>
+                <p className="text-slate-400 font-normal text-[11px]">{t("parametres.lowStockAlertsSub")}</p>
               </div>
               <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-[#4880FF]" />
             </label>
 
             <label className="p-4 bg-[#F8F9FD] rounded-2xl border border-slate-200 flex items-center justify-between cursor-pointer">
               <div>
-                <p className="font-extrabold text-slate-800">Journal de Sécurité & Tentatives de Connexion</p>
-                <p className="text-slate-400 font-normal text-[11px]">Notification immédiate en cas de tentative de connexion suspecte.</p>
+                <p className="font-extrabold text-slate-800">{t("parametres.securityLogAlerts")}</p>
+                <p className="text-slate-400 font-normal text-[11px]">{t("parametres.securityLogAlertsSub")}</p>
               </div>
               <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-[#4880FF]" />
             </label>

@@ -3,7 +3,7 @@
 import React from "react";
 import { Categorie } from "../types/categorie";
 import { Produit } from "@/types/produit";
-import { formaterPrix } from "@/lib/utilitaires/formatage";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import {
   Tag01Icon,
   Add01Icon,
@@ -33,6 +33,7 @@ export const FicheDetailCategorie: React.FC<FicheDetailCategorieProps> = ({
   onSupprimer,
   onOuvrirToutesLesInfos,
 }) => {
+  const { t, formaterPrix } = useLanguage();
   if (!categorie) return null;
 
   const totalStock = produitsRattaches.reduce((acc, p) => acc + (p.stock || 0), 0);
@@ -44,25 +45,25 @@ export const FicheDetailCategorie: React.FC<FicheDetailCategorieProps> = ({
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
           <Tag01Icon size={14} className="text-[#5B63F6]" />
-          <span>Fiche Catégorie</span>
+          <span>{t("categories.categorySheet")}</span>
         </span>
 
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => onOuvrirToutesLesInfos(categorie)}
-            aria-label="Toutes les informations"
+            aria-label={t("categories.moreInfos")}
             className="w-7 h-7 rounded-full bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold flex items-center justify-center shadow-sm transition-all hover:scale-105 cursor-pointer"
-            title="Voir toutes les informations (+)"
+            title={t("categories.moreInfos")}
           >
             <Add01Icon size={15} strokeWidth={2.5} />
           </button>
           <button
             type="button"
             onClick={onFermer}
-            aria-label="Fermer"
+            aria-label={t("common.close")}
             className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-extrabold flex items-center justify-center text-xs transition-colors cursor-pointer"
-            title="Fermer"
+            title={t("common.close")}
           >
             <Cancel01Icon size={14} strokeWidth={2} />
           </button>
@@ -82,7 +83,7 @@ export const FicheDetailCategorie: React.FC<FicheDetailCategorieProps> = ({
               <div>
                 <h3 className="text-lg font-black text-white drop-shadow-sm">{categorie.nom}</h3>
                 <span className="inline-block mt-0.5 text-[10px] bg-white/90 backdrop-blur-sm text-slate-800 font-extrabold px-2.5 py-0.5 rounded-full shadow-xs">
-                  {categorie.statut || "Actif"}
+                  {categorie.statut === "Actif" ? t("common.active") : t("common.inactive")}
                 </span>
               </div>
             </div>
@@ -96,7 +97,7 @@ export const FicheDetailCategorie: React.FC<FicheDetailCategorieProps> = ({
               <h3 className="text-lg font-black">{categorie.nom}</h3>
               <p className="text-xs text-indigo-100 font-medium">Slug : {categorie.slug || "categorie"}</p>
               <span className="inline-block mt-1 text-[10px] bg-white/20 text-white font-extrabold px-2.5 py-0.5 rounded-full">
-                {categorie.statut || "Actif"}
+                {categorie.statut === "Actif" ? t("common.active") : t("common.inactive")}
               </span>
             </div>
           </div>
@@ -104,9 +105,9 @@ export const FicheDetailCategorie: React.FC<FicheDetailCategorieProps> = ({
 
         {/* Description synthétique */}
         <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1 text-xs">
-          <span className="font-bold text-slate-400 uppercase text-[10px]">Description</span>
+          <span className="font-bold text-slate-400 uppercase text-[10px]">{t("common.description")}</span>
           <p className="font-medium text-slate-700 leading-relaxed">
-            {categorie.description || "Aucune description renseignée pour cette catégorie."}
+            {categorie.description || t("common.noData")}
           </p>
         </div>
 
@@ -114,19 +115,19 @@ export const FicheDetailCategorie: React.FC<FicheDetailCategorieProps> = ({
         <div className="grid grid-cols-3 gap-2 text-center text-xs">
           <div className="p-3 bg-indigo-50/60 border border-indigo-100 rounded-2xl">
             <PackageIcon size={18} className="mx-auto text-[#5B63F6] mb-1" />
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">Produits</span>
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">{t("categories.attachedProducts")}</span>
             <span className="font-black text-slate-900 text-sm">{produitsRattaches.length}</span>
           </div>
 
           <div className="p-3 bg-emerald-50/60 border border-emerald-100 rounded-2xl">
             <Store01Icon size={18} className="mx-auto text-emerald-600 mb-1" />
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">Stock Total</span>
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">{t("stocks.currentStock")}</span>
             <span className="font-black text-emerald-700 text-sm">{totalStock}</span>
           </div>
 
           <div className="p-3 bg-amber-50/60 border border-amber-100 rounded-2xl">
             <Coins01Icon size={18} className="mx-auto text-amber-600 mb-1" />
-            <span className="text-[10px] font-bold text-slate-400 block uppercase">Valeur</span>
+            <span className="text-[10px] font-bold text-slate-400 block uppercase">{t("orders.totalAmount")}</span>
             <span className="font-black text-amber-800 text-xs line-clamp-1">{formaterPrix(valeurTotal)}</span>
           </div>
         </div>
@@ -135,7 +136,7 @@ export const FicheDetailCategorie: React.FC<FicheDetailCategorieProps> = ({
         <div className="space-y-2 pt-2">
           <div className="flex items-center justify-between">
             <h4 className="font-extrabold text-xs text-slate-800">
-              Produits dans cette catégorie ({produitsRattaches.length})
+              {t("categories.attachedProducts")} ({produitsRattaches.length})
             </h4>
           </div>
 
@@ -172,7 +173,7 @@ export const FicheDetailCategorie: React.FC<FicheDetailCategorieProps> = ({
             {produitsRattaches.length === 0 && (
               <div className="text-center py-6 text-slate-400 space-y-1">
                 <PackageIcon size={24} className="mx-auto text-slate-300" />
-                <p className="text-xs font-semibold">Aucun produit rattaché</p>
+                <p className="text-xs font-semibold">{t("categories.noProducts")}</p>
               </div>
             )}
           </div>
@@ -187,7 +188,7 @@ export const FicheDetailCategorie: React.FC<FicheDetailCategorieProps> = ({
           className="flex-1 py-2.5 px-4 bg-indigo-50 hover:bg-indigo-100 text-[#5B63F6] font-extrabold text-xs rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer"
         >
           <Edit02Icon size={15} />
-          <span>Modifier</span>
+          <span>{t("common.edit")}</span>
         </button>
 
         <button
@@ -196,7 +197,7 @@ export const FicheDetailCategorie: React.FC<FicheDetailCategorieProps> = ({
           className="py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-600 font-extrabold text-xs rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer"
         >
           <Delete02Icon size={15} />
-          <span>Supprimer</span>
+          <span>{t("common.delete")}</span>
         </button>
       </div>
     </div>

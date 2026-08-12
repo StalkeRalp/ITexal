@@ -18,6 +18,8 @@ import {
   Add01Icon,
 } from "hugeicons-react";
 
+import { useLanguage } from "@/lib/context/LanguageContext";
+
 interface ModalProduitFormulaireProps {
   ouvert: boolean;
   produitAEditer: Produit | null;
@@ -35,6 +37,7 @@ export const ModalProduitFormulaire: React.FC<ModalProduitFormulaireProps> = ({
   onFermer,
   onEnregistrer,
 }) => {
+  const { t, formaterPrix } = useLanguage();
   const [monte, setMonte] = useState(false);
   const [etapeCourante, setEtapeCourante] = useState<1 | 2 | 3 | 4>(1);
   const [erreurEtape, setErreurEtape] = useState("");
@@ -187,31 +190,31 @@ export const ModalProduitFormulaire: React.FC<ModalProduitFormulaireProps> = ({
     setErreurEtape("");
     if (etape === 1) {
       if (!nom.trim()) {
-        setErreurEtape("Le nom du produit est obligatoire.");
+        setErreurEtape(t("products.errNameRequired"));
         return false;
       }
       const catEffective = categorieId || categories[0]?.id;
       if (!catEffective) {
-        setErreurEtape("Veuillez sélectionner une catégorie.");
+        setErreurEtape(t("products.formCatLabel"));
         return false;
       }
     } else if (etape === 2) {
       // Spécifications optionnelles
     } else if (etape === 3) {
       if (prix === "" || Number(prix) <= 0) {
-        setErreurEtape("Veuillez saisir un prix valide supérieur à 0 FCFA.");
+        setErreurEtape(t("products.errPriceRequired"));
         return false;
       }
       if (stock === "" || Number(stock) < 0) {
-        setErreurEtape("Veuillez saisir une quantité de stock valide.");
+        setErreurEtape(t("products.errStockRequired"));
         return false;
       }
       if (imagesApercus.length === 0) {
-        setErreurEtape("Veuillez ajouter au moins 1 image pour le produit (maximum 4 images).");
+        setErreurEtape(t("products.errImagesMinMax"));
         return false;
       }
       if (imagesApercus.length > 4) {
-        setErreurEtape("Vous ne pouvez pas ajouter plus de 4 images.");
+        setErreurEtape(t("products.errImagesMaxExceeded"));
         return false;
       }
     }
@@ -229,15 +232,8 @@ export const ModalProduitFormulaire: React.FC<ModalProduitFormulaireProps> = ({
     setEtapeCourante((prev) => Math.max(prev - 1, 1) as 1 | 2 | 3 | 4);
   };
 
-  const soumettreFormulaire = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (etapeCourante < 4) {
-      etapeSuivante();
-      return;
-    }
-
-    if (!validerEtape(1) || !validerEtape(3)) return;
-
+  // Création finale — appelée UNIQUEMENT par le bouton "Créer le produit" à l'étape 4
+  const creerProduit = () => {
     const catIdEffective = categorieId || categories[0]?.id || "cat-1";
     const marIdEffective = marqueId || marques[0]?.id || "marq-1";
     const cat = categories.find((c) => c.id === catIdEffective);
@@ -276,17 +272,17 @@ export const ModalProduitFormulaire: React.FC<ModalProduitFormulaireProps> = ({
           <div>
             <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
               <PackageIcon size={24} className="text-[#5B63F6]" />
-              <span>{produitAEditer ? "Édition du Produit" : "Création d'un Nouveau Produit"}</span>
+              <span>{produitAEditer ? t("products.editProduct") : t("products.addProduct")}</span>
             </h2>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Remplissez les 4 étapes pour publier le produit dans la boutique Cosmetic Admin.
+              {t("products.subtitle")}
             </p>
           </div>
 
           <button
             type="button"
             onClick={onFermer}
-            aria-label="Fermer la modal"
+            aria-label={t("common.close")}
             className="w-9 h-9 rounded-full bg-white hover:bg-slate-200 text-slate-500 font-bold flex items-center justify-center text-xs transition-colors border border-slate-200 shadow-xs"
           >
             <Cancel01Icon size={18} />
@@ -296,17 +292,25 @@ export const ModalProduitFormulaire: React.FC<ModalProduitFormulaireProps> = ({
         {/* Barres d'Étapes 1 → 2 → 3 → 4 */}
         <div className="px-8 py-4 bg-white border-b border-slate-100 grid grid-cols-4 gap-2">
           {[
-            { num: 1, label: "Informations" },
-            { num: 2, label: "Spécifications" },
-            { num: 3, label: "Prix & Stock" },
-            { num: 4, label: "Confirmation" },
+            { num: 1, label: t("products.step1") },
+            { num: 2, label: t("products.step2") },
+            { num: 3, label: t("products.step3") },
+            { num: 4, label: t("products.step4") },
           ].map((step) => (
             <button
               key={step.num}
               type="button"
               onClick={() => {
-                if (step.num < etapeCourante || validerEtape(etapeCourante)) {
+                // Navigation libre vers les étapes précédentes,
+                // vers les étapes suivantes uniquement si la courante est valide
+                // et jamais directement vers l'étape 4 depuis le stepper (doit passer par Suivant)
+                if (step.num < etapeCourante) {
+                  setErreurEtape("");
                   setEtapeCourante(step.num as any);
+                } else if (step.num === etapeCourante + 1 && step.num < 4) {
+                  etapeSuivante();
+                } else if (step.num === 4 && etapeCourante === 3) {
+                  etapeSuivante();
                 }
               }}
               className={`flex items-center gap-2 py-2.5 px-3 rounded-2xl transition-all text-xs font-bold text-left ${
@@ -334,7 +338,8 @@ export const ModalProduitFormulaire: React.FC<ModalProduitFormulaireProps> = ({
         </div>
 
         {/* Form Body */}
-        <form onSubmit={soumettreFormulaire}>
+        {/* Conteneur principal — Enter bloqué pour éviter la soumission accidentelle */}
+        <div onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault(); }}>
           <div className="p-8 space-y-6">
             {erreurEtape && (
               <div className="p-4 bg-rose-50 border border-rose-200 text-rose-600 font-bold text-xs rounded-2xl flex items-center gap-2 animate-shake">
@@ -781,15 +786,16 @@ export const ModalProduitFormulaire: React.FC<ModalProduitFormulaireProps> = ({
               </button>
             ) : (
               <button
-                type="submit"
+                type="button"
+                onClick={creerProduit}
                 className="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-lg shadow-emerald-500/25 transition-all flex items-center gap-2 cursor-pointer transform hover:-translate-y-0.5"
               >
                 <CheckmarkCircle02Icon size={18} />
-                <span>{produitAEditer ? "Mettre à jour le Produit" : "Créer le produit"}</span>
+                <span>{produitAEditer ? "Mettre à jour le Produit" : "✓ Confirmer & Créer"}</span>
               </button>
             )}
           </div>
-        </form>
+        </div>
       </div>
     </div>,
     document.body

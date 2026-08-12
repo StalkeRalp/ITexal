@@ -5,8 +5,8 @@ import {
   ModalAjustementStock,
   ArticleStockFull,
 } from "@/modules/stocks/composants/modal-ajustement-stock";
-import { formaterPrix } from "@/lib/utilitaires/formatage";
 import { useProduits } from "@/lib/context/ProduitsContext";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import {
   RefreshIcon,
   PackageIcon,
@@ -31,6 +31,7 @@ interface JournalAjustement {
 
 export default function PageStocksAdmin() {
   const { produits, modifierStockEtSeuils, supprimerProduit } = useProduits();
+  const { t, formaterPrix, formaterDate, langue } = useLanguage();
   const [recherche, setRecherche] = useState("");
   const [filtreStatut, setFiltreStatut] = useState<"Tous" | "Faible" | "Rupture">("Tous");
 
@@ -47,22 +48,11 @@ export default function PageStocksAdmin() {
       seuilAlerteMax: p.seuilAlerteMax || 100,
       couleurs: ["bg-slate-800", "bg-[#5B63F6]"],
       iconProduit: p.nomCategorie || "Général",
-      derniereMiseAJour: p.misAJourLe || p.creeLe || new Date().toLocaleDateString("fr-FR"),
+      derniereMiseAJour: p.misAJourLe || p.creeLe || new Date().toLocaleDateString(langue === "fr" ? "fr-FR" : "en-US"),
     }));
-  }, [produits]);
+  }, [produits, langue]);
 
-  const [journal, setJournal] = useState<JournalAjustement[]>([
-    {
-      id: "j-1",
-      nomProduit: "Sérum Visage Éclat Bio Karité",
-      nouveauStock: 30,
-      seuilMin: 10,
-      seuilMax: 100,
-      motif: "Réapprovisionnement Fournisseur",
-      date: "12/08/2026 10:15",
-    },
-  ]);
-
+  const [journal, setJournal] = useState<JournalAjustement[]>([]);
   const [articleAAjuster, setArticleAAjuster] = useState<ArticleStockFull | null>(null);
   const [messageSynchro, setMessageSynchro] = useState("");
 
@@ -77,6 +67,7 @@ export default function PageStocksAdmin() {
     0
   );
 
+  const labelTous = t("common.all");
   const articlesFiltres = articlesStock.filter((art) => {
     const matchRecherche =
       art.nomProduit.toLowerCase().includes(recherche.toLowerCase()) ||
@@ -93,7 +84,7 @@ export default function PageStocksAdmin() {
   });
 
   const rechargerStock = () => {
-    setMessageSynchro("Stocks et seuils synchronisés en temps réel avec la base de données.");
+    setMessageSynchro(t("common.success"));
     setTimeout(() => setMessageSynchro(""), 3500);
   };
 
@@ -118,20 +109,20 @@ export default function PageStocksAdmin() {
       seuilMin,
       seuilMax,
       motif,
-      date: new Date().toLocaleDateString("fr-FR") + " " + new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
+      date: new Date().toLocaleDateString(langue === "fr" ? "fr-FR" : "en-US"),
       remarque,
     };
 
     setJournal((prev) => [nouvelleEntree, ...prev]);
-    setMessageSynchro(`Stock et seuils mis à jour pour ${cible.nomProduit} (${nouveauStock} u., Seuil min: ${seuilMin})`);
+    setMessageSynchro(`${t("stocks.adjustStockTitle")}: ${cible.nomProduit}`);
     setTimeout(() => setMessageSynchro(""), 3500);
     setArticleAAjuster(null);
   };
 
   const supprimerArticleHandler = (id: string) => {
-    if (confirm("Voulez-vous vraiment supprimer cet article du stock ?")) {
+    if (confirm(t("common.confirmDeleteMessage"))) {
       supprimerProduit(id);
-      setMessageSynchro("Article retiré de l'inventaire.");
+      setMessageSynchro(t("products.deletedSuccess"));
       setTimeout(() => setMessageSynchro(""), 3000);
     }
   };
@@ -142,10 +133,10 @@ export default function PageStocksAdmin() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-            Gestion Centralisée des Stocks ({totalReferences})
+            {t("stocks.title")} ({totalReferences})
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Inventaire et seuils d'alerte en temps réel synchronisés sur toute la plateforme Cosmetic Admin.
+            {t("stocks.subtitle")}
           </p>
         </div>
 
@@ -153,9 +144,9 @@ export default function PageStocksAdmin() {
           <button
             type="button"
             onClick={rechargerStock}
-            className="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-2xl shadow-xs transition-all flex items-center gap-2"
+            className="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-2xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
           >
-            <RefreshIcon size={16} /> Synchroniser
+            <RefreshIcon size={16} /> {t("common.refresh")}
           </button>
         </div>
       </div>
@@ -171,13 +162,13 @@ export default function PageStocksAdmin() {
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Valeur Totale Stock
+              {t("dashboard.kpiRevenue")}
             </span>
             <h3 className="text-2xl font-black text-slate-900 mt-1">
               {formaterPrix(totalValeurStock)}
             </h3>
             <span className="text-[11px] text-slate-500 font-medium block mt-1">
-              Sur {totalReferences} références
+              {totalReferences} {t("navigation.products")}
             </span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#5B63F6] flex items-center justify-center font-bold">
@@ -188,13 +179,13 @@ export default function PageStocksAdmin() {
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Stock Total d'Unités
+              {t("common.quantity")}
             </span>
             <h3 className="text-2xl font-black text-slate-900 mt-1">
               {articlesStock.reduce((s, a) => s + a.quantiteActuelle, 0)} u.
             </h3>
             <span className="text-[11px] text-slate-500 font-medium block mt-1">
-              Unités physiques dispo
+              {t("navigation.stocks")}
             </span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
@@ -205,13 +196,13 @@ export default function PageStocksAdmin() {
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Stocks Faibles
+              {t("products.lowStock")}
             </span>
             <h3 className="text-2xl font-black text-amber-600 mt-1">
               {totalStockFaible}
             </h3>
             <span className="text-[11px] text-amber-700/80 font-bold block mt-1">
-              Sous le seuil d'alerte min
+              {t("stocks.alertThreshold")}
             </span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
@@ -222,11 +213,11 @@ export default function PageStocksAdmin() {
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Ruptures de Stock
+              {t("products.outOfStock")}
             </span>
             <h3 className="text-2xl font-black text-rose-600 mt-1">{totalRuptures}</h3>
             <span className="text-[11px] text-rose-700/80 font-bold block mt-1">
-              Indisponibles sur le e-commerce
+              0 {t("common.quantity")}
             </span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
@@ -247,7 +238,7 @@ export default function PageStocksAdmin() {
               type="text"
               value={recherche}
               onChange={(e) => setRecherche(e.target.value)}
-              placeholder="Rechercher un article en stock..."
+              placeholder={t("products.filterSearchPlaceholder")}
               className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#5B63F6]"
             />
           </div>
@@ -256,35 +247,35 @@ export default function PageStocksAdmin() {
             <button
               type="button"
               onClick={() => setFiltreStatut("Tous")}
-              className={`px-4 py-2 rounded-xl transition-all ${
+              className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
                 filtreStatut === "Tous"
                   ? "bg-[#5B63F6] text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
-              Tous ({totalReferences})
+              {t("common.all")} ({totalReferences})
             </button>
             <button
               type="button"
               onClick={() => setFiltreStatut("Faible")}
-              className={`px-4 py-2 rounded-xl transition-all ${
+              className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
                 filtreStatut === "Faible"
                   ? "bg-amber-500 text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
-              Faible ({totalStockFaible})
+              {t("products.lowStock")} ({totalStockFaible})
             </button>
             <button
               type="button"
               onClick={() => setFiltreStatut("Rupture")}
-              className={`px-4 py-2 rounded-xl transition-all ${
+              className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
                 filtreStatut === "Rupture"
                   ? "bg-rose-500 text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
-              Rupture ({totalRuptures})
+              {t("products.outOfStock")} ({totalRuptures})
             </button>
           </div>
         </div>
@@ -293,14 +284,14 @@ export default function PageStocksAdmin() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-100 text-slate-400 text-xs font-bold uppercase tracking-wider">
-                <th className="py-4 px-4">PRODUIT</th>
-                <th className="py-4 px-4">CATÉGORIE</th>
-                <th className="py-4 px-4 text-right">PRIX UNITAIRE</th>
-                <th className="py-4 px-4 text-center">QUANTITÉ ACTUELLE</th>
-                <th className="py-4 px-4 text-center">SEUIL MIN</th>
-                <th className="py-4 px-4 text-center">SEUIL MAX</th>
-                <th className="py-4 px-4 text-center">STATUT</th>
-                <th className="py-4 px-4 text-center">ACTIONS</th>
+                <th className="py-4 px-4">{t("navigation.products")}</th>
+                <th className="py-4 px-4">{t("navigation.categories")}</th>
+                <th className="py-4 px-4 text-right">{t("common.price")}</th>
+                <th className="py-4 px-4 text-center">{t("common.quantity")}</th>
+                <th className="py-4 px-4 text-center">{t("stocks.alertThreshold")} MIN</th>
+                <th className="py-4 px-4 text-center">{t("stocks.alertThreshold")} MAX</th>
+                <th className="py-4 px-4 text-center">{t("common.status")}</th>
+                <th className="py-4 px-4 text-center">{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-700">
@@ -328,15 +319,15 @@ export default function PageStocksAdmin() {
                     <td className="py-4 px-4 text-center whitespace-nowrap">
                       {estRupture ? (
                         <span className="px-3 py-1 rounded-full bg-rose-50 text-rose-600 text-xs font-bold">
-                          Rupture
+                          {t("products.outOfStock")}
                         </span>
                       ) : estFaible ? (
                         <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-600 text-xs font-bold">
-                          Stock Faible
+                          {t("products.lowStock")}
                         </span>
                       ) : (
                         <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-bold">
-                          En Stock
+                          {t("products.inStock")}
                         </span>
                       )}
                     </td>
@@ -348,13 +339,13 @@ export default function PageStocksAdmin() {
                           className="px-3.5 py-1.5 bg-[#5B63F6] hover:bg-indigo-600 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1 cursor-pointer"
                         >
                           <FilterHorizontalIcon size={14} />
-                          <span>Ajuster</span>
+                          <span>{t("common.edit")}</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => supprimerArticleHandler(art.id)}
                           className="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl transition-colors cursor-pointer"
-                          title="Supprimer l'article"
+                          title={t("common.delete")}
                         >
                           <Delete02Icon size={16} />
                         </button>

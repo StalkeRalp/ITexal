@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import {
   UtilisateurInterne,
   RoleUtilisateur,
 } from "@/modules/utilisateurs/types/utilisateur";
 import { ModalUtilisateurFormulaire } from "@/modules/utilisateurs/composants/modal-utilisateur-formulaire";
 import {
-  UserIcon,
   Add01Icon,
   Search01Icon,
   Edit02Icon,
@@ -20,6 +20,7 @@ import {
 } from "hugeicons-react";
 
 export default function PageUtilisateursAdmin() {
+  const { t } = useLanguage();
   const [recherche, setRecherche] = useState("");
   const [filtreRole, setFiltreRole] = useState<string>("Tous");
 
@@ -95,11 +96,11 @@ export default function PageUtilisateursAdmin() {
   };
 
   const reinitialiserMotDePasse = (email: string) => {
-    alert(`Un lien de réinitialisation sécurisé a été envoyé à ${email}`);
+    alert(`${t("utilisateurs.resetPasswordSent")} (${email})`);
   };
 
   const supprimerUtilisateur = (id: string) => {
-    if (confirm("Voulez-vous révoquer l'accès de cet utilisateur ?")) {
+    if (confirm(t("utilisateurs.confirmRevoke"))) {
       setUtilisateurs((prev) => prev.filter((u) => u.id !== id));
     }
   };
@@ -145,25 +146,25 @@ export default function PageUtilisateursAdmin() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fadeIn">
       {/* Title & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-            Utilisateurs & Contrôle d'Accès (RBAC)
+            {t("utilisateurs.title")}
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Gestion des accès administrateurs et collaborateurs de la plateforme ITexal.
+            {t("utilisateurs.subtitle")}
           </p>
         </div>
 
         <button
           type="button"
           onClick={ouvrirCreation}
-          className="px-5 py-2.5 bg-[#4880FF] hover:bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 transition-all flex items-center gap-2"
+          className="px-5 py-2.5 bg-[#4880FF] hover:bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 transition-all flex items-center gap-2 cursor-pointer"
         >
           <Add01Icon size={16} strokeWidth={2.5} />
-          <span>Ajouter un Utilisateur</span>
+          <span>{t("utilisateurs.addUser")}</span>
         </button>
       </div>
 
@@ -174,7 +175,7 @@ export default function PageUtilisateursAdmin() {
             type="text"
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
-            placeholder="Rechercher par nom ou email..."
+            placeholder={t("common.search")}
             className="w-full pl-9 pr-4 py-2 bg-[#F8F9FD] border border-slate-200 rounded-xl focus:outline-none focus:border-[#4880FF] text-slate-800"
           />
           <Search01Icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -186,13 +187,13 @@ export default function PageUtilisateursAdmin() {
               key={tab}
               type="button"
               onClick={() => setFiltreRole(tab)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 filtreRole === tab
                   ? "bg-white text-[#4880FF] shadow-xs"
                   : "text-slate-500 hover:text-slate-800"
               }`}
             >
-              {tab}
+              {tab === "Tous" ? t("common.all") : tab}
             </button>
           ))}
         </div>
@@ -204,12 +205,12 @@ export default function PageUtilisateursAdmin() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-100 text-slate-400 text-[10px] font-extrabold uppercase tracking-wider">
-                <th className="py-4 px-4">MEMBRE</th>
-                <th className="py-4 px-4">E-MAIL / TÉLÉPHONE</th>
-                <th className="py-4 px-4">RÔLE RBAC</th>
-                <th className="py-4 px-4">DERNIER ACCÈS</th>
-                <th className="py-4 px-4 text-center">STATUT</th>
-                <th className="py-4 px-4 text-center">ACTIONS</th>
+                <th className="py-4 px-4">{t("utilisateurs.member")}</th>
+                <th className="py-4 px-4">{t("utilisateurs.emailPhone")}</th>
+                <th className="py-4 px-4">{t("utilisateurs.rbacRole")}</th>
+                <th className="py-4 px-4">{t("utilisateurs.lastAccess")}</th>
+                <th className="py-4 px-4 text-center">{t("common.status")}</th>
+                <th className="py-4 px-4 text-center">{t("common.actions")}</th>
               </tr>
             </thead>
 
@@ -230,7 +231,7 @@ export default function PageUtilisateursAdmin() {
                         {user.nomComplet}
                       </p>
                       <p className="text-[10px] text-slate-400">
-                        Inscrit le {user.creeLe}
+                        {t("clients.registrationDate")} {user.creeLe}
                       </p>
                     </div>
                   </td>
@@ -257,12 +258,10 @@ export default function PageUtilisateursAdmin() {
                       className={`px-3 py-1 rounded-xl text-xs font-bold ${
                         user.statut === "Actif"
                           ? "bg-emerald-100 text-emerald-700"
-                          : user.statut === "Inactif"
-                          ? "bg-slate-100 text-slate-600"
-                          : "bg-rose-100 text-rose-700"
+                          : "bg-slate-100 text-slate-600"
                       }`}
                     >
-                      {user.statut}
+                      {user.statut === "Actif" ? t("common.active") : t("common.inactive")}
                     </span>
                   </td>
 
@@ -272,19 +271,19 @@ export default function PageUtilisateursAdmin() {
                       <button
                         type="button"
                         onClick={() => reinitialiserMotDePasse(user.email)}
-                        className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors flex items-center gap-1"
-                        title="Réinitialiser MDP"
+                        className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                        title={t("utilisateurs.resetPassword")}
                       >
                         <Key01Icon size={14} />
-                        <span>Reset MDP</span>
+                        <span>{t("utilisateurs.resetPassword")}</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => ouvrirEdition(user)}
-                        aria-label="Éditer Rôle & Statut"
-                        className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center text-xs transition-colors"
-                        title="Éditer Rôle & Statut"
+                        aria-label={t("common.edit")}
+                        className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold flex items-center justify-center text-xs transition-colors cursor-pointer"
+                        title={t("common.edit")}
                       >
                         <Edit02Icon size={14} />
                       </button>
@@ -292,9 +291,9 @@ export default function PageUtilisateursAdmin() {
                       <button
                         type="button"
                         onClick={() => supprimerUtilisateur(user.id)}
-                        aria-label="Révoquer l'accès"
-                        className="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white font-bold flex items-center justify-center text-xs transition-colors"
-                        title="Révoquer l'accès"
+                        aria-label={t("utilisateurs.revokeAccess")}
+                        className="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white font-bold flex items-center justify-center text-xs transition-colors cursor-pointer"
+                        title={t("utilisateurs.revokeAccess")}
                       >
                         <Delete02Icon size={14} />
                       </button>

@@ -6,6 +6,7 @@ import { ModalCategorieFormulaire } from "@/modules/categories/composants/modal-
 import { ModalConfirmation } from "@/composants-communs/modal-confirmation";
 import { useProduits } from "@/lib/context/ProduitsContext";
 import { useToast } from "@/lib/context/ToastContext";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import {
   Add01Icon,
   Tag01Icon,
@@ -64,6 +65,7 @@ const PALETTES_CATEGORIES = [
 
 export default function PageCategoriesAdmin() {
   const { categories, produits, creerCategorie, modifierCategorie, supprimerCategorie } = useProduits();
+  const { t, formaterPrix } = useLanguage();
   const toast = useToast();
 
   // Mapping des catégories centralisées
@@ -77,7 +79,7 @@ export default function PageCategoriesAdmin() {
         description: c.description || `Gamme de soins et cosmétiques ${c.nom}`,
         icone: c.nom.split(" ")[0],
         image: c.image,
-        statut: "Actif",
+        statut: "Actif" as "Actif" | "Inactif",
         nombreProduits: countProds || c.nombreProduits || 0,
         creeLe: c.creeLe,
       };
@@ -118,7 +120,7 @@ export default function PageCategoriesAdmin() {
   const confirmerSuppressionHandler = () => {
     if (idASupprimer) {
       supprimerCategorie(idASupprimer);
-      toast.succes("Catégorie supprimée avec succès !");
+      toast.succes(t("categories.deletedSuccess"));
       if (categorieSelectionnee?.id === idASupprimer) {
         setCategorieSelectionnee(null);
       }
@@ -129,10 +131,10 @@ export default function PageCategoriesAdmin() {
   const enregistrerCategorieHandler = (cat: CategorieVue) => {
     if (categorieAEditer) {
       modifierCategorie(cat.id, cat.nom, cat.description, cat.image);
-      toast.succes("Catégorie mise à jour avec succès !");
+      toast.succes(t("categories.updatedSuccess"));
     } else {
       creerCategorie(cat.nom, cat.description, cat.image);
-      toast.succes("Nouvelle catégorie créée avec succès !");
+      toast.succes(t("categories.createdSuccess"));
     }
     setModalOuvert(false);
   };
@@ -141,14 +143,14 @@ export default function PageCategoriesAdmin() {
 
   return (
     <div className="space-y-8 animate-fadeIn max-w-[1600px] mx-auto pb-12">
-      {/* Hero Header matching Design Mockup */}
+      {/* Hero Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-            Liste des Catégories ({categoriesVues.length})
+            {t("categories.title")} ({categoriesVues.length})
           </h1>
           <p className="text-xs text-slate-400 font-medium mt-1">
-            Classification et thématisation des gammes cosmétiques.
+            {t("categories.subtitle")}
           </p>
         </div>
 
@@ -158,7 +160,7 @@ export default function PageCategoriesAdmin() {
           className="px-6 py-3 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 self-start sm:self-auto cursor-pointer"
         >
           <Add01Icon size={18} strokeWidth={2.5} />
-          <span>Ajouter une catégorie</span>
+          <span>{t("categories.addCategory")}</span>
         </button>
       </div>
 
@@ -167,7 +169,7 @@ export default function PageCategoriesAdmin() {
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Total Catégories
+              {t("categories.totalCategories")}
             </span>
             <h3 className="text-2xl font-black text-slate-800 mt-1">{categoriesVues.length}</h3>
           </div>
@@ -179,7 +181,7 @@ export default function PageCategoriesAdmin() {
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Catégories Actives
+              {t("categories.activeCategories")}
             </span>
             <h3 className="text-2xl font-black text-slate-800 mt-1">{categoriesVues.length}</h3>
           </div>
@@ -191,7 +193,7 @@ export default function PageCategoriesAdmin() {
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Produits Rattachés
+              {t("categories.attachedProducts")}
             </span>
             <h3 className="text-2xl font-black text-slate-800 mt-1">{totalProduits}</h3>
           </div>
@@ -212,7 +214,7 @@ export default function PageCategoriesAdmin() {
             type="text"
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
-            placeholder="Rechercher une catégorie..."
+            placeholder={t("categories.searchPlaceholder")}
             className="w-full pl-11 pr-4 py-3 bg-[#F8F9FD] border border-slate-200/60 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#5B63F6] focus:bg-white transition-all"
           />
         </div>
@@ -277,7 +279,7 @@ export default function PageCategoriesAdmin() {
                             className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 transition-colors"
                           >
                             <EyeIcon size={14} className="text-[#5B63F6]" />
-                            <span>Voir fiche</span>
+                            <span>{t("categories.viewCard")}</span>
                           </button>
 
                           <button
@@ -289,7 +291,7 @@ export default function PageCategoriesAdmin() {
                             className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 transition-colors"
                           >
                             <EyeIcon size={14} className="text-emerald-600" />
-                            <span>Plus d'infos (+)</span>
+                            <span>{t("categories.moreInfos")}</span>
                           </button>
 
                           <button
@@ -301,7 +303,7 @@ export default function PageCategoriesAdmin() {
                             className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 transition-colors"
                           >
                             <Edit02Icon size={14} className="text-amber-500" />
-                            <span>Modifier</span>
+                            <span>{t("common.edit")}</span>
                           </button>
 
                           <button
@@ -313,7 +315,7 @@ export default function PageCategoriesAdmin() {
                             className="w-full px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl flex items-center gap-2 transition-colors border-t border-slate-100 mt-1"
                           >
                             <Delete02Icon size={14} />
-                            <span>Supprimer</span>
+                            <span>{t("common.delete")}</span>
                           </button>
                         </div>
                       )}
@@ -330,7 +332,7 @@ export default function PageCategoriesAdmin() {
                           setCategorieDetaillee(cat);
                         }}
                         className="w-6 h-6 rounded-full bg-indigo-50 hover:bg-[#5B63F6] text-[#5B63F6] hover:text-white font-black text-xs flex items-center justify-center transition-all cursor-pointer"
-                        title="Voir toutes les informations (+)"
+                        title={t("categories.moreInfos")}
                       >
                         +
                       </button>
@@ -342,9 +344,9 @@ export default function PageCategoriesAdmin() {
 
                   <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
                     <span className={`px-3 py-1 rounded-xl text-xs font-extrabold border ${palette.badge}`}>
-                      {cat.nombreProduits} produit(s)
+                      {cat.nombreProduits} {t("common.products")}
                     </span>
-                    <span className="text-slate-400 font-mono text-[11px]">Créé le {cat.creeLe}</span>
+                    <span className="text-slate-400 font-mono text-[11px]">{cat.creeLe}</span>
                   </div>
                 </div>
               );
@@ -391,7 +393,7 @@ export default function PageCategoriesAdmin() {
               <button
                 type="button"
                 onClick={() => setCategorieDetaillee(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 font-extrabold flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 font-extrabold flex items-center justify-center transition-colors cursor-pointer"
               >
                 <Cancel01Icon size={16} />
               </button>
@@ -399,35 +401,35 @@ export default function PageCategoriesAdmin() {
 
             <div className="space-y-4 text-xs text-slate-700">
               <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
-                <span className="font-bold text-slate-400 uppercase text-[10px]">Description complète</span>
+                <span className="font-bold text-slate-400 uppercase text-[10px]">{t("categories.fullDescription")}</span>
                 <p className="font-medium text-slate-800 text-sm">{categorieDetaillee.description}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 text-center">
-                  <span className="font-bold text-slate-500 uppercase text-[10px]">Produits Rattachés</span>
+                  <span className="font-bold text-slate-500 uppercase text-[10px]">{t("categories.attachedProducts")}</span>
                   <p className="text-2xl font-black text-[#5B63F6] mt-1">{categorieDetaillee.nombreProduits}</p>
                 </div>
 
                 <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 text-center">
-                  <span className="font-bold text-slate-500 uppercase text-[10px]">Date de création</span>
+                  <span className="font-bold text-slate-500 uppercase text-[10px]">{t("clients.registrationDate")}</span>
                   <p className="text-sm font-black text-emerald-700 mt-1">{categorieDetaillee.creeLe}</p>
                 </div>
               </div>
 
               <div className="space-y-2 pt-2">
                 <h4 className="font-extrabold text-slate-800">
-                  Liste des produits rattachés à cette catégorie :
+                  {t("categories.attachedProducts")} :
                 </h4>
                 <div className="max-h-48 overflow-y-auto space-y-2 border border-slate-100 rounded-2xl p-2">
                   {produits.filter(p => p.categorieId === categorieDetaillee.id).map(prod => (
                     <div key={prod.id} className="p-2.5 bg-white rounded-xl border border-slate-100 flex items-center justify-between">
                       <span className="font-bold text-slate-800">{prod.nom}</span>
-                      <span className="font-extrabold text-[#5B63F6]">{prod.prix} FCFA</span>
+                      <span className="font-extrabold text-[#5B63F6]">{formaterPrix(prod.prix)}</span>
                     </div>
                   ))}
                   {produits.filter(p => p.categorieId === categorieDetaillee.id).length === 0 && (
-                    <p className="text-slate-400 text-center py-4">Aucun produit dans cette catégorie.</p>
+                    <p className="text-slate-400 text-center py-4">{t("categories.noProducts")}</p>
                   )}
                 </div>
               </div>
@@ -437,9 +439,9 @@ export default function PageCategoriesAdmin() {
               <button
                 type="button"
                 onClick={() => setCategorieDetaillee(null)}
-                className="px-6 py-2.5 bg-[#5B63F6] text-white font-extrabold rounded-xl shadow-md"
+                className="px-6 py-2.5 bg-[#5B63F6] text-white font-extrabold rounded-xl shadow-md cursor-pointer"
               >
-                Fermer
+                {t("common.close")}
               </button>
             </div>
           </div>
@@ -459,9 +461,9 @@ export default function PageCategoriesAdmin() {
       {idASupprimer && (
         <ModalConfirmation
           ouvert={!!idASupprimer}
-          titre="Supprimer la Catégorie"
-          message="Êtes-vous sûr de vouloir supprimer définitivement cette catégorie ? Cette action retirera la thématique sans supprimer les produits associés."
-          texteConfirmer="Oui, supprimer"
+          titre={t("categories.confirmDeleteTitle")}
+          message={t("categories.confirmDeleteMsg")}
+          texteConfirmer={t("common.delete")}
           variante="danger"
           onConfirmer={confirmerSuppressionHandler}
           onAnnuler={() => setIdASupprimer(null)}

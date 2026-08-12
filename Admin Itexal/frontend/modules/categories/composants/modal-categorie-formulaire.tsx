@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Categorie } from "../types/categorie";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import { Tag01Icon, Cancel01Icon, Upload01Icon, Image01Icon, Delete02Icon } from "hugeicons-react";
 
 interface ModalCategorieFormulaireProps {
@@ -15,6 +16,7 @@ interface ModalCategorieFormulaireProps {
 export const ModalCategorieFormulaire: React.FC<
   ModalCategorieFormulaireProps
 > = ({ ouvert, categorieAEditer, onFermer, onEnregistrer }) => {
+  const { t } = useLanguage();
   const [monte, setMonte] = useState(false);
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
@@ -81,16 +83,17 @@ export const ModalCategorieFormulaire: React.FC<
       <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col my-8">
         <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-2 text-slate-800">
-            <Tag01Icon size={20} className="text-[#4880FF]" />
+            <Tag01Icon size={20} className="text-[#5B63F6]" />
             <h2 className="font-extrabold text-base">
-              {categorieAEditer ? "Modifier la Catégorie" : "Ajouter une Catégorie"}
+              {categorieAEditer ? t("categories.editCategory") : t("categories.addCategory")}
             </h2>
           </div>
 
           <button
             type="button"
             onClick={onFermer}
-            className="w-8 h-8 rounded-full bg-white hover:bg-slate-200 text-slate-500 font-extrabold flex items-center justify-center text-xs transition-colors border border-slate-200"
+            aria-label={t("common.close")}
+            className="w-8 h-8 rounded-full bg-white hover:bg-slate-200 text-slate-500 font-extrabold flex items-center justify-center text-xs transition-colors border border-slate-200 cursor-pointer"
           >
             <Cancel01Icon size={16} />
           </button>
@@ -99,7 +102,7 @@ export const ModalCategorieFormulaire: React.FC<
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Nom de la catégorie *
+              {t("categories.categoryName")}
             </label>
             <input
               type="text"
@@ -107,27 +110,27 @@ export const ModalCategorieFormulaire: React.FC<
               value={nom}
               onChange={(e) => setNom(e.target.value)}
               placeholder="ex: Soins Visage, Huiles Essentielles..."
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#4880FF]"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#5B63F6]"
             />
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Description
+              {t("categories.categoryDesc")}
             </label>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Courte présentation de la gamme..."
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#4880FF]"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#5B63F6]"
             />
           </div>
 
           {/* Importation de l'image de la catégorie */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Image représentative de la catégorie
+              {t("categories.categoryImage")}
             </label>
 
             {image ? (
@@ -141,81 +144,54 @@ export const ModalCategorieFormulaire: React.FC<
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-3 py-1.5 bg-white text-slate-800 rounded-xl text-xs font-bold shadow-md hover:bg-slate-100 flex items-center gap-1"
+                    className="px-3 py-1.5 bg-white text-slate-800 rounded-xl text-xs font-bold shadow-md hover:bg-slate-100 flex items-center gap-1 cursor-pointer"
                   >
                     <Upload01Icon size={14} />
-                    <span>Changer</span>
+                    <span>{t("common.edit")}</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setImage("")}
-                    className="px-3 py-1.5 bg-rose-600 text-white rounded-xl text-xs font-bold shadow-md hover:bg-rose-700 flex items-center gap-1"
+                    className="px-3 py-1.5 bg-rose-500 text-white rounded-xl text-xs font-bold shadow-md hover:bg-rose-600 flex items-center gap-1 cursor-pointer"
                   >
                     <Delete02Icon size={14} />
-                    <span>Supprimer</span>
+                    <span>{t("common.delete")}</span>
                   </button>
                 </div>
               </div>
             ) : (
-              <div
+              <button
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full h-32 border-2 border-dashed border-slate-300 hover:border-[#4880FF] rounded-2xl flex flex-col items-center justify-center gap-1.5 bg-slate-50/50 hover:bg-indigo-50/20 cursor-pointer transition-all text-slate-500"
+                className="w-full h-28 border-2 border-dashed border-slate-200 hover:border-[#5B63F6] rounded-2xl flex flex-col items-center justify-center gap-1.5 text-slate-400 hover:text-[#5B63F6] hover:bg-indigo-50/30 transition-all group cursor-pointer"
               >
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-[#4880FF] flex items-center justify-center">
-                  <Image01Icon size={20} />
-                </div>
-                <span className="text-xs font-bold text-slate-700">
-                  Cliquer pour importer une image
-                </span>
-                <span className="text-[10px] text-slate-400 font-medium">
-                  PNG, JPG, WEBP (Max 5 Mo)
-                </span>
-              </div>
+                <Image01Icon size={24} className="group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-bold">{t("products.formImageAdd")}</span>
+              </button>
             )}
 
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">
-                Statut
-              </label>
-              <select
-                value={statut}
-                onChange={(e) => setStatut(e.target.value as "Actif" | "Inactif")}
-                className="w-full px-4 py-2.5 bg-[#F8F9FD] border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#4880FF] text-slate-800 font-semibold"
-              >
-                <option value="Actif">Actif (Visible sur la boutique)</option>
-                <option value="Inactif">Inactif (Masqué)</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block font-bold text-slate-700 mb-1">
-              Description
-            </label>
-            <textarea
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Description synthétique de la gamme cosmétique..."
-              className="w-full px-4 py-2.5 bg-[#F8F9FD] border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#4880FF] text-slate-800"
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
             />
           </div>
 
-          {/* Footer Submit */}
-          <div className="pt-4 flex items-center justify-between border-t border-slate-100">
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onFermer}
-              className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold hover:bg-slate-100 transition-colors"
+              className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition-colors cursor-pointer"
             >
-              Annuler
+              {t("common.cancel")}
             </button>
-
             <button
               type="submit"
-              className="px-6 py-2.5 bg-[#4880FF] hover:bg-blue-600 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-500/20"
+              className="px-6 py-2.5 rounded-xl bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold text-xs shadow-md shadow-indigo-500/20 transition-all cursor-pointer"
             >
-              Enregistrer
+              {t("common.save")}
             </button>
           </div>
         </form>

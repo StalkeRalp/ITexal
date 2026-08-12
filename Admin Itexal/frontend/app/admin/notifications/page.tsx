@@ -9,9 +9,7 @@ import {
   Notification01Icon,
   ShoppingBag01Icon,
   Store01Icon,
-  UserIcon,
   AlertCircleIcon,
-  Discount01Icon,
   Tick01Icon,
   Delete02Icon,
   Cancel01Icon,
@@ -24,7 +22,6 @@ export default function PageNotificationsAdmin() {
     notifications,
     nombreNonLues,
     marquerCommeLue,
-    basculerLecture,
     toutMarquerCommeLu,
     supprimerNotification,
     purgerToutesNotifications,
@@ -64,16 +61,16 @@ export default function PageNotificationsAdmin() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
-              {t("centreNotifications")}
+              {t("notifications.title")}
             </h1>
             {nombreNonLues > 0 && (
               <span className="px-3.5 py-1 bg-rose-500 text-white font-black text-xs rounded-full shadow-md shadow-rose-500/30 animate-pulse">
-                {nombreNonLues} {t("nonLues")}
+                {nombreNonLues} {t("notifications.unread")}
               </span>
             )}
           </div>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Gestion centralisée des alertes en temps réel pour le back-office ITexal.
+            {t("notifications.subtitle")}
           </p>
         </div>
 
@@ -81,19 +78,19 @@ export default function PageNotificationsAdmin() {
           <button
             type="button"
             onClick={toutMarquerCommeLu}
-            className="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5"
+            className="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <Tick01Icon size={16} />
-            <span>{t("toutMarquerLu")}</span>
+            <span>{t("notifications.markAllAsRead")}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setModalPurgerOuvert(true)}
-            className="px-4 py-2.5 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white font-bold text-xs rounded-xl border border-rose-200 transition-all flex items-center gap-1.5"
+            className="px-4 py-2.5 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white font-bold text-xs rounded-xl border border-rose-200 transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <Delete02Icon size={16} />
-            <span>{t("purgerTout")}</span>
+            <span>{t("notifications.clearAll")}</span>
           </button>
         </div>
       </div>
@@ -103,7 +100,7 @@ export default function PageNotificationsAdmin() {
         <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              {t("nonLues")}
+              {t("notifications.unread")}
             </span>
             <h3 className="text-2xl font-extrabold text-rose-600 mt-1">
               {nombreNonLues}
@@ -117,7 +114,7 @@ export default function PageNotificationsAdmin() {
         <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              {t("alertesCommandes")}
+              {t("notifications.typeOrder")}
             </span>
             <h3 className="text-2xl font-extrabold text-[#4880FF] mt-1">
               {countCommandes}
@@ -131,7 +128,7 @@ export default function PageNotificationsAdmin() {
         <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              {t("alertesStock")}
+              {t("notifications.typeStock")}
             </span>
             <h3 className="text-2xl font-extrabold text-amber-600 mt-1">
               {countStock}
@@ -145,7 +142,7 @@ export default function PageNotificationsAdmin() {
         <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              {t("securiteLog")}
+              {t("notifications.typeSystem")}
             </span>
             <h3 className="text-2xl font-extrabold text-slate-800 mt-1">
               {countSecurite}
@@ -164,13 +161,21 @@ export default function PageNotificationsAdmin() {
             key={typeFiltre}
             type="button"
             onClick={() => setFiltreType(typeFiltre)}
-            className={`px-4 py-2 rounded-xl transition-all whitespace-nowrap capitalize ${
+            className={`px-4 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer ${
               filtreType === typeFiltre
                 ? "bg-[#4880FF] text-white shadow-md shadow-blue-500/20"
                 : "text-slate-600 hover:bg-slate-100"
             }`}
           >
-            {typeFiltre}
+            {typeFiltre === "Tous"
+              ? t("common.all")
+              : typeFiltre === "Non lues"
+              ? t("notifications.unread")
+              : typeFiltre === "commande"
+              ? t("notifications.typeOrder")
+              : typeFiltre === "stock"
+              ? t("notifications.typeStock")
+              : t("notifications.typeSystem")}
           </button>
         ))}
       </div>
@@ -199,7 +204,7 @@ export default function PageNotificationsAdmin() {
                   </h3>
                   {notif.important && (
                     <span className="px-2.5 py-0.5 rounded-md bg-rose-100 text-rose-700 font-bold text-[10px]">
-                      Urgent
+                      {t("notifications.urgent")}
                     </span>
                   )}
                   {!notif.lue && (
@@ -221,7 +226,7 @@ export default function PageNotificationsAdmin() {
                     href={`/admin/${notif.type === "commande" ? "commandes" : notif.type === "stock" ? "stocks" : "journal"}`}
                     className="text-[11px] font-extrabold text-[#4880FF] hover:underline flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-blue-100"
                   >
-                    <span>Inspecter dans le module</span>
+                    <span>{t("notifications.inspectModule")}</span>
                     <ArrowRight01Icon size={12} />
                   </Link>
                 </div>
@@ -234,9 +239,9 @@ export default function PageNotificationsAdmin() {
                 e.stopPropagation();
                 supprimerNotification(notif.id);
               }}
-              aria-label="Supprimer la notification"
-              className="w-8 h-8 rounded-full bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-500 font-bold flex items-center justify-center text-xs transition-colors shrink-0"
-              title="Supprimer la notification"
+              aria-label={t("common.delete")}
+              className="w-8 h-8 rounded-full bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-500 font-bold flex items-center justify-center text-xs transition-colors shrink-0 cursor-pointer"
+              title={t("common.delete")}
             >
               <Cancel01Icon size={14} />
             </button>
@@ -245,7 +250,7 @@ export default function PageNotificationsAdmin() {
 
         {notifsFiltrees.length === 0 && (
           <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 text-slate-400 text-xs">
-            Aucune notification dans cette catégorie.
+            {t("notifications.emptyNotifications")}
           </div>
         )}
       </div>
@@ -253,9 +258,9 @@ export default function PageNotificationsAdmin() {
       {/* Confirmation modal for Purge */}
       <ModalConfirmation
         ouvert={modalPurgerOuvert}
-        titre="Purger toutes les notifications"
-        message="Voulez-vous vraiment effacer définitivement l'ensemble des notifications de votre centre d'alerte ?"
-        texteConfirmer="Purger tout"
+        titre={t("notifications.purgeTitle")}
+        message={t("notifications.purgeConfirm")}
+        texteConfirmer={t("notifications.clearAll")}
         variante="danger"
         onConfirmer={() => {
           purgerToutesNotifications();

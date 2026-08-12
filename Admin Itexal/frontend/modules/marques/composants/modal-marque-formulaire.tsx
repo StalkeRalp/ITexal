@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Marque } from "../types/marque";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import { Building02Icon, Cancel01Icon } from "hugeicons-react";
 
 interface ModalMarqueFormulaireProps {
@@ -17,6 +18,7 @@ export const ModalMarqueFormulaire: React.FC<ModalMarqueFormulaireProps> = ({
   onFermer,
   onEnregistrer,
 }) => {
+  const { t } = useLanguage();
   const [nom, setNom] = useState("");
   const [logo, setLogo] = useState("");
   const [paysOrigine, setPaysOrigine] = useState("Cameroun");
@@ -75,10 +77,10 @@ export const ModalMarqueFormulaire: React.FC<ModalMarqueFormulaireProps> = ({
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-800">
-                {marqueAEditer ? "Modifier la Marque" : "Ajouter une Marque Partenaire"}
+                {marqueAEditer ? t("marques.editBrand") : t("marques.addBrand")}
               </h2>
               <p className="text-xs text-slate-500">
-                Gestion des marques et maisons cosmétiques.
+                {t("marques.subtitle")}
               </p>
             </div>
           </div>
@@ -86,8 +88,8 @@ export const ModalMarqueFormulaire: React.FC<ModalMarqueFormulaireProps> = ({
           <button
             type="button"
             onClick={onFermer}
-            aria-label="Fermer la fenêtre"
-            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold flex items-center justify-center transition-colors text-xs"
+            aria-label={t("common.close")}
+            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold flex items-center justify-center transition-colors text-xs cursor-pointer"
           >
             <Cancel01Icon size={16} strokeWidth={2} />
           </button>
@@ -97,7 +99,7 @@ export const ModalMarqueFormulaire: React.FC<ModalMarqueFormulaireProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              Nom de la marque *
+              {t("marques.brandName")}
             </label>
             <input
               type="text"
@@ -112,7 +114,7 @@ export const ModalMarqueFormulaire: React.FC<ModalMarqueFormulaireProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                Pays d'origine
+                {t("marques.originCountry")}
               </label>
               <input
                 type="text"
@@ -140,7 +142,7 @@ export const ModalMarqueFormulaire: React.FC<ModalMarqueFormulaireProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                Site Web Officiel
+                {t("marques.officialWebsite")}
               </label>
               <input
                 type="url"
@@ -153,22 +155,22 @@ export const ModalMarqueFormulaire: React.FC<ModalMarqueFormulaireProps> = ({
 
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                Statut
+                {t("common.status")}
               </label>
               <select
                 value={statut}
                 onChange={(e) => setStatut(e.target.value as "Active" | "Inactive")}
                 className="w-full px-4 py-2.5 bg-[#F8F9FD] border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#4880FF] text-slate-800 font-semibold"
               >
-                <option value="Active">Active (Visible)</option>
-                <option value="Inactive">Inactive</option>
+                <option value="Active">{t("common.active")}</option>
+                <option value="Inactive">{t("common.inactive")}</option>
               </select>
             </div>
           </div>
 
           <div>
             <label className="block font-bold text-slate-700 mb-1">
-              Description / Histoire de la marque
+              {t("marques.labPresentation")}
             </label>
             <textarea
               rows={3}
@@ -184,16 +186,16 @@ export const ModalMarqueFormulaire: React.FC<ModalMarqueFormulaireProps> = ({
             <button
               type="button"
               onClick={onFermer}
-              className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold hover:bg-slate-100 transition-colors"
+              className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold hover:bg-slate-100 transition-colors cursor-pointer"
             >
-              Annuler
+              {t("common.cancel")}
             </button>
 
             <button
               type="submit"
-              className="px-6 py-2.5 bg-[#4880FF] hover:bg-blue-600 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-500/20"
+              className="px-6 py-2.5 bg-[#4880FF] hover:bg-blue-600 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-500/20 cursor-pointer"
             >
-              Enregistrer
+              {t("common.save")}
             </button>
           </div>
         </form>

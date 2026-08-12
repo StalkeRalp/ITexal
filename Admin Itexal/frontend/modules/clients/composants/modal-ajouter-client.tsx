@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import { Cancel01Icon, Camera01Icon } from "hugeicons-react";
 
 interface ModalAjouterClientProps {
@@ -21,6 +22,7 @@ export const ModalAjouterClient: React.FC<ModalAjouterClientProps> = ({
   onFermer,
   onAjouter,
 }) => {
+  const { t } = useLanguage();
   const [prenom, setPrenom] = useState("");
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
@@ -63,15 +65,15 @@ export const ModalAjouterClient: React.FC<ModalAjouterClientProps> = ({
         <button
           type="button"
           onClick={onFermer}
-          aria-label="Fermer la fenêtre"
-          className="absolute top-6 right-6 w-8 h-8 rounded-full bg-rose-50 text-rose-500 hover:bg-rose-100 font-extrabold flex items-center justify-center text-xs transition-colors"
+          aria-label={t("common.close")}
+          className="absolute top-6 right-6 w-8 h-8 rounded-full bg-rose-50 text-rose-500 hover:bg-rose-100 font-extrabold flex items-center justify-center text-xs transition-colors cursor-pointer"
         >
           <Cancel01Icon size={16} strokeWidth={2} />
         </button>
 
         {/* Title */}
         <h3 className="text-xl font-black text-slate-800 tracking-tight">
-          Add Customer
+          {t("clients.addCustomer")}
         </h3>
 
         <form onSubmit={soumettre} className="space-y-4">
@@ -85,7 +87,7 @@ export const ModalAjouterClient: React.FC<ModalAjouterClientProps> = ({
           {/* First Name */}
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">
-              First Name
+              {t("clients.firstName")}
             </label>
             <input
               type="text"
@@ -99,11 +101,11 @@ export const ModalAjouterClient: React.FC<ModalAjouterClientProps> = ({
           {/* Last Name */}
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">
-              Last Name
+              {t("clients.lastName")}
             </label>
             <input
               type="text"
-              placeholder="Ex: Deo"
+              placeholder="Ex: Doe"
               value={nom}
               onChange={(e) => setNom(e.target.value)}
               className="w-full px-4 py-3 bg-[#F8F9FD] border border-slate-200 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#4880FF]"
@@ -113,7 +115,7 @@ export const ModalAjouterClient: React.FC<ModalAjouterClientProps> = ({
           {/* Email */}
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">
-              Email
+              {t("common.email")}
             </label>
             <input
               type="email"
@@ -127,7 +129,7 @@ export const ModalAjouterClient: React.FC<ModalAjouterClientProps> = ({
           {/* Phone Number */}
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">
-              Phone Number
+              {t("clients.phone")}
             </label>
             <input
               type="text"
@@ -141,22 +143,22 @@ export const ModalAjouterClient: React.FC<ModalAjouterClientProps> = ({
           {/* Gender Select */}
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">
-              Gender
+              {t("clients.gender")}
             </label>
             <select
               value={genre}
               onChange={(e) => setGenre(e.target.value as "Male" | "Female")}
               className="w-full px-4 py-3 bg-[#F8F9FD] border border-slate-200 rounded-2xl text-xs text-slate-800 focus:outline-none focus:border-[#4880FF] cursor-pointer"
             >
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
+              <option value="Male">{t("clients.male")}</option>
+              <option value="Female">{t("clients.female")}</option>
             </select>
           </div>
 
           {/* Gamme / Type */}
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-700">
-              Gamme de prédilection
+              {t("clients.preferredRange")}
             </label>
             <select
               value={typeGamme}
@@ -175,9 +177,9 @@ export const ModalAjouterClient: React.FC<ModalAjouterClientProps> = ({
           <div className="pt-4">
             <button
               type="submit"
-              className="w-full py-3.5 bg-[#4880FF] hover:bg-blue-600 text-white font-bold text-xs rounded-2xl shadow-lg shadow-blue-500/20 transition-all"
+              className="w-full py-3.5 bg-[#4880FF] hover:bg-blue-600 text-white font-bold text-xs rounded-2xl shadow-lg shadow-blue-500/20 transition-all cursor-pointer"
             >
-              Add Customer
+              {t("clients.addCustomer")}
             </button>
           </div>
         </form>

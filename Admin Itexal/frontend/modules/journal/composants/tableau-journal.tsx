@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { LogAudit, NiveauSeveriteAudit } from "../types/journal";
+import { useLanguage } from "@/lib/context/LanguageContext";
 import {
   Search01Icon,
   AlertCircleIcon,
@@ -18,6 +19,7 @@ export const TableauJournal: React.FC<TableauJournalProps> = ({
   journal,
   onVoirLog,
 }) => {
+  const { t } = useLanguage();
   const [recherche, setRecherche] = useState("");
   const [filtreModule, setFiltreModule] = useState<string>("Tous");
   const [filtreSeverite, setFiltreSeverite] = useState<string>("Tous");
@@ -43,19 +45,19 @@ export const TableauJournal: React.FC<TableauJournalProps> = ({
       case "Critique":
         return (
           <span className="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 text-[10px] font-black inline-flex items-center gap-1">
-            <AlertCircleIcon size={12} /> Critique
+            <AlertCircleIcon size={12} /> {t("common.error")}
           </span>
         );
       case "Avertissement":
         return (
           <span className="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-[10px] font-bold inline-flex items-center gap-1">
-            <AlertCircleIcon size={12} /> Avertissement
+            <AlertCircleIcon size={12} /> {t("common.warning")}
           </span>
         );
       default:
         return (
           <span className="px-2.5 py-1 rounded-lg bg-blue-100 text-blue-700 text-[10px] font-bold inline-flex items-center gap-1">
-            <InformationCircleIcon size={12} /> Info
+            <InformationCircleIcon size={12} /> {t("common.info")}
           </span>
         );
     }
@@ -71,7 +73,7 @@ export const TableauJournal: React.FC<TableauJournalProps> = ({
             type="text"
             value={recherche}
             onChange={(e) => setRecherche(e.target.value)}
-            placeholder="Rechercher par action, admin ou IP..."
+            placeholder={t("journal.searchPlaceholder")}
             className="w-full pl-10 pr-4 py-2.5 bg-[#F8F9FD] border border-slate-200 rounded-2xl text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-[#4880FF]"
           />
           <Search01Icon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -85,7 +87,7 @@ export const TableauJournal: React.FC<TableauJournalProps> = ({
             onChange={(e) => setFiltreModule(e.target.value)}
             className="bg-[#F8F9FD] border border-slate-200 text-slate-700 py-2 px-3 rounded-xl text-xs font-semibold focus:outline-none focus:border-[#4880FF]"
           >
-            <option value="Tous">Tous les Modules</option>
+            <option value="Tous">{t("journal.allModules")}</option>
             <option value="Authentification">Authentification</option>
             <option value="Produits">Produits</option>
             <option value="Catégories">Catégories</option>
@@ -101,7 +103,7 @@ export const TableauJournal: React.FC<TableauJournalProps> = ({
             onChange={(e) => setFiltreSeverite(e.target.value)}
             className="bg-[#F8F9FD] border border-slate-200 text-slate-700 py-2 px-3 rounded-xl text-xs font-semibold focus:outline-none focus:border-[#4880FF]"
           >
-            <option value="Tous">Toutes les Sévérités</option>
+            <option value="Tous">{t("journal.allSeverities")}</option>
             <option value="Info">Informations</option>
             <option value="Avertissement">Avertissements</option>
             <option value="Critique">Critiques / Sécurité</option>
@@ -114,13 +116,13 @@ export const TableauJournal: React.FC<TableauJournalProps> = ({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-slate-100 text-slate-400 text-[10px] font-extrabold uppercase tracking-wider">
-              <th className="py-4 px-4">HORODATAGE</th>
-              <th className="py-4 px-4">UTILISATEUR</th>
-              <th className="py-4 px-4">MODULE</th>
-              <th className="py-4 px-4">ACTION & DESCRIPTION</th>
-              <th className="py-4 px-4">ADRESSE IP</th>
-              <th className="py-4 px-4 text-center">GRAVITÉ</th>
-              <th className="py-4 px-4 text-center">DETAILS</th>
+              <th className="py-4 px-4">{t("journal.timestamp")}</th>
+              <th className="py-4 px-4">{t("journal.user")}</th>
+              <th className="py-4 px-4">{t("journal.module")}</th>
+              <th className="py-4 px-4">{t("journal.actionDescription")}</th>
+              <th className="py-4 px-4">{t("journal.ipAddress")}</th>
+              <th className="py-4 px-4 text-center">{t("journal.severity")}</th>
+              <th className="py-4 px-4 text-center">{t("common.actions")}</th>
             </tr>
           </thead>
 
@@ -192,10 +194,10 @@ export const TableauJournal: React.FC<TableauJournalProps> = ({
                   <button
                     type="button"
                     onClick={() => onVoirLog(log)}
-                    className="px-3 py-1.5 bg-[#F8F9FD] hover:bg-blue-50 text-[#4880FF] font-bold rounded-xl border border-slate-200 text-xs transition-colors flex items-center gap-1"
+                    className="px-3 py-1.5 bg-[#F8F9FD] hover:bg-blue-50 text-[#4880FF] font-bold rounded-xl border border-slate-200 text-xs transition-colors flex items-center gap-1 cursor-pointer"
                   >
                     <ViewIcon size={14} />
-                    <span>Inspecter</span>
+                    <span>{t("journal.inspect")}</span>
                   </button>
                 </td>
               </tr>

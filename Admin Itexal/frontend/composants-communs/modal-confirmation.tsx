@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { AlertCircleIcon, Cancel01Icon, Tick01Icon } from "hugeicons-react";
 
 interface ModalConfirmationProps {
@@ -24,7 +25,13 @@ export const ModalConfirmation: React.FC<ModalConfirmationProps> = ({
   onConfirmer,
   onAnnuler,
 }) => {
-  if (!ouvert) return null;
+  const [monte, setMonte] = useState(false);
+
+  useEffect(() => {
+    setMonte(true);
+  }, []);
+
+  if (!ouvert || !monte) return null;
 
   const couleursHeader = {
     danger: "bg-rose-50 text-rose-500 border-rose-100",
@@ -38,8 +45,8 @@ export const ModalConfirmation: React.FC<ModalConfirmationProps> = ({
     info: "bg-[#4880FF] hover:bg-blue-600 shadow-blue-500/20 text-white",
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col">
         <div className="p-6 text-center space-y-4">
           <div
@@ -58,20 +65,21 @@ export const ModalConfirmation: React.FC<ModalConfirmationProps> = ({
           <button
             type="button"
             onClick={onAnnuler}
-            className="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-100 transition-colors"
+            className="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
           >
             {texteAnnuler}
           </button>
           <button
             type="button"
             onClick={onConfirmer}
-            className={`px-6 py-2.5 font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-1.5 ${couleursBouton[variante]}`}
+            className={`px-6 py-2.5 font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer ${couleursBouton[variante]}`}
           >
             <Tick01Icon size={16} strokeWidth={2.5} />
             <span>{texteConfirmer}</span>
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

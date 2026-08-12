@@ -161,13 +161,23 @@ export default function PageInscription() {
             />
             <span>
               J'accepte les{" "}
-              <a href="#" className="text-[#4880FF] font-extrabold underline">
+              <Link
+                href="/conditions-generales"
+                target="_blank"
+                onClick={(e) => e.stopPropagation()}
+                className="text-[#4880FF] font-extrabold underline hover:text-blue-700"
+              >
                 conditions d'utilisation
-              </a>{" "}
+              </Link>{" "}
               et la{" "}
-              <a href="#" className="text-[#4880FF] font-extrabold underline">
+              <Link
+                href="/politique-confidentialite"
+                target="_blank"
+                onClick={(e) => e.stopPropagation()}
+                className="text-[#4880FF] font-extrabold underline hover:text-blue-700"
+              >
                 politique de confidentialité
-              </a>.
+              </Link>.
             </span>
           </label>
         </div>

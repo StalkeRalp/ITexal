@@ -5,33 +5,32 @@ import {
   ModalAjustementStock,
   ArticleStockFull,
 } from "@/modules/stocks/composants/modal-ajustement-stock";
-import { ModalArticleStockFormulaire } from "@/modules/stocks/composants/modal-article-stock-formulaire";
-import { formatPrix, formatNombre } from "@/lib/formatteur";
+import { formaterPrix } from "@/lib/utilitaires/formatage";
 import { useProduits } from "@/lib/context/ProduitsContext";
 import {
   RefreshIcon,
-  Add01Icon,
   PackageIcon,
   Analytics01Icon,
   AlertCircleIcon,
   Search01Icon,
   Tick01Icon,
-  Edit02Icon,
   Delete02Icon,
-  SparklesIcon,
+  FilterHorizontalIcon,
 } from "hugeicons-react";
 
 interface JournalAjustement {
   id: string;
   nomProduit: string;
-  delta: number;
+  nouveauStock: number;
+  seuilMin: number;
+  seuilMax: number;
   motif: string;
   date: string;
   remarque?: string;
 }
 
 export default function PageStocksAdmin() {
-  const { produits, modifierStockProduit, supprimerProduit } = useProduits();
+  const { produits, modifierStockEtSeuils, supprimerProduit } = useProduits();
   const [recherche, setRecherche] = useState("");
   const [filtreStatut, setFiltreStatut] = useState<"Tous" | "Faible" | "Rupture">("Tous");
 
@@ -42,12 +41,13 @@ export default function PageStocksAdmin() {
       nomProduit: p.nom,
       categorie: p.nomCategorie || "Général",
       prix: p.prix,
-      stockInitial: p.stock + 20,
-      quantiteActuelle: p.stock,
-      seuilAlerte: 15,
-      couleurs: ["bg-slate-800", "bg-[#4880FF]"],
-      iconProduit: p.nomCategorie,
-      derniereMiseAJour: p.misAJourLe || p.creeLe,
+      stockInitial: (p.stock || 0) + 20,
+      quantiteActuelle: p.stock || 0,
+      seuilAlerte: p.seuilAlerte || 15,
+      seuilAlerteMax: p.seuilAlerteMax || 100,
+      couleurs: ["bg-slate-800", "bg-[#5B63F6]"],
+      iconProduit: p.nomCategorie || "Général",
+      derniereMiseAJour: p.misAJourLe || p.creeLe || new Date().toLocaleDateString("fr-FR"),
     }));
   }, [produits]);
 
@@ -55,15 +55,15 @@ export default function PageStocksAdmin() {
     {
       id: "j-1",
       nomProduit: "Sérum Visage Éclat Bio Karité",
-      delta: 20,
+      nouveauStock: 30,
+      seuilMin: 10,
+      seuilMax: 100,
       motif: "Réapprovisionnement Fournisseur",
-      date: "11/08/2026 10:15",
+      date: "12/08/2026 10:15",
     },
   ]);
 
   const [articleAAjuster, setArticleAAjuster] = useState<ArticleStockFull | null>(null);
-  const [modalFormulaireOuvert, setModalFormulaireOuvert] = useState(false);
-  const [articleAEditer, setArticleAEditer] = useState<ArticleStockFull | null>(null);
   const [messageSynchro, setMessageSynchro] = useState("");
 
   const totalReferences = articlesStock.length;
@@ -93,39 +93,43 @@ export default function PageStocksAdmin() {
   });
 
   const rechargerStock = () => {
-    setMessageSynchro("Stocks synchronisés en temps réel avec le catalogue.");
+    setMessageSynchro("Stocks et seuils synchronisés en temps réel avec la base de données.");
     setTimeout(() => setMessageSynchro(""), 3500);
   };
 
   const appliquerAjustementStock = (
     idArticle: string,
-    delta: number,
+    nouveauStock: number,
+    seuilMin: number,
+    seuilMax: number,
     motif: string,
     remarque?: string
   ) => {
     const cible = articlesStock.find((a) => a.id === idArticle);
     if (!cible) return;
 
-    const nouveauStock = Math.max(0, cible.quantiteActuelle + delta);
-    modifierStockProduit(idArticle, nouveauStock);
+    // Mise à jour de la base globale des produits
+    modifierStockEtSeuils(idArticle, nouveauStock, seuilMin, seuilMax);
 
     const nouvelleEntree: JournalAjustement = {
       id: `j-${Date.now()}`,
       nomProduit: cible.nomProduit,
-      delta,
+      nouveauStock,
+      seuilMin,
+      seuilMax,
       motif,
       date: new Date().toLocaleDateString("fr-FR") + " " + new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
       remarque,
     };
 
     setJournal((prev) => [nouvelleEntree, ...prev]);
-    setMessageSynchro(`Stock mis à jour pour ${cible.nomProduit} (${nouveauStock} u.)`);
+    setMessageSynchro(`Stock et seuils mis à jour pour ${cible.nomProduit} (${nouveauStock} u., Seuil min: ${seuilMin})`);
     setTimeout(() => setMessageSynchro(""), 3500);
     setArticleAAjuster(null);
   };
 
   const supprimerArticleHandler = (id: string) => {
-    if (confirm("Voulez-vous vraiment supprimer cet article de stock ?")) {
+    if (confirm("Voulez-vous vraiment supprimer cet article du stock ?")) {
       supprimerProduit(id);
       setMessageSynchro("Article retiré de l'inventaire.");
       setTimeout(() => setMessageSynchro(""), 3000);
@@ -137,11 +141,11 @@ export default function PageStocksAdmin() {
       {/* Title & Quick Actions Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             Gestion Centralisée des Stocks ({totalReferences})
           </h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            Inventaire en temps réel synchronisé avec le catalogue Cosmetic Admin.
+            Inventaire et seuils d'alerte en temps réel synchronisés sur toute la plateforme Cosmetic Admin.
           </p>
         </div>
 
@@ -164,30 +168,30 @@ export default function PageStocksAdmin() {
 
       {/* Grid des KPI de Stock */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Valeur Totale Stock
             </span>
-            <h3 className="text-2xl font-black text-slate-800 mt-1">
-              {formatPrix(totalValeurStock)} FCFA
+            <h3 className="text-2xl font-black text-slate-900 mt-1">
+              {formaterPrix(totalValeurStock)}
             </h3>
             <span className="text-[11px] text-slate-500 font-medium block mt-1">
               Sur {totalReferences} références
             </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#4880FF] flex items-center justify-center font-bold">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#5B63F6] flex items-center justify-center font-bold">
             <Analytics01Icon size={24} />
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Stock Total d'Unités
             </span>
-            <h3 className="text-2xl font-black text-slate-800 mt-1">
-              {formatNombre(articlesStock.reduce((s, a) => s + a.quantiteActuelle, 0))} u.
+            <h3 className="text-2xl font-black text-slate-900 mt-1">
+              {articlesStock.reduce((s, a) => s + a.quantiteActuelle, 0)} u.
             </h3>
             <span className="text-[11px] text-slate-500 font-medium block mt-1">
               Unités physiques dispo
@@ -198,16 +202,16 @@ export default function PageStocksAdmin() {
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Stocks Faibles (&lt;=15)
+              Stocks Faibles
             </span>
             <h3 className="text-2xl font-black text-amber-600 mt-1">
               {totalStockFaible}
             </h3>
             <span className="text-[11px] text-amber-700/80 font-bold block mt-1">
-              Réapprovisionnement recommandé
+              Sous le seuil d'alerte min
             </span>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
@@ -215,7 +219,7 @@ export default function PageStocksAdmin() {
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex items-center justify-between">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 flex items-center justify-between">
           <div>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Ruptures de Stock
@@ -232,7 +236,7 @@ export default function PageStocksAdmin() {
       </div>
 
       {/* Main Stock Table Container */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-6">
+      <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <div className="relative flex-1 max-w-md">
             <Search01Icon
@@ -244,7 +248,7 @@ export default function PageStocksAdmin() {
               value={recherche}
               onChange={(e) => setRecherche(e.target.value)}
               placeholder="Rechercher un article en stock..."
-              className="w-full pl-11 pr-4 py-2.5 bg-[#F8F9FD] border border-slate-200 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#4880FF]"
+              className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-[#5B63F6]"
             />
           </div>
 
@@ -254,7 +258,7 @@ export default function PageStocksAdmin() {
               onClick={() => setFiltreStatut("Tous")}
               className={`px-4 py-2 rounded-xl transition-all ${
                 filtreStatut === "Tous"
-                  ? "bg-[#4880FF] text-white"
+                  ? "bg-[#5B63F6] text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
@@ -293,7 +297,8 @@ export default function PageStocksAdmin() {
                 <th className="py-4 px-4">CATÉGORIE</th>
                 <th className="py-4 px-4 text-right">PRIX UNITAIRE</th>
                 <th className="py-4 px-4 text-center">QUANTITÉ ACTUELLE</th>
-                <th className="py-4 px-4 text-center">SEUIL D'ALERTE</th>
+                <th className="py-4 px-4 text-center">SEUIL MIN</th>
+                <th className="py-4 px-4 text-center">SEUIL MAX</th>
                 <th className="py-4 px-4 text-center">STATUT</th>
                 <th className="py-4 px-4 text-center">ACTIONS</th>
               </tr>
@@ -309,13 +314,16 @@ export default function PageStocksAdmin() {
                     <td className="py-4 px-4 font-bold text-slate-900">{art.nomProduit}</td>
                     <td className="py-4 px-4 text-slate-500">{art.categorie}</td>
                     <td className="py-4 px-4 text-right font-mono font-bold">
-                      {formatPrix(art.prix)} FCFA
+                      {formaterPrix(art.prix)}
                     </td>
                     <td className="py-4 px-4 text-center font-mono font-black text-sm">
                       {art.quantiteActuelle} u.
                     </td>
-                    <td className="py-4 px-4 text-center text-slate-400 font-mono">
+                    <td className="py-4 px-4 text-center text-amber-600 font-mono font-extrabold">
                       {art.seuilAlerte} u.
+                    </td>
+                    <td className="py-4 px-4 text-center text-slate-400 font-mono font-bold">
+                      {art.seuilAlerteMax || 100} u.
                     </td>
                     <td className="py-4 px-4 text-center whitespace-nowrap">
                       {estRupture ? (
@@ -337,14 +345,15 @@ export default function PageStocksAdmin() {
                         <button
                           type="button"
                           onClick={() => setArticleAAjuster(art)}
-                          className="px-3 py-1.5 bg-[#4880FF] hover:bg-blue-600 text-white font-bold text-xs rounded-xl shadow-xs transition-all"
+                          className="px-3.5 py-1.5 bg-[#5B63F6] hover:bg-indigo-600 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1 cursor-pointer"
                         >
-                          Ajuster
+                          <FilterHorizontalIcon size={14} />
+                          <span>Ajuster</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => supprimerArticleHandler(art.id)}
-                          className="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl transition-colors"
+                          className="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-xl transition-colors cursor-pointer"
                           title="Supprimer l'article"
                         >
                           <Delete02Icon size={16} />
@@ -359,7 +368,7 @@ export default function PageStocksAdmin() {
         </div>
       </div>
 
-      {/* Modal d'ajustement du Stock */}
+      {/* Modal d'ajustement du Stock & Seuils */}
       {articleAAjuster && (
         <ModalAjustementStock
           article={articleAAjuster}

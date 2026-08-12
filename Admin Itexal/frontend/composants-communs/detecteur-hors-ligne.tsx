@@ -28,11 +28,10 @@ export const DetecteurHorsLigne: React.FC = () => {
     if (navigator.onLine) {
       setEstHorsLigne(false);
     } else {
-      // Small pulse effect
-      const element = document.getElementById("offline-box");
+      const element = document.getElementById("offline-content");
       if (element) {
-        element.classList.add("animate-bounce");
-        setTimeout(() => element.classList.remove("animate-bounce"), 600);
+        element.classList.add("animate-pulse");
+        setTimeout(() => element.classList.remove("animate-pulse"), 600);
       }
     }
   };
@@ -40,178 +39,293 @@ export const DetecteurHorsLigne: React.FC = () => {
   if (!estHorsLigne) return null;
 
   return (
-    <div className="fixed inset-0 z-[999999] bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-white animate-fadeIn select-none overflow-hidden">
-      {/* ── Décoration thématique Bleue (#4880FF) ── */}
-      <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#4880FF]/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#4880FF]/10 rounded-full blur-[150px] pointer-events-none" />
+    <div className="fixed inset-0 z-[999999] bg-white flex flex-col items-center justify-center p-6 text-slate-800 animate-fadeIn select-none overflow-hidden">
+      {/* Dynamic Keyframes Animation for Endless Walking Dinosaur/Bird & Scrolling Ground */}
+      <style jsx>{`
+        @keyframes legWalkLeft {
+          0%, 100% { transform: rotate(-25deg); transform-origin: top center; }
+          50% { transform: rotate(25deg); transform-origin: top center; }
+        }
+        @keyframes legWalkRight {
+          0%, 100% { transform: rotate(25deg); transform-origin: top center; }
+          50% { transform: rotate(-25deg); transform-origin: top center; }
+        }
+        @keyframes bodyBobbing {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-6px) rotate(2deg); }
+        }
+        @keyframes headBobbing {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-3px) rotate(-3deg); }
+        }
+        @keyframes infiniteRunner {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-400px); }
+        }
+        @keyframes birdAdvanceLoop {
+          0% { transform: translateX(-120px); }
+          50% { transform: translateX(120px); }
+          100% { transform: translateX(-120px); }
+        }
+        .anim-leg-left {
+          animation: legWalkLeft 0.5s infinite ease-in-out;
+        }
+        .anim-leg-right {
+          animation: legWalkRight 0.5s infinite ease-in-out;
+        }
+        .anim-body-bob {
+          animation: bodyBobbing 0.5s infinite ease-in-out;
+        }
+        .anim-head-bob {
+          animation: headBobbing 0.5s infinite ease-in-out;
+        }
+        .anim-ground-infinite {
+          animation: infiniteRunner 4s linear infinite;
+        }
+        .anim-bird-march {
+          animation: birdAdvanceLoop 12s ease-in-out infinite;
+        }
+      `}</style>
 
-      {/* Grid Pattern Background Accent */}
-      <div className="absolute inset-0 bg-[radial-gradient(#4880FF_1px,transparent_1px)] [background-size:24px_24px] opacity-15 pointer-events-none" />
-
-      {/* Main Container */}
+      {/* Conteneur global sans aucun cadre */}
       <div
-        id="offline-box"
-        className="relative z-10 bg-slate-900/90 border border-blue-500/20 rounded-3xl p-8 md:p-12 max-w-lg w-full flex flex-col items-center justify-center text-center shadow-2xl shadow-blue-500/10 backdrop-blur-2xl transition-transform"
+        id="offline-content"
+        className="max-w-xl w-full flex flex-col items-center justify-center text-center space-y-6"
       >
-        {/* Offline Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-extrabold mb-6">
+        {/* Badge Hors Ligne */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-50 border border-rose-200 text-rose-600 text-xs font-extrabold shadow-xs">
           <WifiOff02Icon size={16} />
           <span>Connexion Interrompue</span>
         </div>
 
-        {/* ── Loader SVG Personnage Animé ── */}
-        <div className="offline-loader-container mb-6 scale-90 sm:scale-100">
-          <div className="loader-character">
-            <svg
-              className="legl"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              width="20.69332"
-              height="68.19944"
-              viewBox="0,0,20.69332,68.19944"
-            >
-              <g transform="translate(-201.44063,-235.75466)">
-                <g strokeMiterlimit="10">
-                  <path
-                    d="M218.11971,301.20087c-2.20708,1.73229 -4.41416,0 -4.41416,0l-1.43017,-1.1437c-1.42954,-1.40829 -3.04351,-2.54728 -4.56954,-3.87927c-0.95183,-0.8308 -2.29837,-1.49883 -2.7652,-2.55433c-0.42378,-0.95815 0.14432,-2.02654 0.29355,-3.03399c0.41251,-2.78499 1.82164,-5.43386 2.41472,-8.22683c1.25895,-4.44509 2.73863,-8.98683 3.15318,-13.54796c0.22615,-2.4883 -0.21672,-5.0155 -0.00278,-7.50605c0.30636,-3.56649 1.24602,-7.10406 1.59992,-10.6738c0.29105,-2.93579 -0.00785,-5.9806 -0.00785,-8.93046c0,0 0,-2.44982 3.12129,-2.44982c3.12129,0 3.12129,2.44982 3.12129,2.44982c0,3.06839 0.28868,6.22201 -0.00786,9.27779c-0.34637,3.56935 -1.30115,7.10906 -1.59992,10.6738c-0.2103,2.50918 0.22586,5.05326 -0.00278,7.56284c-0.43159,4.7371 -1.94029,9.46317 -3.24651,14.07835c-0.47439,2.23403 -1.29927,4.31705 -2.05805,6.47156c-0.18628,0.52896 -0.1402,1.0974 -0.327,1.62624c-0.09463,0.26791 -0.64731,0.47816 -0.50641,0.73323c0.19122,0.34617 0.86423,0.3445 1.2346,0.58502c1.88637,1.22503 3.50777,2.79494 5.03,4.28305l0.96971,0.73991c0,0 2.20708,1.73229 0,3.46457z"
-                    fill="none"
-                    stroke="#4880FF"
-                    strokeWidth="7"
-                  ></path>
-                </g>
-              </g>
-            </svg>
+        {/* ── Décoration Forêt Bleue + Oiseau Animé en Marche Infinie (Style Google Dino) ── */}
+        <div className="w-full max-w-lg mx-auto py-2 relative overflow-hidden rounded-3xl">
+          {/* SVG Forêt Bleue en Arrière-plan */}
+          <svg
+            viewBox="0 0 800 360"
+            className="w-full h-auto"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Soleil / Ciel doux */}
+            <circle cx="400" cy="100" r="70" fill="#EEF2FF" />
+            <path
+              d="M320 110 Q335 85 365 90 Q385 70 415 80 Q445 65 475 85 Q495 90 505 110 Z"
+              fill="#E0E7FF"
+              opacity="0.8"
+            />
 
-            <svg
-              className="legr"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              width="41.02537"
-              height="64.85502"
-              viewBox="0,0,41.02537,64.85502"
-            >
-              <g transform="translate(-241.54137,-218.44347)">
-                <g strokeMiterlimit="10">
-                  <path
-                    d="M279.06674,279.42662c-2.27967,1.98991 -6.08116,0.58804 -6.08116,0.58804l-2.47264,-0.92915c-2.58799,-1.18826 -5.31176,-2.08831 -7.99917,-3.18902c-1.67622,-0.68654 -3.82471,-1.16116 -4.93147,-2.13229c-1.00468,-0.88156 -0.69132,-2.00318 -0.92827,-3.00935c-0.65501,-2.78142 0.12275,-5.56236 -0.287,-8.37565c-0.2181,-4.51941 -0.17458,-9.16283 -1.60696,-13.68334c-0.78143,-2.46614 -2.50162,-4.88125 -3.30086,-7.34796c-1.14452,-3.53236 -1.40387,-7.12078 -2.48433,-10.66266c-0.88858,-2.91287 -2.63779,-5.85389 -3.93351,-8.74177c0,0 -1.07608,-2.39835 3.22395,-2.81415c4.30003,-0.41581 2.41605,1.98254 2.41605,1.98254c1.34779,3.00392 3.13072,6.05282 4.06444,9.0839c1.09065,3.54049 1.33011,7.13302 2.48433,10.66266c0.81245,2.48448 2.5308,4.917 3.31813,7.40431c1.48619,4.69506 1.48366,9.52281 1.71137,14.21503c0.32776,2.25028 0.10631,4.39942 0.00736,6.60975c-0.02429,0.54266 0.28888,1.09302 0.26382,1.63563c-0.01269,0.27488 -0.68173,0.55435 -0.37558,0.78529c0.41549,0.31342 1.34191,0.22213 1.95781,0.40826c3.13684,0.94799 6.06014,2.26892 8.81088,3.52298l1.66093,0.59519c0,0 6.76155,1.40187 4.48187,3.39177z"
-                    fill="none"
-                    stroke="#4880FF"
-                    strokeWidth="7"
-                  ></path>
-                </g>
-              </g>
-            </svg>
+            {/* Collines d'arrière-plan en dégradé bleu */}
+            <path
+              d="M0 270 Q180 200 400 240 T800 230 L800 360 L0 360 Z"
+              fill="#DBEAFE"
+            />
+            <path
+              d="M0 250 Q240 295 480 230 T800 255 L800 360 L0 360 Z"
+              fill="#BFDBFE"
+            />
 
-            <div className="bod">
-              <svg
-                version="1.1"
-                xmlns="http://www.w3.org/2000/svg"
-                width="144.10576"
-                height="144.91623"
-                viewBox="0,0,144.10576,144.91623"
-              >
-                <g transform="translate(-164.41679,-112.94712)">
-                  <g strokeMiterlimit="10">
+            {/* Arbres sapins et feuillus bleus */}
+            <path d="M110 245 L130 175 L150 245 Z" fill="#93C5FD" />
+            <path d="M115 205 L130 155 L145 205 Z" fill="#60A5FA" />
+            <rect x="127" y="245" width="6" height="25" fill="#3B82F6" />
+
+            <path d="M210 260 L235 180 L260 260 Z" fill="#60A5FA" />
+            <path d="M216 220 L235 160 L254 220 Z" fill="#3B82F6" />
+            <rect x="232" y="260" width="6" height="30" fill="#2563EB" />
+
+            <path d="M370 250 L400 140 L430 250 Z" fill="#3B82F6" />
+            <path d="M376 200 L400 115 L424 200 Z" fill="#2563EB" />
+            <path d="M382 160 L400 90 L418 160 Z" fill="#1D4ED8" />
+            <rect x="396" y="250" width="8" height="40" fill="#1E40AF" />
+
+            <path d="M520 260 L545 175 L570 260 Z" fill="#60A5FA" />
+            <path d="M526 215 L545 150 L564 215 Z" fill="#3B82F6" />
+            <rect x="542" y="260" width="6" height="30" fill="#2563EB" />
+
+            <path d="M630 245 L650 175 L670 245 Z" fill="#93C5FD" />
+            <path d="M635 205 L650 155 L665 205 Z" fill="#60A5FA" />
+            <rect x="647" y="245" width="6" height="25" fill="#3B82F6" />
+
+            {/* Arbres Arrondis */}
+            <circle cx="75" cy="225" r="28" fill="#60A5FA" />
+            <circle cx="60" cy="235" r="20" fill="#3B82F6" />
+            <circle cx="90" cy="235" r="20" fill="#2563EB" />
+            <rect x="72" y="250" width="6" height="30" fill="#1E40AF" />
+
+            <circle cx="725" cy="220" r="30" fill="#3B82F6" />
+            <circle cx="710" cy="230" r="22" fill="#2563EB" />
+            <circle cx="740" cy="230" r="22" fill="#60A5FA" />
+            <rect x="722" y="245" width="6" height="35" fill="#1E40AF" />
+
+            {/* Reliefs et Buissons Bleus */}
+            <path
+              d="M-20 285 Q150 240 320 275 T700 265 Q760 255 820 285 L820 360 L-20 360 Z"
+              fill="#3B82F6"
+            />
+            <path
+              d="M0 300 Q200 265 420 295 T800 290 L800 340 L0 340 Z"
+              fill="#2563EB"
+            />
+            <path
+              d="M0 320 Q250 295 500 315 T800 310 L800 340 L0 340 Z"
+              fill="#1D4ED8"
+            />
+
+            {/* Buissons Bleus Denses au Premier Plan */}
+            <circle cx="160" cy="290" r="16" fill="#93C5FD" />
+            <circle cx="180" cy="285" r="22" fill="#60A5FA" />
+            <circle cx="202" cy="292" r="15" fill="#3B82F6" />
+
+            <circle cx="300" cy="298" r="18" fill="#93C5FD" />
+            <circle cx="322" cy="292" r="24" fill="#60A5FA" />
+            <circle cx="345" cy="300" r="16" fill="#3B82F6" />
+
+            <circle cx="450" cy="300" r="16" fill="#60A5FA" />
+            <circle cx="470" cy="292" r="23" fill="#3B82F6" />
+            <circle cx="494" cy="300" r="16" fill="#2563EB" />
+
+            <circle cx="590" cy="290" r="20" fill="#93C5FD" />
+            <circle cx="615" cy="283" r="26" fill="#60A5FA" />
+            <circle cx="640" cy="292" r="18" fill="#3B82F6" />
+          </svg>
+
+          {/* ── L'OISEAU / PERSONNAGE ANIMÉ MARCHANT SUR LE SOL EN AVANÇANT (Style Dino Google) ── */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center anim-bird-march">
+            <div className="relative scale-75 sm:scale-90">
+              {/* Corps & Tête Animés */}
+              <div className="anim-body-bob flex flex-col items-center">
+                {/* Tête */}
+                <div className="anim-head-bob">
+                  <svg
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="80"
+                    height="60"
+                    viewBox="0 0 115 88"
+                  >
+                    <g strokeMiterlimit="10">
+                      <path
+                        d="M195.12889,128.77752c0,-26.96048 21.33334,-48.81626 47.64934,-48.81626c26.316,0 47.64935,21.85578 47.64935,48.81626"
+                        transform="translate(-191.87889,-75.62023)"
+                        fill="none"
+                        stroke="#5B63F6"
+                        strokeWidth="6"
+                      ></path>
+                      <path
+                        d="M195.31785,124.43649c0,-26.96048 21.33334,-48.81626 47.64934,-48.81626c26.316,0 47.64935,21.85578 47.64935,48.81626"
+                        transform="translate(-191.87889,-75.62023)"
+                        fill="#1E293B"
+                      ></path>
+                      {/* Bec / Bec Oiseau Bleu */}
+                      <path
+                        d="M271.10348,122.46768l10.06374,-3.28166l24.06547,24.28424"
+                        transform="translate(-191.87889,-75.62023)"
+                        fill="none"
+                        stroke="#5B63F6"
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                      ></path>
+                      {/* Œil */}
+                      <circle cx="50" cy="45" r="7" fill="#FFFFFF" />
+                      <circle cx="52" cy="45" r="3.5" fill="#5B63F6" />
+                    </g>
+                  </svg>
+                </div>
+
+                {/* Corps */}
+                <div className="-mt-4">
+                  <svg
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="100"
+                    height="80"
+                    viewBox="0 0 144 144"
+                  >
+                    <g transform="translate(-164.41679,-112.94712)">
+                      <path
+                        d="M166.9168,184.02633c0,-36.49454 35.0206,-66.07921 72.05288,-66.07921c37.03228,0 67.05288,29.58467 67.05288,66.07921"
+                        fill="#1E293B"
+                        stroke="#5B63F6"
+                        strokeWidth="5"
+                      ></path>
+                      {/* Plume d'aile */}
+                      <path
+                        d="M216.22445,188.06994c0,0 1.02834,11.73245 -3.62335,21.11235c-4.65169,9.3799 -13.06183,10.03776 -13.06183,10.03776"
+                        fill="none"
+                        stroke="#5B63F6"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                      ></path>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+
+              {/* Jambes qui marchent (Walking legs alternating) */}
+              <div className="flex justify-center gap-4 -mt-6">
+                <div className="anim-leg-left">
+                  <svg
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="45"
+                    viewBox="0 0 20 68"
+                  >
                     <path
-                      d="M166.9168,184.02633c0,-36.49454 35.0206,-66.07921 72.05288,-66.07921c37.03228,0 67.05288,29.58467 67.05288,66.07921c0,6.94489 -1.08716,13.63956 -3.10292,19.92772c-2.71464,8.46831 -7.1134,16.19939 -12.809,22.81158c-2.31017,2.68194 -7.54471,12.91599 -7.54471,12.91599c0,0 -5.46714,-1.18309 -8.44434,0.6266c-3.86867,2.35159 -10.95356,10.86714 -10.95356,10.86714c0,0 -6.96906,-3.20396 -9.87477,-2.58085c-2.64748,0.56773 -6.72538,5.77072 -6.72538,5.77072c0,0 -5.5023,-4.25969 -7.5982,-4.25969c-3.08622,0 -9.09924,3.48259 -9.09924,3.48259c0,0 -6.0782,-5.11244 -9.00348,-5.91884c-4.26461,-1.17561 -12.23343,0.75049 -12.23343,0.75049c0,0 -5.18164,-8.26065 -7.60688,-9.90388c-3.50443,-2.37445 -8.8271,-3.95414 -8.8271,-3.95414c0,0 -5.33472,-8.81718 -7.27019,-11.40895c-4.81099,-6.44239 -13.46422,-9.83437 -15.65729,-17.76175c-1.53558,-5.55073 -2.35527,-21.36472 -2.35527,-21.36472z"
-                      fill="#1e293b"
-                      stroke="#4880FF"
-                      strokeWidth="4"
-                    ></path>
-                    <path
-                      d="M216.22445,188.06994c0,0 1.02834,11.73245 -3.62335,21.11235c-4.65169,9.3799 -13.06183,10.03776 -13.06183,10.03776c0,0 7.0703,-3.03121 10.89231,-10.7381c4.34839,-8.76831 5.79288,-20.41201 5.79288,-20.41201z"
+                      d="M10 0 L10 50 L18 65"
                       fill="none"
-                      stroke="#4880FF"
-                      strokeWidth="3"
+                      stroke="#5B63F6"
+                      strokeWidth="7"
                       strokeLinecap="round"
+                      strokeLinejoin="round"
                     ></path>
-                  </g>
-                </g>
-              </svg>
+                  </svg>
+                </div>
 
-              <svg
-                className="head"
-                version="1.1"
-                xmlns="http://www.w3.org/2000/svg"
-                width="115.68559"
-                height="88.29441"
-                viewBox="0,0,115.68559,88.29441"
-              >
-                <g transform="translate(-191.87889,-75.62023)">
-                  <g strokeMiterlimit="10">
+                <div className="anim-leg-right">
+                  <svg
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="45"
+                    viewBox="0 0 20 68"
+                  >
                     <path
-                      d="M195.12889,128.77752c0,-26.96048 21.33334,-48.81626 47.64934,-48.81626c26.316,0 47.64935,21.85578 47.64935,48.81626c0,0.60102 -9.22352,20.49284 -9.22352,20.49284l-7.75885,0.35623l-7.59417,6.15039l-8.64295,-1.74822l-11.70703,6.06119l-6.38599,-4.79382l-6.45999,2.36133l-7.01451,-7.38888l-8.11916,1.29382l-6.19237,-6.07265l-7.6263,-1.37795l-4.19835,-7.87062l-4.24236,-4.16907c0,0 -0.13314,-2.0999 -0.13314,-3.29458z"
+                      d="M10 0 L10 50 L18 65"
                       fill="none"
-                      stroke="#4880FF"
-                      strokeWidth="5"
-                    ></path>
-                    <path
-                      d="M195.31785,124.43649c0,-26.96048 21.33334,-48.81626 47.64934,-48.81626c26.316,0 47.64935,21.85578 47.64935,48.81626c0,1.03481 -0.08666,2.8866 -0.08666,2.8866c0,0 16.8538,15.99287 16.21847,17.23929c-0.66726,1.30905 -23.05667,-4.14265 -23.05667,-4.14265l-2.29866,4.5096l-7.75885,0.35623l-7.59417,6.15039l-8.64295,-1.74822l-11.70703,6.06119l-6.38599,-4.79382l-6.45999,2.36133l-7.01451,-7.38888l-8.11916,1.29382l-6.19237,-6.07265l-7.6263,-1.37795l-4.19835,-7.87062l-4.24236,-4.16907c0,0 -0.13314,-2.0999 -0.13314,-3.29458z"
-                      fill="#0f172a"
-                    ></path>
-                    <path
-                      d="M271.10348,122.46768l10.06374,-3.28166l24.06547,24.28424"
-                      fill="none"
-                      stroke="#4880FF"
-                      strokeWidth="5"
+                      stroke="#3B82F6"
+                      strokeWidth="7"
                       strokeLinecap="round"
+                      strokeLinejoin="round"
                     ></path>
-                    <path
-                      d="M276.02738,115.72434c-0.66448,-4.64715 2.56411,-8.95308 7.21127,-9.61756c4.64715,-0.66448 8.95309,2.56411 9.61757,7.21126c0.46467,3.24972 -1.94776,8.02206 -5.96624,9.09336c-2.11289,-1.73012 -5.08673,-5.03426 -5.08673,-5.03426c0,0 -4.12095,1.16329 -4.60481,1.54229c-0.16433,-0.04891 -0.62732,-0.38126 -0.72803,-0.61269c-0.30602,-0.70328 -0.36302,-2.02286 -0.44303,-2.58239z"
-                      fill="#ffffff"
-                    ></path>
-                    <path
-                      d="M242.49281,125.6424c0,-4.69442 3.80558,-8.5 8.5,-8.5c4.69442,0 8.5,3.80558 8.5,8.5c0,4.69442 -3.80558,8.5 -8.5,8.5c-4.69442,0 -8.5,-3.80558 -8.5,-8.5z"
-                      fill="#ffffff"
-                    ></path>
-                  </g>
-                </g>
-              </svg>
+                  </svg>
+                </div>
+              </div>
             </div>
-
-            <svg
-              id="gnd"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              width="475"
-              height="530"
-              viewBox="0,0,163.40011,85.20095"
-            >
-              <g transform="translate(-176.25,-207.64957)">
-                <g
-                  stroke="#4880FF"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeMiterlimit="10"
-                >
-                  <path
-                    d="M295.5,273.1829c0,0 -57.38915,6.69521 -76.94095,-9.01465c-13.65063,-10.50609 15.70098,-20.69467 -2.5451,-19.94465c-30.31027,2.05753 -38.51396,-26.84135 -38.51396,-26.84135c0,0 6.50084,13.30023 18.93224,19.17888c9.53286,4.50796 26.23632,-1.02541 32.09529,4.95137c3.62417,3.69704 2.8012,6.33005 0.66517,8.49452c-3.79415,3.84467 -11.7312,6.21103 -6.24682,10.43645c22.01082,16.95812 72.55412,12.73944 72.55412,12.73944z"
-                    fill="#1e293b"
-                  ></path>
-                </g>
-              </g>
-            </svg>
           </div>
         </div>
 
-        {/* Message & Submessage */}
-        <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mb-2">
-          Vous êtes hors ligne
-        </h2>
-        <p className="text-slate-400 text-xs sm:text-sm max-w-sm mb-8 leading-relaxed font-medium">
-          Veuillez vérifier votre connexion internet pour continuer à utiliser le back-office ITexal.
-        </p>
+        {/* Titre & Message directement sur la page sans aucun cadre */}
+        <div className="space-y-2">
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            Vous êtes hors ligne
+          </h1>
+          <p className="text-slate-500 text-sm max-w-md mx-auto font-medium leading-relaxed">
+            Veuillez vérifier votre connexion internet pour continuer à utiliser le back-office ITexal.
+          </p>
+        </div>
 
-        {/* Retry Button */}
-        <button
-          type="button"
-          onClick={testerConnexion}
-          className="px-6 py-3 bg-[#4880FF] hover:bg-blue-600 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 hover:scale-[1.03]"
-        >
-          <RefreshIcon size={18} />
-          <span>Réessayer la connexion</span>
-        </button>
+        {/* Bouton Réessayer de couleur Bleue (#5B63F6) */}
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={testerConnexion}
+            className="px-8 py-3.5 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 hover:scale-[1.03] active:scale-[0.98]"
+          >
+            <RefreshIcon size={18} />
+            <span>Réessayer la connexion</span>
+          </button>
+        </div>
       </div>
     </div>
   );

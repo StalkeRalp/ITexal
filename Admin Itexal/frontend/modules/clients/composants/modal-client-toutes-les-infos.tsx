@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ClientComplet } from "./fiche-detail-client";
 import { formatPrix } from "@/lib/formatteur";
+import { exporterFicheClientPDF } from "@/lib/utilitaires/exportateur";
 import { useCommandes } from "@/lib/context/CommandesContext";
 import {
   Cancel01Icon,
@@ -383,11 +384,34 @@ export const ModalClientToutesLesInfos: React.FC<
             )}
             <button
               type="button"
-              onClick={() => window.print()}
+              onClick={() =>
+                exporterFicheClientPDF({
+                  nom: client.nom,
+                  email: client.email,
+                  telephone: client.telephone,
+                  adresse: client.adresse,
+                  genre: client.genre || "Male",
+                  typeGamme: client.typeGamme,
+                  statut: client.statut,
+                  totalDepense: depenseTotale,
+                  totalCommandes: nbCommandes,
+                  dateInscrit: client.dateInscrit,
+                  avatar: client.avatar,
+                  metier: client.metier,
+                  commandes: commandesReellesClient.map((cmd) => ({
+                    reference: cmd.reference,
+                    dateCommande: cmd.dateCommande,
+                    articlesResume: cmd.articles.map((art) => `${art.nomProduit} (x${art.quantite})`).join(", "),
+                    methodePaiement: cmd.methodePaiement.replace(/_/g, " "),
+                    montantTotal: cmd.montantTotal,
+                    statut: cmd.statut.replace(/_/g, " "),
+                  })),
+                })
+              }
               className="px-5 py-2.5 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold rounded-xl shadow-md shadow-indigo-500/20 transition-all text-xs flex items-center gap-1.5"
             >
               <File01Icon size={14} />
-              <span>Imprimer Fiche Complète</span>
+              <span>Exporter Fiche Client (PDF)</span>
             </button>
           </div>
         </div>

@@ -4,7 +4,9 @@ import React, { useState } from "react";
 import { LogAudit } from "@/modules/journal/types/journal";
 import { TableauJournal } from "@/modules/journal/composants/tableau-journal";
 import { ModalDetailLog } from "@/modules/journal/composants/modal-detail-log";
+import { ModalExportation } from "@/composants-communs/modal-exportation";
 import { formatNombre } from "@/lib/formatteur";
+import { exporterCSV, exporterRapportPDF } from "@/lib/utilitaires/exportateur";
 import {
   File01Icon,
   Download01Icon,
@@ -118,6 +120,7 @@ export default function PageJournalAdmin() {
   ]);
 
   const [logSelectionne, setLogSelectionne] = useState<LogAudit | null>(null);
+  const [modalExportOuvert, setModalExportOuvert] = useState(false);
   const [messageAction, setMessageAction] = useState("");
 
   // KPIs
@@ -127,25 +130,49 @@ export default function PageJournalAdmin() {
     ["Produits", "Stock", "Utilisateurs", "Paramètres"].includes(l.typeEvenement)
   ).length;
 
-  const exporterLogsCSV = () => {
-    const entetes = "ID;Horodatage;Utilisateur;Role;Module;Action;Description;IP;Severite\n";
-    const lignes = logs
-      .map(
-        (l) =>
-          `${l.id};${l.horodatage};"${l.nomUtilisateur}";"${l.roleUtilisateur}";${l.typeEvenement};${l.action};"${l.description}";${l.adresseIP};${l.niveauSeverite}`
-      )
-      .join("\n");
+  const executerExportationLogs = (format: "pdf" | "csv") => {
+    const enTetes = [
+      "ID",
+      "Horodatage",
+      "Utilisateur",
+      "Rôle",
+      "Module",
+      "Action",
+      "Description",
+      "Adresse IP",
+      "Sévérité",
+    ];
 
-    const blob = new Blob([entetes + lignes], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `journal_audit_itexal_${new Date().toISOString().split("T")[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const lignes = logs.map((l) => [
+      l.id,
+      l.horodatage,
+      l.nomUtilisateur,
+      l.roleUtilisateur,
+      l.typeEvenement,
+      l.action,
+      l.description,
+      l.adresseIP || "127.0.0.1",
+      l.niveauSeverite,
+    ]);
 
-    setMessageAction("Le fichier du journal d'audit CSV a été généré et téléchargé.");
+    if (format === "csv") {
+      exporterCSV("journal_audit_itexal", enTetes, lignes);
+      setMessageAction("Le fichier du journal d'audit CSV a été généré et téléchargé.");
+    } else {
+      exporterRapportPDF(
+        "RAPPORT DU JOURNAL D'AUDIT & SÉCURITÉ",
+        "Traçabilité intégrale des événements administrateurs et accès système",
+        [
+          { label: "Total Événements", valeur: formatNombre(totalLogs) },
+          { label: "Alertes / Sécurité", valeur: formatNombre(totalCritiques) },
+          { label: "Actions Sensibles", valeur: formatNombre(totalModifsSensibles) },
+        ],
+        enTetes,
+        lignes
+      );
+      setMessageAction("Le rapport du journal d'audit PDF a été généré.");
+    }
+
     setTimeout(() => setMessageAction(""), 4000);
   };
 
@@ -162,7 +189,7 @@ export default function PageJournalAdmin() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fadeIn max-w-[1600px] mx-auto pb-12">
       {/* Title & Action buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -177,11 +204,11 @@ export default function PageJournalAdmin() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={exporterLogsCSV}
-            className="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2"
+            onClick={() => setModalExportOuvert(true)}
+            className="px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
           >
             <Download01Icon size={16} className="text-[#4880FF]" />
-            <span>Exporter CSV / Audit</span>
+            <span>Exporter / Audit (PDF/CSV)</span>
           </button>
 
           <button
@@ -247,6 +274,16 @@ export default function PageJournalAdmin() {
       <ModalDetailLog
         log={logSelectionne}
         onFermer={() => setLogSelectionne(null)}
+      />
+
+      {/* Modal Exportation PDF / CSV */}
+      <ModalExportation
+        ouvert={modalExportOuvert}
+        titre="Exporter le Journal d'Audit"
+        description="Choisissez le format d'exportation souhaité pour enregistrer les événements et logs d'audit administrateurs."
+        nombreElements={totalLogs}
+        onFermer={() => setModalExportOuvert(false)}
+        onExporter={executerExportationLogs}
       />
     </div>
   );

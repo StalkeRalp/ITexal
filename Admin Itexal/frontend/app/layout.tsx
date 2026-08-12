@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { ChargeurNavigation } from "@/composants-communs/chargeur-navigation";
 import { DetecteurHorsLigne } from "@/composants-communs/detecteur-hors-ligne";
 import { FournisseurGlobal } from "@/composants-communs/fournisseur-global";
+import { PwaInstaller } from "@/composants-communs/pwa-installer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,9 +12,11 @@ export const metadata: Metadata = {
     template: "%s | Cosmetic Admin",
   },
   description: "Plateforme d'administration e-commerce Cosmetic Admin — Tableau de Bord • Gestion • Performance",
+  manifest: "/manifest.webmanifest",
+  themeColor: "#5B63F6",
   icons: {
     icon: "/icon.svg",
-    shortcut: "/favicon.svg",
+    shortcut: "/icon.svg",
     apple: "/icon.svg",
   },
 };
@@ -27,6 +30,7 @@ export default function RootLayout({
     <html lang="fr" className="h-full bg-slate-900 text-slate-100 antialiased">
       <body className="min-h-full flex flex-col font-sans bg-slate-900 text-slate-100">
         <DetecteurHorsLigne />
+        <PwaInstaller />
         <Suspense fallback={null}>
           <ChargeurNavigation />
         </Suspense>

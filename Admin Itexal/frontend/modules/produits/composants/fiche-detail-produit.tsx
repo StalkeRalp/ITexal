@@ -12,6 +12,7 @@ import {
   InformationCircleIcon,
   Edit02Icon,
   Delete02Icon,
+  Chart01Icon,
 } from "hugeicons-react";
 
 interface FicheDetailProduitProps {
@@ -19,6 +20,7 @@ interface FicheDetailProduitProps {
   onFermer: () => void;
   onEditer: (produit: Produit) => void;
   onSupprimer?: (id: string) => void;
+  onVoirStatistiques?: (produit: Produit) => void;
 }
 
 export const FicheDetailProduit: React.FC<FicheDetailProduitProps> = ({
@@ -26,6 +28,7 @@ export const FicheDetailProduit: React.FC<FicheDetailProduitProps> = ({
   onFermer,
   onEditer,
   onSupprimer,
+  onVoirStatistiques,
 }) => {
   const [indexImage, setIndexImage] = useState(0);
 
@@ -44,14 +47,14 @@ export const FicheDetailProduit: React.FC<FicheDetailProduitProps> = ({
       {/* Header Banner */}
       <div className="bg-slate-50/80 border-b border-slate-200/80 -mx-6 -mt-6 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <span className="w-8 h-8 rounded-xl bg-blue-50 text-[#4880FF] font-black text-sm flex items-center justify-center border border-blue-100">
+          <span className="w-8 h-8 rounded-xl bg-blue-50 text-[#5B63F6] font-black text-sm flex items-center justify-center border border-blue-100">
             <Search01Icon size={18} strokeWidth={2} />
           </span>
           <div>
             <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">
               Fiche Produit Détaillée
             </h3>
-            <p className="text-[11px] font-mono font-bold text-[#4880FF]">
+            <p className="text-[11px] font-mono font-bold text-[#5B63F6]">
               {produit.reference}
             </p>
           </div>
@@ -61,7 +64,7 @@ export const FicheDetailProduit: React.FC<FicheDetailProduitProps> = ({
           type="button"
           onClick={onFermer}
           aria-label="Fermer le volet"
-          className="w-8 h-8 rounded-full bg-slate-200/70 hover:bg-rose-50 text-slate-600 hover:text-rose-600 font-extrabold flex items-center justify-center text-xs transition-colors"
+          className="w-8 h-8 rounded-full bg-slate-200/70 hover:bg-rose-50 text-slate-600 hover:text-rose-600 font-extrabold flex items-center justify-center text-xs transition-colors cursor-pointer"
           title="Fermer le volet"
         >
           <Cancel01Icon size={16} strokeWidth={2} />
@@ -97,7 +100,7 @@ export const FicheDetailProduit: React.FC<FicheDetailProduitProps> = ({
                 aria-label={`Afficher l'image ${idx + 1}`}
                 className={`w-12 h-12 rounded-xl border-2 overflow-hidden shrink-0 transition-all ${
                   indexImage === idx
-                    ? "border-[#4880FF] scale-105 shadow-sm"
+                    ? "border-[#5B63F6] scale-105 shadow-sm"
                     : "border-transparent opacity-70 hover:opacity-100"
                 }`}
               >
@@ -118,7 +121,7 @@ export const FicheDetailProduit: React.FC<FicheDetailProduitProps> = ({
       {/* Identity & Price */}
       <div className="space-y-2">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="px-3 py-1 rounded-xl bg-blue-50 text-[#4880FF] text-xs font-bold border border-blue-100/80">
+          <span className="px-3 py-1 rounded-xl bg-blue-50 text-[#5B63F6] text-xs font-bold border border-blue-100/80">
             {produit.nomCategorie || "Soin Cosmétique"}
           </span>
           <span className="px-3 py-1 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200/60">
@@ -131,7 +134,7 @@ export const FicheDetailProduit: React.FC<FicheDetailProduitProps> = ({
         </h4>
 
         <div className="flex items-baseline gap-2.5 pt-1">
-          <span className="text-2xl font-black text-[#4880FF]">
+          <span className="text-2xl font-black text-[#5B63F6]">
             {formatPrix(produit.prixPromotionnel || produit.prix)} FCFA
           </span>
           {produit.prixPromotionnel && (
@@ -167,7 +170,7 @@ export const FicheDetailProduit: React.FC<FicheDetailProduitProps> = ({
             Origine
           </span>
           <span className="font-bold text-slate-800 flex items-center gap-1">
-            <Globe02Icon size={14} className="text-[#4880FF]" /> {produit.origine || "Cameroun"}
+            <Globe02Icon size={14} className="text-[#5B63F6]" /> {produit.origine || "Cameroun"}
           </span>
         </div>
 
@@ -195,46 +198,38 @@ export const FicheDetailProduit: React.FC<FicheDetailProduitProps> = ({
         </p>
       </div>
 
-      {/* Composition & Usage */}
-      <div className="space-y-3 bg-blue-50/40 p-3.5 rounded-2xl border border-blue-100/70 text-xs">
-        <div>
-          <h5 className="font-extrabold uppercase text-[10px] tracking-wider text-[#4880FF] mb-0.5 flex items-center gap-1">
-            <SparklesIcon size={14} /> Composition
-          </h5>
-          <p className="text-slate-700 font-mono text-[11px]">
-            {produit.composition || "Aqua, Glycerin, Botanical Extracts."}
-          </p>
-        </div>
-
-        <div>
-          <h5 className="font-extrabold uppercase text-[10px] tracking-wider text-amber-700 mb-0.5 flex items-center gap-1">
-            <InformationCircleIcon size={14} /> Conseils d'utilisation
-          </h5>
-          <p className="text-slate-600 text-[11px]">
-            {produit.modeUtilisation || produit.caracteristiques || "Appliquer quotidiennement sur peau propre."}
-          </p>
-        </div>
-      </div>
-
       {/* Action Buttons */}
-      <div className="flex items-center gap-3 pt-2">
-        <button
-          type="button"
-          onClick={() => onEditer(produit)}
-          className="flex-1 py-3 bg-[#4880FF] hover:bg-blue-600 text-white font-extrabold text-xs rounded-xl shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
-        >
-          <Edit02Icon size={16} strokeWidth={2} /> Éditer Produit
-        </button>
+      <div className="flex flex-col gap-2.5 pt-2">
+        {onVoirStatistiques && (
+          <button
+            type="button"
+            onClick={() => onVoirStatistiques(produit)}
+            className="w-full py-2.5 bg-indigo-50 hover:bg-[#5B63F6] text-[#5B63F6] hover:text-white font-extrabold text-xs rounded-xl transition-all flex items-center justify-center gap-2 border border-indigo-200/60 cursor-pointer"
+          >
+            <Chart01Icon size={16} strokeWidth={2} />
+            <span>Voir Statistiques Ventes & Stock</span>
+          </button>
+        )}
 
-        <button
-          type="button"
-          onClick={() => onSupprimer && onSupprimer(produit.id)}
-          aria-label="Supprimer le produit"
-          className="py-3 px-4 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white font-bold text-xs rounded-xl transition-colors border border-rose-100 flex items-center justify-center"
-          title="Supprimer le produit"
-        >
-          <Delete02Icon size={16} strokeWidth={2} />
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => onEditer(produit)}
+            className="flex-1 py-2.5 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold text-xs rounded-xl shadow-md shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <Edit02Icon size={16} strokeWidth={2} /> Éditer Produit
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onSupprimer && onSupprimer(produit.id)}
+            aria-label="Supprimer le produit"
+            className="py-2.5 px-4 bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white font-bold text-xs rounded-xl transition-colors border border-rose-100 flex items-center justify-center cursor-pointer"
+            title="Supprimer le produit"
+          >
+            <Delete02Icon size={16} strokeWidth={2} />
+          </button>
+        </div>
       </div>
     </div>
   );

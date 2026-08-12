@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   PackageIcon,
   Cancel01Icon,
   Add01Icon,
   Remove01Icon,
+  AlertCircleIcon,
+  CheckmarkCircle02Icon,
+  FilterHorizontalIcon,
 } from "hugeicons-react";
 
 export interface ArticleStockFull {
@@ -16,6 +19,7 @@ export interface ArticleStockFull {
   stockInitial: number;
   quantiteActuelle: number;
   seuilAlerte: number;
+  seuilAlerteMax?: number;
   iconProduit: string;
   couleurs?: string[];
   derniereMiseAJour: string;
@@ -26,7 +30,9 @@ interface ModalAjustementStockProps {
   onFermer: () => void;
   onValiderAjustement: (
     id: string,
-    delta: number,
+    nouveauStock: number,
+    seuilMin: number,
+    seuilMax: number,
     motif: string,
     remarque?: string
   ) => void;
@@ -37,36 +43,44 @@ export const ModalAjustementStock: React.FC<ModalAjustementStockProps> = ({
   onFermer,
   onValiderAjustement,
 }) => {
-  const [typeOperation, setTypeOperation] = useState<"ajouter" | "retirer">(
-    "ajouter"
-  );
-  const [quantite, setQuantite] = useState<number | "">(10);
+  const [nouveauStock, setNouveauStock] = useState<number>(0);
+  const [seuilMin, setSeuilMin] = useState<number>(10);
+  const [seuilMax, setSeuilMax] = useState<number>(100);
   const [motif, setMotif] = useState("Réapprovisionnement Fournisseur");
   const [remarque, setRemarque] = useState("");
+
+  useEffect(() => {
+    if (article) {
+      setNouveauStock(article.quantiteActuelle);
+      setSeuilMin(article.seuilAlerte || 10);
+      setSeuilMax(article.seuilAlerteMax || 100);
+      setMotif("Réapprovisionnement Fournisseur");
+      setRemarque("");
+    }
+  }, [article]);
 
   if (!article) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!quantite || Number(quantite) <= 0) return;
+    if (nouveauStock < 0 || seuilMin < 0 || seuilMax < seuilMin) return;
 
-    const delta = typeOperation === "ajouter" ? Number(quantite) : -Number(quantite);
-    onValiderAjustement(article.id, delta, motif, remarque);
+    onValiderAjustement(article.id, nouveauStock, seuilMin, seuilMax, motif, remarque);
     onFermer();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-100 flex flex-col overflow-hidden">
+      <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200/80 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#4880FF] font-extrabold flex items-center justify-center text-lg">
-              <PackageIcon size={20} strokeWidth={2} />
+            <div className="w-11 h-11 rounded-2xl bg-indigo-50 text-[#5B63F6] font-black flex items-center justify-center text-lg shadow-xs">
+              <FilterHorizontalIcon size={22} />
             </div>
             <div>
-              <h2 className="text-base font-bold text-slate-800">
-                Ajustement de Stock
+              <h2 className="text-base font-extrabold text-slate-900">
+                Ajustement de Stock & Seuils
               </h2>
               <p className="text-xs text-slate-500 font-medium">
                 {article.nomProduit}
@@ -80,159 +94,137 @@ export const ModalAjustementStock: React.FC<ModalAjustementStockProps> = ({
             aria-label="Fermer la fenêtre"
             className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold flex items-center justify-center transition-colors text-xs"
           >
-            <Cancel01Icon size={16} strokeWidth={2} />
+            <Cancel01Icon size={16} />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
-          {/* Stock actuel pill */}
-          <div className="bg-[#F8F9FD] p-3 rounded-2xl border border-slate-200/70 flex items-center justify-between">
-            <span className="font-bold text-slate-600">Stock Actuel :</span>
-            <span className="font-extrabold text-sm text-[#4880FF]">
-              {article.quantiteActuelle} unités
-            </span>
+        <form onSubmit={handleSubmit} className="p-6 space-y-5 text-xs font-sans">
+          {/* Badge comparaison du stock actuel */}
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 flex items-center justify-between">
+            <div>
+              <span className="font-bold text-slate-500 text-[11px] uppercase tracking-wider block">Stock Actuel en Base</span>
+              <span className="font-black text-sm text-slate-800">{article.quantiteActuelle} unités</span>
+            </div>
+
+            <div className="text-right">
+              <span className="font-bold text-slate-500 text-[11px] uppercase tracking-wider block">Nouveau Stock</span>
+              <span className="font-black text-base text-[#5B63F6]">{nouveauStock} unités</span>
+            </div>
           </div>
 
-          {/* Type d'opération */}
-          <div>
-            <label className="block font-bold text-slate-700 mb-1.5">
-              Type d'opération
+          {/* 1. Modification du Stock Actuel */}
+          <div className="space-y-1.5">
+            <label className="block font-bold text-slate-800">
+              Quantité Actuelle de Stock *
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => {
-                  setTypeOperation("ajouter");
-                  setMotif("Réapprovisionnement Fournisseur");
-                }}
-                className={`py-2.5 px-3 rounded-xl font-bold transition-all text-xs flex items-center justify-center gap-1.5 ${
-                  typeOperation === "ajouter"
-                    ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
+                onClick={() => setNouveauStock((prev) => Math.max(0, prev - 1))}
+                className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-base flex items-center justify-center shrink-0 transition-colors"
               >
-                <Add01Icon size={14} strokeWidth={2.5} />
-                <span>Entrée / Ajout</span>
+                -
               </button>
-
+              <input
+                type="number"
+                required
+                min="0"
+                value={nouveauStock}
+                onChange={(e) => setNouveauStock(Math.max(0, Number(e.target.value)))}
+                className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-center text-base font-black text-slate-900 focus:outline-none focus:border-[#5B63F6] focus:bg-white"
+              />
               <button
                 type="button"
-                onClick={() => {
-                  setTypeOperation("retirer");
-                  setMotif("Casse / Péremption Produit");
-                }}
-                className={`py-2.5 px-3 rounded-xl font-bold transition-all text-xs flex items-center justify-center gap-1.5 ${
-                  typeOperation === "retirer"
-                    ? "bg-rose-500 text-white shadow-md shadow-rose-500/20"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
+                onClick={() => setNouveauStock((prev) => prev + 1)}
+                className="w-10 h-10 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-[#5B63F6] font-black text-base flex items-center justify-center shrink-0 transition-colors"
               >
-                <Remove01Icon size={14} strokeWidth={2.5} />
-                <span>Sortie / Déduction</span>
+                +
               </button>
             </div>
           </div>
 
-          {/* Quantité d'ajustement */}
-          <div>
-            <label className="block font-bold text-slate-700 mb-1">
-              Quantité à {typeOperation === "ajouter" ? "ajouter" : "déduire"} *
-            </label>
-            <input
-              type="number"
-              required
-              min="1"
-              value={quantite}
-              onChange={(e) =>
-                setQuantite(e.target.value ? Number(e.target.value) : "")
-              }
-              placeholder="10"
-              className="w-full px-4 py-2.5 bg-[#F8F9FD] border border-slate-200 rounded-xl text-sm font-black focus:outline-none focus:border-[#4880FF] text-slate-800"
-            />
+          {/* 2 & 3. Seuils d'Alerte Minimum et Maximum */}
+          <div className="grid grid-cols-2 gap-4 pt-2">
+            <div>
+              <label className="block font-bold text-slate-800 mb-1">
+                Seuil d'alerte Minimum *
+              </label>
+              <input
+                type="number"
+                required
+                min="0"
+                value={seuilMin}
+                onChange={(e) => setSeuilMin(Math.max(0, Number(e.target.value)))}
+                className="w-full px-3.5 py-2.5 bg-amber-50/50 border border-amber-200 rounded-xl text-xs font-black text-amber-800 focus:outline-none focus:border-amber-400"
+              />
+              <span className="text-[10px] text-slate-400 font-medium block mt-1">Alerte stock bas</span>
+            </div>
+
+            <div>
+              <label className="block font-bold text-slate-800 mb-1">
+                Seuil d'alerte Maximum
+              </label>
+              <input
+                type="number"
+                min={seuilMin}
+                value={seuilMax}
+                onChange={(e) => setSeuilMax(Math.max(seuilMin, Number(e.target.value)))}
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-black text-slate-800 focus:outline-none focus:border-[#5B63F6]"
+              />
+              <span className="text-[10px] text-slate-400 font-medium block mt-1">Plafond de surstock</span>
+            </div>
           </div>
 
-          {/* Motif */}
-          <div>
-            <label className="block font-bold text-slate-700 mb-1">
-              Motif d'ajustement
-            </label>
-            <select
-              value={motif}
-              onChange={(e) => setMotif(e.target.value)}
-              className="w-full px-4 py-2.5 bg-[#F8F9FD] border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-[#4880FF] text-slate-800"
-            >
-              {typeOperation === "ajouter" ? (
-                <>
-                  <option value="Réapprovisionnement Fournisseur">
-                    Réapprovisionnement Fournisseur
-                  </option>
-                  <option value="Retour Client Homologué">
-                    Retour Client Homologué
-                  </option>
-                  <option value="Ajustement Inventaire Positif">
-                    Ajustement Inventaire Positif
-                  </option>
-                </>
-              ) : (
-                <>
-                  <option value="Casse / Péremption Produit">
-                    Casse / Péremption Produit
-                  </option>
-                  <option value="Vente Magasin Physique">
-                    Vente Magasin Physique
-                  </option>
-                  <option value="Échantillon / Testeur Promo">
-                    Échantillon / Testeur Promo
-                  </option>
-                  <option value="Ajustement Inventaire Négatif">
-                    Ajustement Inventaire Négatif
-                  </option>
-                </>
-              )}
-            </select>
+          {/* 4. Motif & Remarques */}
+          <div className="space-y-3 pt-2">
+            <div>
+              <label className="block font-bold text-slate-800 mb-1">
+                Motif de l'ajustement *
+              </label>
+              <select
+                value={motif}
+                onChange={(e) => setMotif(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#5B63F6]"
+              >
+                <option value="Réapprovisionnement Fournisseur">Réapprovisionnement Fournisseur</option>
+                <option value="Inventaire Physique Périodique">Inventaire Physique Périodique</option>
+                <option value="Casse / Dégradation Produit">Casse / Dégradation Produit</option>
+                <option value="Ajustement de Sécurité">Ajustement de Sécurité</option>
+                <option value="Correction Erreur de Saisie">Correction Erreur de Saisie</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block font-bold text-slate-800 mb-1">
+                Remarque / Référence Bon (Optionnel)
+              </label>
+              <input
+                type="text"
+                value={remarque}
+                onChange={(e) => setRemarque(e.target.value)}
+                placeholder="Ex: Bon de Livraison BL-2026-902"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:border-[#5B63F6]"
+              />
+            </div>
           </div>
 
-          {/* Remarque optionnelle */}
-          <div>
-            <label className="block font-bold text-slate-700 mb-1">
-              Remarque / Note (Optionnel)
-            </label>
-            <input
-              type="text"
-              value={remarque}
-              onChange={(e) => setRemarque(e.target.value)}
-              placeholder="Ex: Bon de livraison #BL-9921"
-              className="w-full px-4 py-2 bg-[#F8F9FD] border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#4880FF]"
-            />
-          </div>
-
-          {/* Preview du nouveau stock */}
-          <div className="pt-2 border-t border-slate-100 flex justify-between font-bold text-xs text-slate-700">
-            <span>Nouveau Stock après validation :</span>
-            <span className="text-[#4880FF] font-black">
-              {typeOperation === "ajouter"
-                ? article.quantiteActuelle + (Number(quantite) || 0)
-                : Math.max(0, article.quantiteActuelle - (Number(quantite) || 0))}{" "}
-              unités
-            </span>
-          </div>
-
-          {/* Submit Buttons */}
-          <div className="pt-3 flex items-center justify-between border-t border-slate-100">
+          {/* Buttons Bar */}
+          <div className="pt-4 flex items-center justify-between border-t border-slate-100">
             <button
               type="button"
               onClick={onFermer}
-              className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold hover:bg-slate-100 transition-colors"
+              className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold hover:bg-slate-100 transition-colors"
             >
               Annuler
             </button>
 
             <button
               type="submit"
-              className="px-6 py-2 bg-[#4880FF] hover:bg-blue-600 text-white font-bold rounded-xl transition-all shadow-md shadow-blue-500/20"
+              className="px-6 py-2.5 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold rounded-xl transition-all shadow-md shadow-indigo-500/20 flex items-center gap-1.5 cursor-pointer"
             >
-              Valider l'ajustement
+              <CheckmarkCircle02Icon size={16} />
+              <span>Valider les modifications</span>
             </button>
           </div>
         </form>

@@ -7,10 +7,13 @@ import { ModalFiltreCalendrier } from "@/modules/clients/composants/modal-filtre
 import { ModalAjouterClient } from "@/modules/clients/composants/modal-ajouter-client";
 import { FicheDetailClient, ClientComplet } from "@/modules/clients/composants/fiche-detail-client";
 import { ModalClientToutesLesInfos } from "@/modules/clients/composants/modal-client-toutes-les-infos";
+import { ModalExportation } from "@/composants-communs/modal-exportation";
 import { useCommandes } from "@/lib/context/CommandesContext";
 import { formatPrix, formatNombre } from "@/lib/formatteur";
+import { exporterCSV, exporterRapportPDF } from "@/lib/utilitaires/exportateur";
 import {
   Add01Icon,
+  Download01Icon,
   FilterIcon,
   Calendar01Icon,
   ShoppingBag01Icon,
@@ -81,6 +84,7 @@ export default function PageClientsAdmin() {
   const [clientSelectionne, setClientSelectionne] = useState<ClientComplet | null>(
     clientsComplets[0] || null
   );
+  const [modalExportOuvert, setModalExportOuvert] = useState(false);
   const [modalAjouterOuvert, setModalAjouterOuvert] = useState(false);
   const [modalToutesInfosOuvert, setModalToutesInfosOuvert] = useState(false);
   const [clientAVisualiserIntegral, setClientAVisualiserIntegral] = useState<ClientComplet | null>(null);
@@ -107,6 +111,51 @@ export default function PageClientsAdmin() {
 
     return matchStatut && matchType && matchDate;
   });
+
+  const executerExportationClients = (format: "pdf" | "csv") => {
+    const enTetes = [
+      "ID",
+      "Nom Client",
+      "Email",
+      "Téléphone",
+      "Adresse",
+      "Genre",
+      "Statut",
+      "Commandes",
+      "Total Dépensé FCFA",
+      "Date Inscription",
+    ];
+
+    const lignes = clientsComplets.map((c) => [
+      c.id,
+      c.nom,
+      c.email,
+      c.telephone,
+      c.adresse,
+      c.genre || "Male",
+      c.statut === "Completed" ? "Actif" : "Inactif",
+      c.totalCommandes || 0,
+      formatPrix(c.totalDepense || 0),
+      c.dateInscrit,
+    ]);
+
+    if (format === "csv") {
+      exporterCSV("liste_clients_itexal", enTetes, lignes);
+    } else {
+      exporterRapportPDF(
+        "LISTE GLOBALE DES CLIENTS",
+        "Base de données clients et historique d'achats ITexal Cosmetic",
+        [
+          { label: "Total Clients", valeur: formatNombre(kpisClients.total) },
+          { label: "Clients Actifs", valeur: formatNombre(kpisClients.actifs) },
+          { label: "Total Commandes", valeur: formatNombre(kpisClients.totalCommandesCumulees) },
+          { label: "Chiffre Cumulé", valeur: formatPrix(kpisClients.totalDepenseCumulee) + " FCFA" },
+        ],
+        enTetes,
+        lignes
+      );
+    }
+  };
 
   const ouvrirToutesLesInfos = (client: ClientComplet) => {
     setClientAVisualiserIntegral(client);
@@ -181,14 +230,25 @@ export default function PageClientsAdmin() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setModalAjouterOuvert(true)}
-          className="px-6 py-3 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-indigo-500/20 transition-all self-start sm:self-auto flex items-center gap-2"
-        >
-          <Add01Icon size={18} strokeWidth={2.5} />
-          <span>+ Add Customer</span>
-        </button>
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setModalExportOuvert(true)}
+            className="px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-2xl border border-slate-200 shadow-xs transition-all flex items-center gap-2"
+          >
+            <Download01Icon size={18} className="text-[#5B63F6]" />
+            <span>Exporter la liste</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setModalAjouterOuvert(true)}
+            className="px-6 py-3 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2"
+          >
+            <Add01Icon size={18} strokeWidth={2.5} />
+            <span>+ Add Customer</span>
+          </button>
+        </div>
       </div>
 
       {notification && (
@@ -508,6 +568,15 @@ export default function PageClientsAdmin() {
         onFermer={() => setModalCalendrierOuvert(false)}
         dateSelectionnee={dateFiltree}
         onAppliquer={(dt) => setDateFiltree(dt)}
+      />
+
+      <ModalExportation
+        ouvert={modalExportOuvert}
+        titre="Exporter la Liste des Clients"
+        description="Générez la liste exhaustive de l'ensemble des clients enregistrés avec leurs coordonnées, statut et historique de dépenses."
+        nombreElements={clientsComplets.length}
+        onFermer={() => setModalExportOuvert(false)}
+        onExporter={executerExportationClients}
       />
     </div>
   );

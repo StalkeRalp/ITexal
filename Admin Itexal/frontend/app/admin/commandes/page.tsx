@@ -4,9 +4,11 @@ import React, { useState, useMemo } from "react";
 import { CarteStatCommande } from "@/modules/commandes/composants/carte-stat-commande";
 import { TableauCommandes } from "@/modules/commandes/composants/tableau-commandes";
 import { ModalDetailCommande } from "@/modules/commandes/composants/modal-detail-commande";
+import { ModalExportation } from "@/composants-communs/modal-exportation";
 import { Commande as CommandeVue, StatutCommande as StatutVue } from "@/modules/commandes/types/commande";
 import { useCommandes } from "@/lib/context/CommandesContext";
-import { formatNombre } from "@/lib/formatteur";
+import { formatNombre, formatPrix } from "@/lib/formatteur";
+import { exporterCSV, exporterRapportPDF } from "@/lib/utilitaires/exportateur";
 import {
   Download01Icon,
   ShoppingBag01Icon,
@@ -17,6 +19,7 @@ import {
 
 export default function PageCommandesAdmin() {
   const { commandes, modifierStatutCommande, supprimerCommande } = useCommandes();
+  const [modalExportOuvert, setModalExportOuvert] = useState(false);
 
   // Mapping des commandes centralisées vers le type CommandeVue de la vue
   const commandesVues: CommandeVue[] = useMemo(() => {
@@ -64,6 +67,7 @@ export default function PageCommandesAdmin() {
   ).length;
   const livrees = commandesVues.filter((c) => c.statut === "Livrée").length;
   const annulees = commandesVues.filter((c) => c.statut === "Annulée").length;
+  const chiffreAffairesTotal = commandesVues.reduce((sum, c) => sum + c.montantTotal, 0);
 
   const changerStatut = (id: string, nouveauStatut: StatutVue) => {
     let internalStatut: "en_attente" | "validee" | "en_preparation" | "expediee" | "livree" | "annulee" = "validee";
@@ -88,6 +92,49 @@ export default function PageCommandesAdmin() {
     }
   };
 
+  const executerExportationCommandes = (format: "pdf" | "csv") => {
+    const enTetes = [
+      "N° Commande",
+      "Date",
+      "Client",
+      "Email",
+      "Téléphone",
+      "Adresse",
+      "Statut",
+      "Paiement",
+      "Total FCFA",
+    ];
+
+    const lignes = commandesVues.map((c) => [
+      c.numeroCommande,
+      c.creeLe,
+      c.nomClient,
+      c.emailClient,
+      c.telephoneClient,
+      `${c.adresseLivraison}, ${c.villeLivraison}`,
+      c.statut,
+      `${c.modePaiement} (${c.statutPaiement})`,
+      formatPrix(c.montantTotal),
+    ]);
+
+    if (format === "csv") {
+      exporterCSV("rapport_commandes_itexal", enTetes, lignes);
+    } else {
+      exporterRapportPDF(
+        "RAPPORT GÉNÉRAL DES COMMANDES",
+        "Synthèse et historique des ventes cosmétiques ITexal",
+        [
+          { label: "Total Commandes", valeur: formatNombre(totalCmd) },
+          { label: "Commandes Livrées", valeur: formatNombre(livrees) },
+          { label: "En Traitement", valeur: formatNombre(enTraitement) },
+          { label: "Chiffre d'Affaires", valeur: formatPrix(chiffreAffairesTotal) + " FCFA" },
+        ],
+        enTetes,
+        lignes
+      );
+    }
+  };
+
   return (
     <div className="space-y-8 animate-fadeIn max-w-[1600px] mx-auto pb-12">
       {/* Entête de page */}
@@ -103,8 +150,8 @@ export default function PageCommandesAdmin() {
 
         <button
           type="button"
-          onClick={() => alert("Rapport de commandes exporté avec succès.")}
-          className="px-6 py-3 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2 self-start sm:self-auto"
+          onClick={() => setModalExportOuvert(true)}
+          className="px-6 py-3 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2 self-start sm:self-auto cursor-pointer hover:scale-[1.02]"
         >
           <Download01Icon size={18} strokeWidth={2.5} /> Exporter Rapport
         </button>
@@ -162,6 +209,16 @@ export default function PageCommandesAdmin() {
           onChangerStatut={changerStatut}
         />
       )}
+
+      {/* Pop-up Modale d'exportation */}
+      <ModalExportation
+        ouvert={modalExportOuvert}
+        titre="Exporter le Rapport des Commandes"
+        description="Générez un rapport complet contenant l'ensemble des commandes avec la liste des clients et les montants."
+        nombreElements={totalCmd}
+        onFermer={() => setModalExportOuvert(false)}
+        onExporter={executerExportationCommandes}
+      />
     </div>
   );
 }

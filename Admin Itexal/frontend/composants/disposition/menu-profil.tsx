@@ -5,11 +5,13 @@ import Link from "next/link";
 import { useProfil } from "@/lib/context/ProfilContext";
 import { useAuth } from "@/lib/context/AuthContext";
 import { ArrowDown01Icon, User02Icon, Logout01Icon, Settings02Icon } from "hugeicons-react";
+import { ModalConfirmationDeconnexion } from "@/composants-communs/modal-confirmation-deconnexion";
 
 export const MenuProfil: React.FC = () => {
   const { profil, nomComplet, initiales } = useProfil();
   const { seDeconnecter } = useAuth();
   const [estOuvert, setEstOuvert] = useState(false);
+  const [modalDeconnexionOuvert, setModalDeconnexionOuvert] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Fermer le menu si clic extérieur
@@ -109,7 +111,7 @@ export const MenuProfil: React.FC = () => {
             type="button"
             onClick={() => {
               setEstOuvert(false);
-              seDeconnecter();
+              setModalDeconnexionOuvert(true);
             }}
             className="w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-xs text-rose-600 hover:bg-rose-50 font-semibold border-t border-slate-100 transition-colors mt-1 cursor-pointer"
           >
@@ -118,6 +120,13 @@ export const MenuProfil: React.FC = () => {
           </button>
         </div>
       )}
+
+      {/* Modal de confirmation de déconnexion */}
+      <ModalConfirmationDeconnexion
+        estOuvert={modalDeconnexionOuvert}
+        surFermer={() => setModalDeconnexionOuvert(false)}
+        surConfirmer={seDeconnecter}
+      />
     </div>
   );
 };

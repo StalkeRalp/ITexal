@@ -14,18 +14,22 @@ export interface Produit {
   nom: string;
   categorieId: string;
   nomCategorie: string;
+  categorie?: string;
   marqueId: string;
   nomMarque: string;
   description: string;
   prix: number;
   prixPromotionnel?: number;
   enPromotion?: boolean;
+  image?: string;
   images: string[];
   stock: number;
+  seuilAlerte?: number;
+  seuilAlerteMax?: number;
   disponible: boolean;
   
   // Caractéristiques & Fiche détaillée cosmétique
-  caracteristiques?: string[];
+  caracteristiques?: string[] | string;
   modeUtilisation?: string;
   precautions?: string;
   composition?: string;

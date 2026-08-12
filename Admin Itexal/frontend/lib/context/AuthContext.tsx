@@ -88,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       pathname === "/mot-de-passe-oublie" ||
       pathname === "/recuperation" ||
       pathname === "/verification-email" ||
-      pathname.startsWith("/auth/");
+      (pathname.startsWith("/auth/") && pathname !== "/auth/otp" && pathname !== "/verification-otp");
 
     if (estRoutePrivee && !estConnecte) {
       toast.avertissement("Veuillez vous connecter pour accéder à l'administration.");

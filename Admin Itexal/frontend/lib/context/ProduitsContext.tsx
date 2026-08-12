@@ -24,10 +24,11 @@ interface ProduitsContextType {
   modifierProduit: (id: string, modifs: Partial<Produit>) => void;
   supprimerProduit: (id: string) => void;
   modifierStockProduit: (id: string, nouveauStock: number) => void;
+  modifierStockEtSeuils: (id: string, nouveauStock: number, seuilMin: number, seuilMax?: number) => void;
   
   // Actions Catégories
-  creerCategorie: (nom: string, description?: string) => void;
-  modifierCategorie: (id: string, nom: string, description?: string) => void;
+  creerCategorie: (nom: string, description?: string, image?: string) => void;
+  modifierCategorie: (id: string, nom: string, description?: string, image?: string) => void;
   supprimerCategorie: (id: string) => void;
 
   // Actions Marques
@@ -53,6 +54,7 @@ const ProduitsContext = createContext<ProduitsContextType>({
   modifierProduit: () => {},
   supprimerProduit: () => {},
   modifierStockProduit: () => {},
+  modifierStockEtSeuils: () => {},
   creerCategorie: () => {},
   modifierCategorie: () => {},
   supprimerCategorie: () => {},
@@ -153,14 +155,31 @@ export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     );
   };
 
+  const modifierStockEtSeuils = (id: string, nouveauStock: number, seuilMin: number, seuilMax?: number) => {
+    sauvegarderProds(
+      produits.map((p) =>
+        p.id === id
+          ? {
+              ...p,
+              stock: Math.max(0, nouveauStock),
+              seuilAlerte: seuilMin,
+              seuilAlerteMax: seuilMax,
+              disponible: nouveauStock > 0,
+            }
+          : p
+      )
+    );
+  };
+
   // Actions Catégories
-  const creerCategorie = (nom: string, description?: string) => {
-    const id = `cat-${nom.toLowerCase().replace(/[^a-z0-9]/g, "-")}`;
+  const creerCategorie = (nom: string, description?: string, image?: string) => {
+    const id = `cat-${Date.now()}`;
     const nouvelle: Categorie = {
       id,
       nom,
-      slug: id,
+      slug: nom.toLowerCase().trim().replace(/[\s\W]+/g, "-"),
       description,
+      image,
       nombreProduits: 0,
       ordreAffichage: categories.length + 1,
       creeLe: new Date().toLocaleDateString("fr-FR"),
@@ -168,9 +187,9 @@ export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     sauvegarderCats([...categories, nouvelle]);
   };
 
-  const modifierCategorie = (id: string, nom: string, description?: string) => {
+  const modifierCategorie = (id: string, nom: string, description?: string, image?: string) => {
     sauvegarderCats(
-      categories.map((c) => (c.id === id ? { ...c, nom, description } : c))
+      categories.map((c) => (c.id === id ? { ...c, nom, description, image: image !== undefined ? image : c.image } : c))
     );
   };
 
@@ -236,6 +255,7 @@ export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         modifierProduit,
         supprimerProduit,
         modifierStockProduit,
+        modifierStockEtSeuils,
         creerCategorie,
         modifierCategorie,
         supprimerCategorie,

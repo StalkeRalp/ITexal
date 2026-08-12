@@ -3,6 +3,7 @@
 import React from "react";
 import { Commande, StatutCommande } from "../types/commande";
 import { formatPrix } from "@/lib/formatteur";
+import { exporterBonDeCommandePDF } from "@/lib/utilitaires/exportateur";
 import {
   ShoppingCart01Icon,
   Cancel01Icon,
@@ -78,6 +79,10 @@ export const ModalDetailCommande: React.FC<ModalDetailCommandeProps> = ({
     { label: "En attente", val: "En attente" },
     { label: "Annulée", val: "Annulée" },
   ];
+
+  const exporterBonDeCommande = () => {
+    exporterBonDeCommandePDF(commande);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fadeIn">
@@ -208,7 +213,7 @@ export const ModalDetailCommande: React.FC<ModalDetailCommandeProps> = ({
                 <span>Sous-total</span>
                 <span className="font-semibold">
                   {formatPrix(
-                    commande.montantTotal - commande.fraisLivraison
+                    commande.montantTotal - (commande.fraisLivraison || 1500)
                   )}{" "}
                   FCFA
                 </span>
@@ -216,7 +221,7 @@ export const ModalDetailCommande: React.FC<ModalDetailCommandeProps> = ({
               <div className="flex justify-between text-slate-600">
                 <span>Frais de livraison</span>
                 <span className="font-semibold">
-                  {formatPrix(commande.fraisLivraison)} FCFA
+                  {formatPrix(commande.fraisLivraison || 1500)} FCFA
                 </span>
               </div>
               <div className="border-t border-slate-200 pt-2 flex justify-between font-extrabold text-slate-900 text-sm">
@@ -259,13 +264,11 @@ export const ModalDetailCommande: React.FC<ModalDetailCommandeProps> = ({
         <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
           <button
             type="button"
-            onClick={() =>
-              alert(`Impression de la facture #${commande.numeroCommande}`)
-            }
-            className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-700 font-bold hover:bg-slate-100 transition-colors flex items-center gap-2"
+            onClick={exporterBonDeCommande}
+            className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-[#5B63F6] font-bold hover:bg-indigo-50 transition-colors flex items-center gap-2 shadow-xs"
           >
             <PrinterIcon size={16} strokeWidth={2} />
-            <span>Imprimer Facture</span>
+            <span>Exporter Bon de Commande (PDF)</span>
           </button>
 
           <button

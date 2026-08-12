@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { EmblemeCosmeticAdmin } from "./embleme-cosmetic-admin";
+import Link from "next/link";
 
 interface LayoutAuthBaseProps {
   titre: string;
@@ -26,7 +26,7 @@ export const LayoutAuthBase: React.FC<LayoutAuthBaseProps> = ({
   return (
     <div className="h-screen w-full flex bg-[#F8FAFC] select-none font-sans overflow-hidden">
       
-      {/* ── Left Column: Form Panel (Matches Sign Up Reference Image) ── */}
+      {/* ── Left Column: Form Panel ── */}
       <div className="w-full md:w-[480px] lg:w-[520px] bg-white h-full max-h-screen p-5 sm:p-6 md:p-8 flex flex-col justify-between z-10 border-r border-slate-200/60 shadow-xs shrink-0 overflow-hidden">
         <div className="my-auto space-y-3.5 sm:space-y-4">
           
@@ -101,31 +101,32 @@ export const LayoutAuthBase: React.FC<LayoutAuthBaseProps> = ({
             </div>
           )}
 
-          {/* Main Form Fields & Submit Button */}
+          {/* Main Form Fields */}
           {children}
 
         </div>
 
-        {/* Footer Links */}
-        {lienFooter && (
-          <div className="text-center text-xs text-slate-500 font-bold pt-3 border-t border-slate-100 mt-2 shrink-0">
-            {lienFooter}
+        {/* Footer Links & Legal Pages */}
+        <div className="text-center text-xs text-slate-500 font-bold pt-3 border-t border-slate-100 mt-2 shrink-0 space-y-1.5">
+          {lienFooter && <div>{lienFooter}</div>}
+          <div className="flex items-center justify-center gap-3 text-[11px] font-semibold text-slate-400">
+            <Link href="/conditions-generales" className="hover:text-[#5B63F6] hover:underline transition-colors">
+              Conditions Générales
+            </Link>
+            <span>•</span>
+            <Link href="/politique-confidentialite" className="hover:text-[#5B63F6] hover:underline transition-colors">
+              Politique de Confidentialité
+            </Link>
           </div>
-        )}
+        </div>
       </div>
 
-      {/* ── Right Column: Vector Illustration & Organic Blue Blob Background ── */}
+      {/* ── Right Column: Vector Illustration ── */}
       <div className="flex-1 bg-[#EBF3FF] hidden md:flex items-center justify-center p-8 lg:p-12 relative overflow-hidden">
-        
-        {/* Corner Organic Blue Blobs (Identical to user reference image) */}
-        {/* Top-Left Blob */}
         <div className="absolute top-0 left-0 w-64 h-64 bg-[#7CA5FF]/60 rounded-br-[140px] pointer-events-none transform -translate-x-10 -translate-y-10" />
-        {/* Top-Right Blob */}
         <div className="absolute top-0 right-0 w-80 h-96 bg-[#4880FF]/70 rounded-bl-[200px] pointer-events-none transform translate-x-12 -translate-y-12" />
-        {/* Bottom-Right Blob */}
         <div className="absolute bottom-0 right-0 w-96 h-80 bg-[#3B82F6]/75 rounded-tl-[220px] pointer-events-none transform translate-x-10 translate-y-10" />
 
-        {/* Centered Vector Illustration Container */}
         <div className="relative z-10 max-w-xl w-full flex items-center justify-center p-4">
           <Image
             src={illustrationSrc}
@@ -136,7 +137,6 @@ export const LayoutAuthBase: React.FC<LayoutAuthBaseProps> = ({
             className="w-full h-auto max-h-[82vh] object-contain drop-shadow-md rounded-2xl transition-transform duration-500 hover:scale-[1.01]"
           />
         </div>
-
       </div>
 
     </div>

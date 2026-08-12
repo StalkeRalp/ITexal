@@ -332,7 +332,14 @@ export const genererCommandesInitiales = (clients: Client[], produits: Produit[]
       remisePromotion: 0,
       montantTotal: totalFinal,
       statut: statutCmd,
-      dateCommande: `0${(idx % 8) + 1}/08/2026 à ${10 + (idx % 9)}:30`,
+      dateCommande: (() => {
+        const d = new Date();
+        const jour = String(Math.max(1, ((idx * 2) % 28) + 1)).padStart(2, "0");
+        const mois = String(d.getMonth() + 1).padStart(2, "0");
+        const annee = d.getFullYear();
+        const heure = 10 + (idx % 9);
+        return `${jour}/${mois}/${annee} à ${heure}:30`;
+      })(),
       methodePaiement: idx % 2 === 0 ? "mobile_money" : "carte_bancaire",
       statutPaiement: statutCmd === "annulee" ? "rembourse" : statutCmd === "en_attente" ? "en_attente" : "paye",
       modeLivraison: idx % 3 === 0 ? "express" : "standard",

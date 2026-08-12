@@ -3,7 +3,9 @@
 import React, { useState, useMemo } from "react";
 import { Categorie as CategorieVue } from "@/modules/categories/types/categorie";
 import { ModalCategorieFormulaire } from "@/modules/categories/composants/modal-categorie-formulaire";
+import { ModalConfirmation } from "@/composants-communs/modal-confirmation";
 import { useProduits } from "@/lib/context/ProduitsContext";
+import { useToast } from "@/lib/context/ToastContext";
 import {
   Add01Icon,
   Tag01Icon,
@@ -17,6 +19,8 @@ import {
   EyeIcon,
   Cancel01Icon,
 } from "hugeicons-react";
+
+import { FicheDetailCategorie } from "@/modules/categories/composants/fiche-detail-categorie";
 
 // Palettes de couleurs vibrantes pour différencier chaque catégorie
 const PALETTES_CATEGORIES = [
@@ -60,6 +64,7 @@ const PALETTES_CATEGORIES = [
 
 export default function PageCategoriesAdmin() {
   const { categories, produits, creerCategorie, modifierCategorie, supprimerCategorie } = useProduits();
+  const toast = useToast();
 
   // Mapping des catégories centralisées
   const categoriesVues: CategorieVue[] = useMemo(() => {
@@ -71,6 +76,7 @@ export default function PageCategoriesAdmin() {
         slug: c.slug,
         description: c.description || `Gamme de soins et cosmétiques ${c.nom}`,
         icone: c.nom.split(" ")[0],
+        image: c.image,
         statut: "Actif",
         nombreProduits: countProds || c.nombreProduits || 0,
         creeLe: c.creeLe,
@@ -81,9 +87,11 @@ export default function PageCategoriesAdmin() {
   const [recherche, setRecherche] = useState("");
   const [modalOuvert, setModalOuvert] = useState(false);
   const [categorieAEditer, setCategorieAEditer] = useState<CategorieVue | null>(null);
+  const [idASupprimer, setIdASupprimer] = useState<string | null>(null);
 
-  // Popover d'action & Modal "Toutes les infos (+)" pour catégorie
+  // Popover d'action & Fiche de détail latérale / Modal "Toutes les infos (+)"
   const [popoverId, setPopoverId] = useState<string | null>(null);
+  const [categorieSelectionnee, setCategorieSelectionnee] = useState<CategorieVue | null>(null);
   const [categorieDetaillee, setCategorieDetaillee] = useState<CategorieVue | null>(null);
 
   const categoriesFiltrees = categoriesVues.filter((c) => {
@@ -104,16 +112,27 @@ export default function PageCategoriesAdmin() {
   };
 
   const verifierSuppression = (id: string) => {
-    if (confirm("Voulez-vous vraiment supprimer cette catégorie ?")) {
-      supprimerCategorie(id);
+    setIdASupprimer(id);
+  };
+
+  const confirmerSuppressionHandler = () => {
+    if (idASupprimer) {
+      supprimerCategorie(idASupprimer);
+      toast.succes("Catégorie supprimée avec succès !");
+      if (categorieSelectionnee?.id === idASupprimer) {
+        setCategorieSelectionnee(null);
+      }
+      setIdASupprimer(null);
     }
   };
 
   const enregistrerCategorieHandler = (cat: CategorieVue) => {
     if (categorieAEditer) {
-      modifierCategorie(cat.id, cat.nom, cat.description);
+      modifierCategorie(cat.id, cat.nom, cat.description, cat.image);
+      toast.succes("Catégorie mise à jour avec succès !");
     } else {
-      creerCategorie(cat.nom, cat.description);
+      creerCategorie(cat.nom, cat.description, cat.image);
+      toast.succes("Nouvelle catégorie créée avec succès !");
     }
     setModalOuvert(false);
   };
@@ -126,7 +145,7 @@ export default function PageCategoriesAdmin() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-            Categories List ({categoriesVues.length})
+            Liste des Catégories ({categoriesVues.length})
           </h1>
           <p className="text-xs text-slate-400 font-medium mt-1">
             Classification et thématisation des gammes cosmétiques.
@@ -136,10 +155,10 @@ export default function PageCategoriesAdmin() {
         <button
           type="button"
           onClick={ouvrirCreation}
-          className="px-6 py-3 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 self-start sm:self-auto"
+          className="px-6 py-3 bg-[#5B63F6] hover:bg-indigo-600 text-white font-extrabold text-xs rounded-2xl shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 self-start sm:self-auto cursor-pointer"
         >
           <Add01Icon size={18} strokeWidth={2.5} />
-          <span>+ Add Category</span>
+          <span>Ajouter une catégorie</span>
         </button>
       </div>
 
@@ -199,105 +218,153 @@ export default function PageCategoriesAdmin() {
         </div>
       </div>
 
-      {/* Grid of Distinct Colored Categories Cards with Popover Menu */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categoriesFiltrees.map((cat, idx) => {
-          const palette = PALETTES_CATEGORIES[idx % PALETTES_CATEGORIES.length];
-          const estPopoverOuvert = popoverId === cat.id;
+      {/* Main Grid Layout: Left Cards + Right Sticky Detail Panel */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Left Categories Grid */}
+        <div className={`space-y-6 ${categorieSelectionnee ? "lg:col-span-2" : "lg:col-span-3"}`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categoriesFiltrees.map((cat, idx) => {
+              const palette = PALETTES_CATEGORIES[idx % PALETTES_CATEGORIES.length];
+              const estPopoverOuvert = popoverId === cat.id;
+              const estSelectionnee = categorieSelectionnee?.id === cat.id;
 
-          return (
-            <div
-              key={cat.id}
-              className={`bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-4 transition-all duration-300 relative overflow-hidden group ${palette.borderTop} ${palette.hoverBorder} hover:shadow-md`}
-            >
-              <div className="flex items-start justify-between">
+              return (
                 <div
-                  className={`w-12 h-12 rounded-2xl ${palette.bgIcon} font-black flex items-center justify-center text-sm border shadow-xs transition-transform group-hover:scale-105`}
+                  key={cat.id}
+                  onClick={() => setCategorieSelectionnee(estSelectionnee ? null : cat)}
+                  className={`bg-white rounded-3xl p-6 shadow-sm border space-y-4 transition-all duration-300 relative overflow-hidden group cursor-pointer ${palette.borderTop} ${palette.hoverBorder} hover:shadow-md ${
+                    estSelectionnee ? "ring-2 ring-[#5B63F6] border-indigo-200 bg-indigo-50/20" : "border-slate-100"
+                  }`}
                 >
-                  <SparklesIcon size={22} />
-                </div>
+                  <div className="flex items-start justify-between">
+                    {/* Image ou icône de la catégorie */}
+                    {cat.image ? (
+                      <div className="w-14 h-14 rounded-2xl overflow-hidden border border-slate-200 shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                        <img src={cat.image} alt={cat.nom} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div
+                        className={`w-12 h-12 rounded-2xl ${palette.bgIcon} font-black flex items-center justify-center text-sm border shadow-xs transition-transform group-hover:scale-105`}
+                      >
+                        <SparklesIcon size={22} />
+                      </div>
+                    )}
 
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setPopoverId(estPopoverOuvert ? null : cat.id)}
-                    className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold transition-colors inline-flex items-center justify-center"
-                  >
-                    <MoreHorizontalIcon size={18} />
-                  </button>
-
-                  {/* Interactive Popover Menu (Details / Edit / Delete) */}
-                  {estPopoverOuvert && (
-                    <div
-                      onClick={(e) => e.stopPropagation()}
-                      className="absolute right-0 top-10 z-20 w-36 bg-white rounded-2xl p-1.5 shadow-xl border border-slate-100 animate-fadeIn text-left"
-                    >
+                    <div className="relative">
                       <button
                         type="button"
-                        onClick={() => {
-                          setPopoverId(null);
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPopoverId(estPopoverOuvert ? null : cat.id);
+                        }}
+                        className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold transition-colors inline-flex items-center justify-center cursor-pointer"
+                      >
+                        <MoreHorizontalIcon size={18} />
+                      </button>
+
+                      {/* Interactive Popover Menu (Details / Edit / Delete) */}
+                      {estPopoverOuvert && (
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute right-0 top-10 z-20 w-40 bg-white rounded-2xl p-1.5 shadow-xl border border-slate-100 animate-fadeIn text-left"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPopoverId(null);
+                              setCategorieSelectionnee(cat);
+                            }}
+                            className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 transition-colors"
+                          >
+                            <EyeIcon size={14} className="text-[#5B63F6]" />
+                            <span>Voir fiche</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPopoverId(null);
+                              setCategorieDetaillee(cat);
+                            }}
+                            className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 transition-colors"
+                          >
+                            <EyeIcon size={14} className="text-emerald-600" />
+                            <span>Plus d'infos (+)</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPopoverId(null);
+                              ouvrirEdition(cat);
+                            }}
+                            className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 transition-colors"
+                          >
+                            <Edit02Icon size={14} className="text-amber-500" />
+                            <span>Modifier</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPopoverId(null);
+                              verifierSuppression(cat.id);
+                            }}
+                            className="w-full px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl flex items-center gap-2 transition-colors border-t border-slate-100 mt-1"
+                          >
+                            <Delete02Icon size={14} />
+                            <span>Supprimer</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-extrabold text-base text-slate-900">{cat.nom}</h3>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setCategorieDetaillee(cat);
                         }}
-                        className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 transition-colors"
+                        className="w-6 h-6 rounded-full bg-indigo-50 hover:bg-[#5B63F6] text-[#5B63F6] hover:text-white font-black text-xs flex items-center justify-center transition-all cursor-pointer"
+                        title="Voir toutes les informations (+)"
                       >
-                        <EyeIcon size={14} className="text-[#5B63F6]" />
-                        <span>Voir tout (+)</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPopoverId(null);
-                          ouvrirEdition(cat);
-                        }}
-                        className="w-full px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 transition-colors"
-                      >
-                        <Edit02Icon size={14} className="text-amber-500" />
-                        <span>Modifier</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPopoverId(null);
-                          verifierSuppression(cat.id);
-                        }}
-                        className="w-full px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl flex items-center gap-2 transition-colors border-t border-slate-100 mt-1"
-                      >
-                        <Delete02Icon size={14} />
-                        <span>Supprimer</span>
+                        +
                       </button>
                     </div>
-                  )}
-                </div>
-              </div>
+                    <p className="text-xs text-slate-500 font-medium mt-1 line-clamp-2 leading-relaxed">
+                      {cat.description}
+                    </p>
+                  </div>
 
-              <div>
-                <div className="flex items-center justify-between">
-                  <h3 className="font-extrabold text-base text-slate-900">{cat.nom}</h3>
-                  <button
-                    type="button"
-                    onClick={() => setCategorieDetaillee(cat)}
-                    className="w-6 h-6 rounded-full bg-indigo-50 hover:bg-[#5B63F6] text-[#5B63F6] hover:text-white font-black text-xs flex items-center justify-center transition-all"
-                    title="Voir toutes les informations (+)"
-                  >
-                    +
-                  </button>
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
+                    <span className={`px-3 py-1 rounded-xl text-xs font-extrabold border ${palette.badge}`}>
+                      {cat.nombreProduits} produit(s)
+                    </span>
+                    <span className="text-slate-400 font-mono text-[11px]">Créé le {cat.creeLe}</span>
+                  </div>
                 </div>
-                <p className="text-xs text-slate-500 font-medium mt-1 line-clamp-2 leading-relaxed">
-                  {cat.description}
-                </p>
-              </div>
+              );
+            })}
+          </div>
+        </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
-                <span className={`px-3 py-1 rounded-xl text-xs font-extrabold border ${palette.badge}`}>
-                  {cat.nombreProduits} produit(s)
-                </span>
-                <span className="text-slate-400 font-mono text-[11px]">Créé le {cat.creeLe}</span>
-              </div>
-            </div>
-          );
-        })}
+        {/* Right Sticky Detail Panel (Fiche Detail Categorie) */}
+        {categorieSelectionnee && (
+          <div className="lg:col-span-1 sticky top-6">
+            <FicheDetailCategorie
+              categorie={categorieSelectionnee}
+              produitsRattaches={produits.filter((p) => p.categorieId === categorieSelectionnee.id)}
+              onFermer={() => setCategorieSelectionnee(null)}
+              onEditer={ouvrirEdition}
+              onSupprimer={(id) => verifierSuppression(id)}
+              onOuvrirToutesLesInfos={(cat) => setCategorieDetaillee(cat)}
+            />
+          </div>
+        )}
       </div>
 
       {/* Modal Toutes les infos de la Catégorie (+) */}
@@ -306,9 +373,15 @@ export default function PageCategoriesAdmin() {
           <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden space-y-6 p-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#5B63F6] font-black flex items-center justify-center">
-                  <SparklesIcon size={24} />
-                </div>
+                {categorieDetaillee.image ? (
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden border border-slate-200 shrink-0 shadow-xs">
+                    <img src={categorieDetaillee.image} alt={categorieDetaillee.nom} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-[#5B63F6] font-black flex items-center justify-center">
+                    <SparklesIcon size={24} />
+                  </div>
+                )}
                 <div>
                   <h2 className="text-xl font-extrabold text-slate-900">{categorieDetaillee.nom}</h2>
                   <p className="text-xs text-slate-400 font-medium">Slug : {categorieDetaillee.slug}</p>
@@ -379,6 +452,19 @@ export default function PageCategoriesAdmin() {
           onFermer={() => setModalOuvert(false)}
           onEnregistrer={enregistrerCategorieHandler}
           categorieAEditer={categorieAEditer}
+        />
+      )}
+
+      {/* Modal Confirmation de Suppression */}
+      {idASupprimer && (
+        <ModalConfirmation
+          ouvert={!!idASupprimer}
+          titre="Supprimer la Catégorie"
+          message="Êtes-vous sûr de vouloir supprimer définitivement cette catégorie ? Cette action retirera la thématique sans supprimer les produits associés."
+          texteConfirmer="Oui, supprimer"
+          variante="danger"
+          onConfirmer={confirmerSuppressionHandler}
+          onAnnuler={() => setIdASupprimer(null)}
         />
       )}
     </div>

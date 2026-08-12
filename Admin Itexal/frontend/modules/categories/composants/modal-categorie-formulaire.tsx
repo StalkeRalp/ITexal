@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Categorie } from "../types/categorie";
 import { Tag01Icon, Cancel01Icon, Upload01Icon, Image01Icon, Delete02Icon } from "hugeicons-react";
 
@@ -14,12 +15,17 @@ interface ModalCategorieFormulaireProps {
 export const ModalCategorieFormulaire: React.FC<
   ModalCategorieFormulaireProps
 > = ({ ouvert, categorieAEditer, onFermer, onEnregistrer }) => {
+  const [monte, setMonte] = useState(false);
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
   const [icone, setIcone] = useState("Soin Visage");
   const [image, setImage] = useState("");
   const [statut, setStatut] = useState<"Actif" | "Inactif">("Actif");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setMonte(true);
+  }, []);
 
   useEffect(() => {
     if (categorieAEditer) {
@@ -37,7 +43,7 @@ export const ModalCategorieFormulaire: React.FC<
     }
   }, [categorieAEditer, ouvert]);
 
-  if (!ouvert) return null;
+  if (!ouvert || !monte) return null;
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -70,39 +76,29 @@ export const ModalCategorieFormulaire: React.FC<
     onFermer();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-100 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#4880FF] font-extrabold flex items-center justify-center text-lg">
-              <Tag01Icon size={20} strokeWidth={2} />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-slate-800">
-                {categorieAEditer ? "Modifier la Catégorie" : "Créer une Catégorie"}
-              </h2>
-              <p className="text-xs text-slate-500">
-                Classification des produits cosmétiques ITexal.
-              </p>
-            </div>
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col my-8">
+        <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-slate-800">
+            <Tag01Icon size={20} className="text-[#4880FF]" />
+            <h2 className="font-extrabold text-base">
+              {categorieAEditer ? "Modifier la Catégorie" : "Ajouter une Catégorie"}
+            </h2>
           </div>
 
           <button
             type="button"
             onClick={onFermer}
-            aria-label="Fermer la fenêtre"
-            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-full bg-white hover:bg-slate-200 text-slate-500 font-extrabold flex items-center justify-center text-xs transition-colors border border-slate-200"
           >
-            <Cancel01Icon size={16} strokeWidth={2} />
+            <Cancel01Icon size={16} />
           </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block font-bold text-slate-700 mb-1">
+            <label className="block text-xs font-bold text-slate-700 mb-1">
               Nom de la catégorie *
             </label>
             <input
@@ -110,83 +106,72 @@ export const ModalCategorieFormulaire: React.FC<
               required
               value={nom}
               onChange={(e) => setNom(e.target.value)}
-              placeholder="Ex: Soin du Visage"
-              className="w-full px-4 py-2.5 bg-[#F8F9FD] border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#4880FF] text-slate-800"
+              placeholder="ex: Soins Visage, Huiles Essentielles..."
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#4880FF]"
             />
           </div>
 
-          {/* Optional Image Upload */}
           <div>
-            <label className="block font-bold text-slate-700 mb-1 flex items-center justify-between">
-              <span>Image de la catégorie</span>
-              <span className="text-[11px] font-normal text-slate-400">(Optionnel)</span>
+            <label className="block text-xs font-bold text-slate-700 mb-1">
+              Description
+            </label>
+            <textarea
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Courte présentation de la gamme..."
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#4880FF]"
+            />
+          </div>
+
+          {/* Importation de l'image de la catégorie */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">
+              Image représentative de la catégorie
             </label>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="hidden"
-            />
-
             {image ? (
-              <div className="relative w-full h-36 rounded-2xl overflow-hidden border border-slate-200 group bg-slate-50 flex items-center justify-center">
+              <div className="relative w-full h-36 rounded-2xl overflow-hidden border border-slate-200 group bg-slate-100">
                 <img
                   src={image}
                   alt="Aperçu catégorie"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-3 py-1.5 bg-white text-slate-800 font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 hover:bg-slate-100"
+                    className="px-3 py-1.5 bg-white text-slate-800 rounded-xl text-xs font-bold shadow-md hover:bg-slate-100 flex items-center gap-1"
                   >
-                    <Upload01Icon size={14} /> Modifier
+                    <Upload01Icon size={14} />
+                    <span>Changer</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setImage("")}
-                    className="px-3 py-1.5 bg-rose-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 hover:bg-rose-600"
+                    className="px-3 py-1.5 bg-rose-600 text-white rounded-xl text-xs font-bold shadow-md hover:bg-rose-700 flex items-center gap-1"
                   >
-                    <Delete02Icon size={14} /> Supprimer
+                    <Delete02Icon size={14} />
+                    <span>Supprimer</span>
                   </button>
                 </div>
               </div>
             ) : (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full py-6 px-4 bg-[#F8F9FD] border-2 border-dashed border-slate-200 hover:border-[#4880FF] rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all hover:bg-blue-50/20"
+                className="w-full h-32 border-2 border-dashed border-slate-300 hover:border-[#4880FF] rounded-2xl flex flex-col items-center justify-center gap-1.5 bg-slate-50/50 hover:bg-indigo-50/20 cursor-pointer transition-all text-slate-500"
               >
-                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-[#4880FF] flex items-center justify-center shadow-xs">
-                  <Image01Icon size={20} strokeWidth={2} />
+                <div className="w-9 h-9 rounded-xl bg-indigo-50 text-[#4880FF] flex items-center justify-center">
+                  <Image01Icon size={20} />
                 </div>
-                <div className="text-center">
-                  <p className="font-bold text-slate-700 text-xs">
-                    Cliquez pour téléverser une image
-                  </p>
-                  <p className="text-[10px] text-slate-400">
-                    PNG, JPG, WEBP • Max 5Mo (Optionnel)
-                  </p>
-                </div>
+                <span className="text-xs font-bold text-slate-700">
+                  Cliquer pour importer une image
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium">
+                  PNG, JPG, WEBP (Max 5 Mo)
+                </span>
               </div>
             )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">
-                Identifiant / Gamme
-              </label>
-              <input
-                type="text"
-                value={icone}
-                onChange={(e) => setIcone(e.target.value)}
-                placeholder="Ex: Soin Visage"
-                className="w-full px-4 py-2.5 bg-[#F8F9FD] border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#4880FF] text-slate-800"
-              />
-            </div>
 
             <div>
               <label className="block font-bold text-slate-700 mb-1">
@@ -235,6 +220,7 @@ export const ModalCategorieFormulaire: React.FC<
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

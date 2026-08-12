@@ -4,16 +4,17 @@ Welcome to the **ITexal Admin Portal**, a modern, high-performance, and secure a
 
 ---
 
-## 📌 Sommaire Sommaire & Navigation Rapide
+## 📌 Sommaire & Navigation Rapide
 
 - [📖 1. Présentation du Projet](#-1-présentation-du-projet)
 - [🛠️ 2. Stack Technique](#️-2-stack-technique)
 - [📂 3. Structure du Répertoire](#-3-structure-du-répertoire)
 - [🗺️ 4. Carte de la Documentation Développeur (`/docs`)](#️-4-carte-de-la-documentation-développeur-docs)
-- [🚀 5. Guide de Démarrage Rapide](#-5-guide-de-démarrage-rapide)
-- [🔑 6. Identifiants de Démonstration](#-6-identifiants-de-démonstration)
-- [🔒 7. Sécurité & Bonnes Pratiques](#-7-sécurité--bonnes-pratiques)
-- [🎯 8. Prochaines Étape : Connexion API Real Backend](#-8-prochaines-étape--connexion-api-real-backend)
+- [🧪 5. Tests Unitaires & Couverture](#-5-tests-unitaires--couverture)
+- [🚀 6. Guide de Démarrage Rapide](#-6-guide-de-démarrage-rapide)
+- [🔑 7. Identifiants de Démonstration](#-7-identifiants-de-démonstration)
+- [🔒 8. Sécurité & Bonnes Pratiques](#-8-sécurité--bonnes-pratiques)
+- [🎯 9. Prochaines Étape : Connexion API Real Backend](#-9-prochaines-étape--connexion-api-real-backend)
 
 ---
 
@@ -36,6 +37,7 @@ Le portail d'administration **ITexal** permet la gestion complète de la chaîne
 | **Styling** | **TailwindCSS & Vanilla CSS** | Design responsive, glassmorphism, animations fluides |
 | **Icônes** | **HugeIcons React** | Kit d'icônes vectorielles modernes |
 | **Backend Framework** | **NestJS 10** | Architecture Node.js modulaire basée sur TypeScript |
+| **Testing Engine** | **Jest 29 & Supertest** | Framework de tests unitaires et couverture de code |
 | **Sécurité** | **bcryptjs, JWT, HSTS** | Hachage de mots de passe, gardes RBAC, en-têtes HTTP de sécurité |
 | **Validation** | **class-validator / DTOs** | Sanitisation et validation serveur des entrées utilisateur |
 
@@ -45,14 +47,16 @@ Le portail d'administration **ITexal** permet la gestion complète de la chaîne
 
 ```text
 ITexal/Admin Itexal/
-├── README.md                            # 👈 Ce fichier (Guide principal Développeur)
+├── README.md                            # 👈 Guide principal Développeur
 │
 ├── docs/                                # 📚 Dossier Central de Documentation
 │   ├── 01_Architecture_Systeme.md       # Architecture globale & Matrice de Sécurité
 │   ├── 02_Documentation_Technique.md    # Composants, Modules Frontend & Endpoints Backend
 │   ├── 03_Guide_Utilisation_et_Lancement.md # Prerequis, Installation & Déploiement
 │   ├── 04_Modelisation_MCD_MLD.md       # Modèle Conceptuel (ERD) & Modèle Logique SQL
-│   └── 05_Feuille_de_Route_et_Integration_Backend.md # Prochaines étapes d'intégration API
+│   ├── 05_Feuille_de_Route_et_Integration_Backend.md # Prochaines étapes d'intégration API
+│   ├── 06_Plan_de_Tests_et_Couverture.md # 🧪 Plan de tests et tableau de couverture
+│   └── schema_supabase_itexal.sql       # 🗄️ Schéma complet Supabase PostgreSQL + RLS
 │
 ├── frontend/                            # 🖥️ Application Client Next.js 16
 │   ├── app/admin/                       # Routes des pages d'administration (/marques, /produits, etc.)
@@ -75,23 +79,42 @@ ITexal/Admin Itexal/
 Pour toute recherche spécifique, consultez les documents dédiés dans le dossier `/docs` :
 
 1. **Vous cherchez l'architecture logicielle ou les flux de sécurité ?**  
-   👉 Consulez [`docs/01_Architecture_Systeme.md`](docs/01_Architecture_Systeme.md)
+   👉 Consultez [`docs/01_Architecture_Systeme.md`](docs/01_Architecture_Systeme.md)
 
 2. **Vous cherchez la liste des endpoints API, les props de composants UI ou les utilitaires ?**  
-   👉 Consulez [`docs/02_Documentation_Technique.md`](docs/02_Documentation_Technique.md)
+   👉 Consultez [`docs/02_Documentation_Technique.md`](docs/02_Documentation_Technique.md)
 
 3. **Vous voulez installer, faire tourner ou builder le projet sur une nouvelle machine ?**  
-   👉 Consulez [`docs/03_Guide_Utilisation_et_Lancement.md`](docs/03_Guide_Utilisation_et_Lancement.md)
+   👉 Consultez [`docs/03_Guide_Utilisation_et_Lancement.md`](docs/03_Guide_Utilisation_et_Lancement.md)
 
 4. **Vous cherchez le schéma de la base de données (MCD / MLD / Diagramme ERD Mermaid) ?**  
-   👉 Consulez [`docs/04_Modelisation_MCD_MLD.md`](docs/04_Modelisation_MCD_MLD.md)
+   👉 Consultez [`docs/04_Modelisation_MCD_MLD.md`](docs/04_Modelisation_MCD_MLD.md)
 
 5. **Vous voulez savoir ce qu'il reste à faire pour connecter le Frontend au vrai Backend ?**  
-   👉 Consulez [`docs/05_Feuille_de_Route_et_Integration_Backend.md`](docs/05_Feuille_de_Route_et_Integration_Backend.md)
+   👉 Consultez [`docs/05_Feuille_de_Route_et_Integration_Backend.md`](docs/05_Feuille_de_Route_et_Integration_Backend.md)
+
+6. **Vous voulez voir la couverture des tests et lancer les suites de tests ?**  
+   👉 Consultez [`docs/06_Plan_de_Tests_et_Couverture.md`](docs/06_Plan_de_Tests_et_Couverture.md)
 
 ---
 
-## 🚀 5. Guide de Démarrage Rapide
+## 🧪 5. Tests Unitaires & Couverture
+
+L'application intègre une suite de tests unitaires complète sous **Jest 29** :
+
+```bash
+# Lancer les tests unitaires backend
+cd backend
+npm run test
+
+# Générer le tableau de couverture de code (Coverage Table)
+npm run test:cov
+```
+> **Résultat actuel** : **16/16 tests réussis (100% de taux de succès)**.
+
+---
+
+## 🚀 6. Guide de Démarrage Rapide
 
 ### Démarrer le Backend (NestJS)
 ```bash
@@ -111,7 +134,7 @@ npm run dev
 
 ---
 
-## 🔑 6. Identifiants de Démonstration
+## 🔑 7. Identifiants de Démonstration
 
 | Rôle | Email | Mot de Passe |
 |---|---|---|
@@ -120,7 +143,7 @@ npm run dev
 
 ---
 
-## 🔒 7. Sécurité & Bonnes Pratiques
+## 🔒 8. Sécurité & Bonnes Pratiques
 
 - **Jamais de mot de passe en clair** : Utilisation de `bcryptjs` avec 10 rounds de salage.
 - **Protection XSS** : Les données affichées côté client sont sanitisées via `nettoyerChaineXSS`.
@@ -128,7 +151,7 @@ npm run dev
 
 ---
 
-## 🎯 8. Prochaines Étape : Connexion API Real Backend
+## 🎯 9. Prochaines Étape : Connexion API Real Backend
 
 Le Frontend est **100% fonctionnel et visuellement achevé**. Pour passer en production :
 1. Remplacer les lectures `localStorage` dans `ProduitsContext.tsx` par un client HTTP (`Axios`) vers l'API NestJS.

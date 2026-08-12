@@ -263,14 +263,14 @@ export default function PageDashboardAdmin() {
         </div>
       </div>
 
-      {/* Graphique de Ventes et Transactions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <GraphiqueVentes />
-        </div>
-        <div>
-          <TableauTransactionsRecentes />
-        </div>
+      {/* Graphique de Ventes et Répartition (Chiffre d'Affaires + Donut) */}
+      <div>
+        <GraphiqueVentes />
+      </div>
+
+      {/* Deals & Offres Spéciales (Produits Réels) positionné en bas en pleine largeur */}
+      <div>
+        <TableauTransactionsRecentes />
       </div>
     </div>
   );

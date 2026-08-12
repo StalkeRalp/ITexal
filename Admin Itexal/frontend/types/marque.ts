@@ -10,5 +10,6 @@ export interface Marque {
   logo?: string;
   paysOrigine?: string;
   nombreProduits?: number;
+  statut?: "Active" | "Inactive";
   creeLe: string;
 }

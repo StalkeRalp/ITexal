@@ -1,10 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { ChargeurNavigation } from "@/composants-communs/chargeur-navigation";
 import { DetecteurHorsLigne } from "@/composants-communs/detecteur-hors-ligne";
 import { FournisseurGlobal } from "@/composants-communs/fournisseur-global";
 import { PwaInstaller } from "@/composants-communs/pwa-installer";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  themeColor: "#5B63F6",
+};
 
 export const metadata: Metadata = {
   title: {
@@ -13,7 +17,6 @@ export const metadata: Metadata = {
   },
   description: "Plateforme d'administration e-commerce Cosmetic Admin — Tableau de Bord • Gestion • Performance",
   manifest: "/manifest.webmanifest",
-  themeColor: "#5B63F6",
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg",

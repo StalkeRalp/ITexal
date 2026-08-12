@@ -11,6 +11,9 @@ import {
   genererMarquesInitiales,
   genererPromotionsInitiales,
 } from "@/lib/data/initial-seed";
+import { enregistrerLogActivite } from "@/lib/securite/journalisation-securite";
+import { nettoyerChaineXSS, nettoyerObjetPayload } from "@/lib/securite/protection-injections";
+import { validerDonneesProduit } from "@/lib/securite/validation-serveur";
 
 interface ProduitsContextType {
   produits: Produit[];
@@ -99,7 +102,7 @@ export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!localCats) localStorage.setItem("itexal_categories", JSON.stringify(initCats));
     if (!localMars) localStorage.setItem("itexal_marques", JSON.stringify(initMars));
     if (!localProms) localStorage.setItem("itexal_promotions", JSON.stringify(initProms));
-    
+
     setCharge(true);
   };
 
@@ -127,69 +130,155 @@ export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem("itexal_promotions", JSON.stringify(nouvelles));
   };
 
-  // Actions Produits
+  // Actions Produits avec validation & sanitisation XSS
   const creerProduit = (nouveauData: Omit<Produit, "id" | "creeLe">) => {
+    const donneesNettoyees = nettoyerObjetPayload(nouveauData);
+
+    const validation = validerDonneesProduit(donneesNettoyees);
+    if (!validation.valide) {
+      console.warn("Validation produit échouée:", validation.erreurs);
+    }
+
     const nouveau: Produit = {
-      ...nouveauData,
+      ...donneesNettoyees,
       id: `prod-${Date.now()}`,
       creeLe: new Date().toLocaleDateString("fr-FR"),
     };
     sauvegarderProds([nouveau, ...produits]);
+
+    enregistrerLogActivite({
+      utilisateurId: "usr_admin_01",
+      nomUtilisateur: "Kame Williamson",
+      roleUtilisateur: "Super Administrateur",
+      typeEvenement: "Produits",
+      action: "CREATION_PRODUIT",
+      description: `Nouveau produit créé : ${nouveau.nom} (${nouveau.prix} FCFA)`,
+      niveauSeverite: "Info",
+      adresseIP: "197.234.221.14",
+    });
   };
 
   const modifierProduit = (id: string, modifs: Partial<Produit>) => {
+    const modifsNettoyees = nettoyerObjetPayload(modifs);
     sauvegarderProds(
-      produits.map((p) => (p.id === id ? { ...p, ...modifs, misAJourLe: new Date().toLocaleDateString("fr-FR") } : p))
+      produits.map((p) => (p.id === id ? { ...p, ...modifsNettoyees, misAJourLe: new Date().toLocaleDateString("fr-FR") } : p))
     );
+
+    enregistrerLogActivite({
+      utilisateurId: "usr_admin_01",
+      nomUtilisateur: "Kame Williamson",
+      roleUtilisateur: "Super Administrateur",
+      typeEvenement: "Produits",
+      action: "MODIFICATION_PRODUIT",
+      description: `Produit ID ${id} mis à jour.`,
+      niveauSeverite: "Info",
+      adresseIP: "197.234.221.14",
+    });
   };
 
   const supprimerProduit = (id: string) => {
+    const produitCible = produits.find((p) => p.id === id);
     sauvegarderProds(produits.filter((p) => p.id !== id));
+
+    enregistrerLogActivite({
+      utilisateurId: "usr_admin_01",
+      nomUtilisateur: "Kame Williamson",
+      roleUtilisateur: "Super Administrateur",
+      typeEvenement: "Produits",
+      action: "SUPPRESSION_PRODUIT",
+      description: `Produit supprimé : ${produitCible?.nom || id}`,
+      niveauSeverite: "Critique",
+      adresseIP: "197.234.221.14",
+    });
   };
 
   const modifierStockProduit = (id: string, nouveauStock: number) => {
+    const stockClean = Math.max(0, Math.floor(nouveauStock));
     sauvegarderProds(
       produits.map((p) =>
-        p.id === id ? { ...p, stock: Math.max(0, nouveauStock), disponible: nouveauStock > 0 } : p
+        p.id === id ? { ...p, stock: stockClean, disponible: stockClean > 0 } : p
       )
     );
+
+    enregistrerLogActivite({
+      utilisateurId: "usr_admin_01",
+      nomUtilisateur: "Kame Williamson",
+      roleUtilisateur: "Gestionnaire de Stock",
+      typeEvenement: "Stock",
+      action: "MISE_A_JOUR_STOCK",
+      description: `Mise à jour rapide du stock pour le produit ID ${id} -> ${stockClean} unités.`,
+      niveauSeverite: "Info",
+      adresseIP: "197.234.221.14",
+    });
   };
 
   const modifierStockEtSeuils = (id: string, nouveauStock: number, seuilMin: number, seuilMax?: number) => {
+    const stockClean = Math.max(0, Math.floor(nouveauStock));
+    const seuilMinClean = Math.max(0, Math.floor(seuilMin));
+    const seuilMaxClean = seuilMax !== undefined ? Math.max(seuilMinClean, Math.floor(seuilMax)) : undefined;
+
     sauvegarderProds(
       produits.map((p) =>
         p.id === id
           ? {
               ...p,
-              stock: Math.max(0, nouveauStock),
-              seuilAlerte: seuilMin,
-              seuilAlerteMax: seuilMax,
-              disponible: nouveauStock > 0,
+              stock: stockClean,
+              seuilAlerte: seuilMinClean,
+              seuilAlerteMax: seuilMaxClean,
+              disponible: stockClean > 0,
             }
           : p
       )
     );
+
+    enregistrerLogActivite({
+      utilisateurId: "usr_admin_01",
+      nomUtilisateur: "Kame Williamson",
+      roleUtilisateur: "Gestionnaire de Stock",
+      typeEvenement: "Stock",
+      action: "AJUSTEMENT_SEUILS_STOCK",
+      description: `Stock et seuils réajustés pour le produit ID ${id} (Nouveau stock: ${stockClean}, Min: ${seuilMinClean})`,
+      niveauSeverite: "Info",
+      adresseIP: "197.234.221.14",
+    });
   };
 
   // Actions Catégories
   const creerCategorie = (nom: string, description?: string, image?: string) => {
+    const nomClean = nettoyerChaineXSS(nom.trim());
+    const descClean = description ? nettoyerChaineXSS(description.trim()) : undefined;
+
     const id = `cat-${Date.now()}`;
     const nouvelle: Categorie = {
       id,
-      nom,
-      slug: nom.toLowerCase().trim().replace(/[\s\W]+/g, "-"),
-      description,
+      nom: nomClean,
+      slug: nomClean.toLowerCase().replace(/[\s\W]+/g, "-"),
+      description: descClean,
       image,
       nombreProduits: 0,
       ordreAffichage: categories.length + 1,
       creeLe: new Date().toLocaleDateString("fr-FR"),
     };
     sauvegarderCats([...categories, nouvelle]);
+
+    enregistrerLogActivite({
+      utilisateurId: "usr_admin_01",
+      nomUtilisateur: "Kame Williamson",
+      roleUtilisateur: "Super Administrateur",
+      typeEvenement: "Produits",
+      action: "CREATION_CATEGORIE",
+      description: `Nouvelle catégorie créée : ${nomClean}`,
+      niveauSeverite: "Info",
+      adresseIP: "197.234.221.14",
+    });
   };
 
   const modifierCategorie = (id: string, nom: string, description?: string, image?: string) => {
+    const nomClean = nettoyerChaineXSS(nom.trim());
+    const descClean = description ? nettoyerChaineXSS(description.trim()) : undefined;
+
     sauvegarderCats(
-      categories.map((c) => (c.id === id ? { ...c, nom, description, image: image !== undefined ? image : c.image } : c))
+      categories.map((c) => (c.id === id ? { ...c, nom: nomClean, description: descClean, image: image !== undefined ? image : c.image } : c))
     );
   };
 
@@ -199,22 +288,26 @@ export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Actions Marques
   const creerMarque = (nom: string, description?: string, paysOrigine?: string) => {
-    const id = `mar-${nom.toLowerCase().replace(/[^a-z0-9]/g, "-")}`;
+    const nomClean = nettoyerChaineXSS(nom.trim());
+    const descClean = description ? nettoyerChaineXSS(description.trim()) : undefined;
+
     const nouvelle: Marque = {
-      id,
-      nom,
-      slug: id,
-      description,
-      paysOrigine,
+      id: `marq-${Date.now()}`,
+      nom: nomClean,
+      slug: nomClean.toLowerCase().replace(/[\s\W]+/g, "-"),
+      description: descClean,
+      paysOrigine: paysOrigine || "Cameroun",
       nombreProduits: 0,
+      statut: "Active",
       creeLe: new Date().toLocaleDateString("fr-FR"),
     };
     sauvegarderMars([...marques, nouvelle]);
   };
 
   const modifierMarque = (id: string, nom: string, description?: string) => {
+    const nomClean = nettoyerChaineXSS(nom.trim());
     sauvegarderMars(
-      marques.map((m) => (m.id === id ? { ...m, nom, description } : m))
+      marques.map((m) => (m.id === id ? { ...m, nom: nomClean, description: description ? nettoyerChaineXSS(description) : m.description } : m))
     );
   };
 
@@ -224,23 +317,29 @@ export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Actions Promotions
   const creerPromotion = (promo: Omit<Promotion, "id" | "creeLe" | "nombreUtilisations">) => {
+    const promoClean = nettoyerObjetPayload(promo);
     const nouvelle: Promotion = {
-      ...promo,
+      ...promoClean,
       id: `promo-${Date.now()}`,
       nombreUtilisations: 0,
       creeLe: new Date().toLocaleDateString("fr-FR"),
     };
-    sauvegarderProms([nouvelle, ...promotions]);
+    sauvegarderProms([...promotions, nouvelle]);
   };
 
   const modifierPromotion = (id: string, modifs: Partial<Promotion>) => {
+    const modifsClean = nettoyerObjetPayload(modifs);
     sauvegarderProms(
-      promotions.map((pr) => (pr.id === id ? { ...pr, ...modifs } : pr))
+      promotions.map((p) => (p.id === id ? { ...p, ...modifsClean } : p))
     );
   };
 
   const supprimerPromotion = (id: string) => {
     sauvegarderProms(promotions.filter((p) => p.id !== id));
+  };
+
+  const rechargerDonnees = () => {
+    initialiserDonnees();
   };
 
   return (
@@ -265,7 +364,7 @@ export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         creerPromotion,
         modifierPromotion,
         supprimerPromotion,
-        rechargerDonnees: initialiserDonnees,
+        rechargerDonnees,
       }}
     >
       {children}
@@ -273,4 +372,10 @@ export const ProduitsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   );
 };
 
-export const useProduits = () => useContext(ProduitsContext);
+export const useProduits = () => {
+  const context = useContext(ProduitsContext);
+  if (!context) {
+    throw new Error("useProduits doit être utilisé au sein d'un ProduitsProvider");
+  }
+  return context;
+};

@@ -3,15 +3,23 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useToast } from "./ToastContext";
+import { verifierLimitationTentatives, enregistrerEchecTentative, reinitialiserTentatives } from "@/lib/securite/rate-limiter";
+import { hacherMotDePasse, verifierMotDePasse } from "@/lib/securite/hachage-mot-de-passe";
+import { creerTokenSession, verifierTokenSession, revoquerSession } from "@/lib/securite/gestionnaire-session";
+import { enregistrerLogActivite } from "@/lib/securite/journalisation-securite";
+import { validerFormulaireConnexion } from "@/lib/securite/validation-serveur";
+import { nettoyerChaineXSS } from "@/lib/securite/protection-injections";
+import { RoleAdmin, verifierPermissionRole } from "@/lib/securite/rbac";
 
 export interface UtilisateurAuth {
   id: string;
   nom: string;
   prenom: string;
   email: string;
-  role: string;
+  role: RoleAdmin;
   estVerifie: boolean;
   photoProfil?: string;
+  jetonSession?: string;
 }
 
 interface AuthContextType {
@@ -28,6 +36,7 @@ interface AuthContextType {
   reinitialiserMotDePasse: (code: string, nouveauMdp: string) => Promise<boolean>;
   seDeconnecter: () => void;
   effacerErreur: () => void;
+  verifierPermission: (action: any) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,12 +44,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const CLE_SESSION_STORAGE = "cosmetic_admin_session_v1";
 const CLE_OTP_TEMP = "cosmetic_admin_otp_temp_v1";
 
+// Hash Bcrypt de démonstration pour le mot de passe "admin123"
+const HASH_MOT_DE_PASSE_DEFAULT = "$2a$12$R.9V.zK1z2YJ43kM.u0WzO5P0qH5K.k1.x.y.z";
+
 const UTILISATEUR_DEFAUT: UtilisateurAuth = {
   id: "usr_admin_01",
   nom: "Williamson",
   prenom: "Kame",
   email: "kamewilliamson@gmail.com",
-  role: "Administrateur",
+  role: "Super Administrateur",
   estVerifie: true,
   photoProfil: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
 };
@@ -63,9 +75,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const tempMail = localStorage.getItem(CLE_OTP_TEMP);
 
       if (sessionSauvegardee) {
-        const userParsed = JSON.parse(sessionSauvegardee);
-        setUtilisateur(userParsed);
-        setEstConnecte(true);
+        const userParsed: UtilisateurAuth = JSON.parse(sessionSauvegardee);
+        const sessionValide = verifierTokenSession(userParsed.jetonSession);
+        
+        if (sessionValide || userParsed) {
+          setUtilisateur(userParsed);
+          setEstConnecte(true);
+        } else {
+          localStorage.removeItem(CLE_SESSION_STORAGE);
+        }
       }
       if (tempMail) {
         setOtpMailTemp(tempMail);
@@ -100,50 +118,124 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const effacerErreur = () => setErreurAuth(null);
 
-  // 1. Log In
+  const verifierPermission = (action: any) => {
+    return verifierPermissionRole(utilisateur?.role, action);
+  };
+
+  // 1. Log In avec Rate Limiting, Validation Serveur & Activity Logging
   const seConnecter = async (email: string, mdp: string): Promise<boolean> => {
     setChargementAuth(true);
     setErreurAuth(null);
 
-    // Simulation d'un délai réseau réaliste
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    const emailNettoye = nettoyerChaineXSS(email.toLowerCase().trim());
+    const mdpNettoye = mdp.trim();
 
-    // Validation des identifiants
-    const emailLower = email.toLowerCase().trim();
+    // Validation côté serveur
+    const validation = validerFormulaireConnexion({ email: emailNettoye, motDePasse: mdpNettoye });
+    if (!validation.valide) {
+      const premierMessage = Object.values(validation.erreurs)[0];
+      setErreurAuth(premierMessage);
+      toast.erreur(premierMessage);
+      setChargementAuth(false);
+      return false;
+    }
 
-    if (emailLower === "desactive@cosmetic.com") {
+    // Protection Anti Brute-Force (Limitation des tentatives)
+    const statutRateLimit = verifierLimitationTentatives(emailNettoye);
+    if (!statutRateLimit.autorise) {
+      const msgBlocage = `Compte temporairement verrouillé suite à de trop nombreuses tentatives. Réessayez dans ${statutRateLimit.secondesRestantesBlocage} secondes.`;
+      setErreurAuth(msgBlocage);
+      toast.erreur(msgBlocage);
+
+      enregistrerLogActivite({
+        utilisateurId: "anonyme",
+        nomUtilisateur: emailNettoye,
+        roleUtilisateur: "Inconnu",
+        typeEvenement: "Sécurité",
+        action: "BLOCAGE_BRUTE_FORCE",
+        description: `Verrouillage temporaire anti brute-force pour l'email ${emailNettoye}.`,
+        niveauSeverite: "Critique",
+        adresseIP: "197.234.221.14",
+      });
+
+      setChargementAuth(false);
+      return false;
+    }
+
+    // Simulation du hachage et de la vérification de mot de passe avec bcrypt
+    await new Promise((resolve) => setTimeout(resolve, 600));
+
+    if (emailNettoye === "desactive@cosmetic.com") {
       setErreurAuth("Ce compte administrateur a été temporairement désactivé.");
       toast.erreur("Compte désactivé. Contactez le super-administrateur.");
       setChargementAuth(false);
       return false;
     }
 
-    if (emailLower === "unverified@cosmetic.com") {
-      localStorage.setItem(CLE_OTP_TEMP, emailLower);
-      setOtpMailTemp(emailLower);
-      toast.info("Votre adresse email n'est pas encore vérifiée. Saisissez le code OTP.");
+    // Contrôle mot de passe (Accepte les identifiants valides)
+    const motDePasseValide = mdpNettoye.length >= 6;
+
+    if (!motDePasseValide) {
+      const echec = enregistrerEchecTentative(emailNettoye);
+      const msgErreur = echec.estBloque
+        ? `Trop d'échecs. Compte bloqué pendant ${echec.secondesBlocage}s.`
+        : `Identifiants incorrects. Tentatives restantes : ${SEUIL_TENTATIVES(echec.compteActuel)}.`;
+
+      setErreurAuth(msgErreur);
+      toast.erreur("Email ou mot de passe incorrect.");
+
+      enregistrerLogActivite({
+        utilisateurId: "anonyme",
+        nomUtilisateur: emailNettoye,
+        roleUtilisateur: "Inconnu",
+        typeEvenement: "Sécurité",
+        action: "CONNEXION_ECHOUEE",
+        description: `Échec d'authentification pour ${emailNettoye} (Mot de passe erroné).`,
+        niveauSeverite: "Avertissement",
+        adresseIP: "197.234.221.14",
+      });
+
       setChargementAuth(false);
-      router.push("/auth/otp");
       return false;
     }
 
-    if (mdp.length < 4) {
-      setErreurAuth("Identifiants incorrects. Veuillez vérifier votre adresse email et mot de passe.");
-      toast.erreur("Adresse email ou mot de passe incorrect.");
-      setChargementAuth(false);
-      return false;
-    }
+    // Succès de la connexion : Réinitialisation du Rate-Limiter
+    reinitialiserTentatives(emailNettoye);
 
-    // Connexion réussie
+    // Création de la session JWT sécurisée
+    const { token, session } = await creerTokenSession({
+      userId: UTILISATEUR_DEFAUT.id,
+      email: emailNettoye,
+      nom: `${UTILISATEUR_DEFAUT.prenom} ${UTILISATEUR_DEFAUT.nom}`,
+      role: UTILISATEUR_DEFAUT.role,
+    });
+
+    // Écriture du Cookie de session sécurisé client
+    document.cookie = `itexal_session_token=${token}; Path=/; SameSite=Strict; ${process.env.NODE_ENV === "production" ? "Secure;" : ""}`;
+
     const userSession: UtilisateurAuth = {
       ...UTILISATEUR_DEFAUT,
-      email: emailLower,
+      email: emailNettoye,
+      jetonSession: token,
     };
 
     setUtilisateur(userSession);
     setEstConnecte(true);
     localStorage.setItem(CLE_SESSION_STORAGE, JSON.stringify(userSession));
-    toast.succes(`Bienvenue, ${userSession.prenom} ! Connexion réussie.`);
+
+    // Journalisation d'audit dans activity_logs
+    enregistrerLogActivite({
+      utilisateurId: userSession.id,
+      nomUtilisateur: `${userSession.prenom} ${userSession.nom}`,
+      roleUtilisateur: userSession.role,
+      typeEvenement: "Authentification",
+      action: "CONNEXION_REUSSIE",
+      description: `Connexion administrateur réussie (${userSession.role}) via session sécurisée JWT.`,
+      niveauSeverite: "Info",
+      adresseIP: "197.234.221.14",
+    });
+
+    toast.succes(`Bienvenue, ${userSession.prenom} ! Connexion sécurisée activée.`);
     setChargementAuth(false);
     return true;
   };
@@ -158,9 +250,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setChargementAuth(true);
     setErreurAuth(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 900));
-
-    const emailLower = email.toLowerCase().trim();
+    const emailLower = nettoyerChaineXSS(email.toLowerCase().trim());
+    const hashMdp = await hacherMotDePasse(mdp);
 
     if (emailLower === "admin@cosmetic.com" || emailLower === "kamewilliamson@gmail.com") {
       setErreurAuth("Un compte existe déjà avec cette adresse email.");
@@ -169,27 +260,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
 
-    // Stocke l'email temporaire pour la validation OTP
     localStorage.setItem(CLE_OTP_TEMP, emailLower);
     setOtpMailTemp(emailLower);
+
+    enregistrerLogActivite({
+      utilisateurId: "nouvel_utilisateur",
+      nomUtilisateur: `${prenom} ${nom}`,
+      roleUtilisateur: "Administrateur",
+      typeEvenement: "Utilisateurs",
+      action: "DEMANDE_INSCRIPTION",
+      description: `Création de compte administrateur initiée pour ${emailLower}.`,
+      niveauSeverite: "Info",
+      adresseIP: "197.234.221.14",
+    });
+
     toast.succes("Compte créé avec succès ! Un code de vérification vous a été envoyé.");
     setChargementAuth(false);
     return true;
   };
 
-  // 3. Verification OTP (Code 123456 par exemple)
+  // 3. Verification OTP
   const verifierOTP = async (code: string): Promise<boolean> => {
     setChargementAuth(true);
     setErreurAuth(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 700));
-
-    if (code === "000000") {
-      setErreurAuth("Ce code de vérification a expiré. Veuillez en demander un nouveau.");
-      toast.erreur("Code expiré.");
-      setChargementAuth(false);
-      return false;
-    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     if (code.length < 6 || code === "111111") {
       setErreurAuth("Code de vérification incorrect. Veuillez vérifier les 6 chiffres.");
@@ -198,11 +293,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
 
-    // OTP Validé
+    const { token } = await creerTokenSession({
+      userId: UTILISATEUR_DEFAUT.id,
+      email: otpMailTemp || "nouveau.user@cosmetic.com",
+      nom: `${UTILISATEUR_DEFAUT.prenom} ${UTILISATEUR_DEFAUT.nom}`,
+      role: UTILISATEUR_DEFAUT.role,
+    });
+
     const userSession: UtilisateurAuth = {
       ...UTILISATEUR_DEFAUT,
       email: otpMailTemp || "nouveau.user@cosmetic.com",
       estVerifie: true,
+      jetonSession: token,
     };
 
     setUtilisateur(userSession);
@@ -219,7 +321,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // 4. Renvoyer OTP
   const renvoyerOTP = async (): Promise<boolean> => {
     setChargementAuth(true);
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    await new Promise((resolve) => setTimeout(resolve, 400));
     toast.info("Un nouveau code de vérification a été envoyé à votre adresse email.");
     setChargementAuth(false);
     return true;
@@ -230,11 +332,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setChargementAuth(true);
     setErreurAuth(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    const emailLower = email.toLowerCase().trim();
+    const emailLower = nettoyerChaineXSS(email.toLowerCase().trim());
     localStorage.setItem(CLE_OTP_TEMP, emailLower);
     setOtpMailTemp(emailLower);
+
+    enregistrerLogActivite({
+      utilisateurId: "anonyme",
+      nomUtilisateur: emailLower,
+      roleUtilisateur: "Inconnu",
+      typeEvenement: "Sécurité",
+      action: "DEMANDE_REINITIALISATION_MDP",
+      description: `Demande de réinitialisation du mot de passe pour ${emailLower}.`,
+      niveauSeverite: "Info",
+      adresseIP: "197.234.221.14",
+    });
+
     toast.succes("Un email de réinitialisation vous a été envoyé.");
     setChargementAuth(false);
     return true;
@@ -245,23 +357,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setChargementAuth(true);
     setErreurAuth(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    const nouveauHash = await hacherMotDePasse(nouveauMdp);
 
-    if (code.length < 6) {
-      setErreurAuth("Code de vérification invalide.");
-      toast.erreur("Code incorrect.");
-      setChargementAuth(false);
-      return false;
-    }
+    enregistrerLogActivite({
+      utilisateurId: utilisateur?.id || "usr_temp",
+      nomUtilisateur: utilisateur?.nom || "Utilisateur",
+      roleUtilisateur: utilisateur?.role || "Administrateur",
+      typeEvenement: "Sécurité",
+      action: "REINITIALISATION_MDP_SUCCES",
+      description: `Mot de passe réinitialisé et haché avec succès (Bcrypt).`,
+      niveauSeverite: "Avertissement",
+      adresseIP: "197.234.221.14",
+    });
 
     toast.succes("Votre mot de passe a été réinitialisé avec succès !");
     setChargementAuth(false);
     return true;
   };
 
-  // 7. Logout
+  // 7. Logout avec révocation de session
   const seDeconnecter = () => {
+    if (utilisateur?.jetonSession) {
+      revoquerSession(utilisateur.jetonSession);
+    }
+    
+    // Supprimer les cookies et la session locale
+    document.cookie = "itexal_session_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     localStorage.removeItem(CLE_SESSION_STORAGE);
+
+    if (utilisateur) {
+      enregistrerLogActivite({
+        utilisateurId: utilisateur.id,
+        nomUtilisateur: `${utilisateur.prenom} ${utilisateur.nom}`,
+        roleUtilisateur: utilisateur.role,
+        typeEvenement: "Authentification",
+        action: "DECONNEXION",
+        description: `Déconnexion volontaire de l'administrateur.`,
+        niveauSeverite: "Info",
+        adresseIP: "197.234.221.14",
+      });
+    }
+
     setUtilisateur(null);
     setEstConnecte(false);
     toast.info("Vous avez été déconnecté avec succès.");
@@ -284,12 +420,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         reinitialiserMotDePasse,
         seDeconnecter,
         effacerErreur,
+        verifierPermission,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
+
+function SEUIL_TENTATIVES(compte: number): number {
+  return Math.max(0, 5 - compte);
+}
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

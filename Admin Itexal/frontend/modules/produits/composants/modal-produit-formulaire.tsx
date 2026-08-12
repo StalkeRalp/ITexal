@@ -19,6 +19,7 @@ import {
 } from "hugeicons-react";
 
 import { useLanguage } from "@/lib/context/LanguageContext";
+import { validerEtSanitiserFichier } from "@/lib/securite/validation-fichiers";
 
 interface ModalProduitFormulaireProps {
   ouvert: boolean;
@@ -121,8 +122,8 @@ export const ModalProduitFormulaire: React.FC<ModalProduitFormulaireProps> = ({
 
   if (!ouvert || !monte) return null;
 
-  // Gestion de l'upload multi-images (PNG, JPG, JPEG, WEBP, max 5 Mo, max 4 photos)
-  const ajouterImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Gestion de l'upload multi-images (Magic Bytes, type MIME réel, max 5 Mo, max 4 photos)
+  const ajouterImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setErreurUpload("");
     const fichiers = e.target.files;
     if (!fichiers || fichiers.length === 0) return;
@@ -133,14 +134,9 @@ export const ModalProduitFormulaire: React.FC<ModalProduitFormulaireProps> = ({
     }
 
     const fichier = fichiers[0];
-    const formatsAutorises = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    if (!formatsAutorises.includes(fichier.type)) {
-      setErreurUpload("Format non supporté. Veuillez choisir une image JPG, PNG ou WEBP.");
-      return;
-    }
-
-    if (fichier.size > 5 * 1024 * 1024) {
-      setErreurUpload("Taille du fichier trop volumineuse (maximum 5 Mo).");
+    const validation = await validerEtSanitiserFichier(fichier);
+    if (!validation.valide) {
+      setErreurUpload(validation.erreur || "Fichier d'image invalide.");
       return;
     }
 
@@ -153,19 +149,14 @@ export const ModalProduitFormulaire: React.FC<ModalProduitFormulaireProps> = ({
     reader.readAsDataURL(fichier);
   };
 
-  const remplacerImage = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const remplacerImage = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     setErreurUpload("");
     const fichier = e.target.files?.[0];
     if (!fichier) return;
 
-    const formatsAutorises = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    if (!formatsAutorises.includes(fichier.type)) {
-      setErreurUpload("Format non supporté. Veuillez choisir une image JPG, PNG ou WEBP.");
-      return;
-    }
-
-    if (fichier.size > 5 * 1024 * 1024) {
-      setErreurUpload("Taille du fichier trop volumineuse (maximum 5 Mo).");
+    const validation = await validerEtSanitiserFichier(fichier);
+    if (!validation.valide) {
+      setErreurUpload(validation.erreur || "Fichier d'image invalide.");
       return;
     }
 

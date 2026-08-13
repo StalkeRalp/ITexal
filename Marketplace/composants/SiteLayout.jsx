@@ -295,11 +295,11 @@ export function SiteLayout({ children }) {
 
       {/* Luxury Dior / Gucci Inspired Footer */}
       <footer className="fenty-style-footer" suppressHydrationWarning>
-        <div className="container footer-top-grid">
+        <div className="container footer-top-grid" suppressHydrationWarning>
           {/* Newsletter Column */}
-          <div className="footer-col-newsletter">
-            <span className="footer-eyebrow">MAISON ITEXAL — BEAUTÉ & LUXE</span>
-            <h3 className="footer-col-title">Privilèges & Confidentialité</h3>
+          <div className="footer-col-newsletter" suppressHydrationWarning>
+            <span className="footer-eyebrow" suppressHydrationWarning>MAISON ITEXAL — BEAUTÉ & LUXE</span>
+            <h3 className="footer-col-title" suppressHydrationWarning>Privilèges & Confidentialité</h3>
             <p className="footer-desc-text">
               Inscrivez-vous pour recevoir en avant-première nos invitations privées, secrets de soins et nouvelles collections Haute Beauté.
             </p>

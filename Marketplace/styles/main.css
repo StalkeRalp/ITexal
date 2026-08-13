@@ -7362,12 +7362,217 @@ body,
   transform: translate3d(0, 0, 0);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .scroll-reveal {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
+
+
+
+/* ==========================================================================
+   UNIFIED RESPONSIVE & MOBILE/TABLET/DESKTOP HIGH-FASHION ENGINE
+   ========================================================================== */
+
+/* 1. Global Overflow Protection */
+html, body {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  position: relative;
+}
+
+/* Fix 100vw collection hero overflow issue on mobile */
+@media (max-width: 768px) {
+  .collection-hero {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100% !important;
   }
 }
+
+/* 2. Touch Target Optimization (min 44px on mobile) & iOS Safari Zoom Prevention */
+@media (max-width: 768px) {
+  button, input, select, textarea, a.btn, .action-circle-btn, .header-exact-login-btn, .pill-tab, .subnav-link {
+    min-height: 44px;
+  }
+
+  input[type="text"], input[type="email"], input[type="password"], input[type="search"], input[type="tel"], input[type="number"], select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* 3. Responsive Hero Slider & Overlay Content */
+@media (max-width: 768px) {
+  .hero-page-slider {
+    min-height: 490px !important;
+    height: 490px !important;
+  }
+
+  .hero-right-content-box {
+    padding: 24px 18px !important;
+    max-width: 100% !important;
+    border-radius: 12px !important;
+  }
+
+  .hero-serif-title {
+    font-size: clamp(24px, 6.5vw, 34px) !important;
+    line-height: 1.18 !important;
+    margin-bottom: 10px !important;
+  }
+
+  .hero-subtitle {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    margin-bottom: 18px !important;
+  }
+
+  .hero-actions-group {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+
+  .hero-actions-group a {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .hero-social-proof {
+    margin-top: 14px !important;
+    font-size: 11px !important;
+  }
+
+  .hero-arrow-btn {
+    display: none !important;
+  }
+}
+
+/* 4. Subnav Ribbon & Horizontal Scroll Bars */
+.subnav-ribbon-bar, .category-pills-strip, .subcat-circles-row, .horizontal-carousel-rail {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+
+@media (max-width: 768px) {
+  .subnav-ribbon-container {
+    padding: 8px 12px !important;
+    gap: 10px !important;
+  }
+
+  .subnav-links-group {
+    gap: 12px !important;
+  }
+
+  .subnav-link {
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+    white-space: nowrap !important;
+  }
+
+  .subcat-circles-row {
+    gap: 14px !important;
+    overflow-x: auto !important;
+    padding-bottom: 10px !important;
+    justify-content: flex-start !important;
+  }
+
+  .subcat-circle-item {
+    flex: 0 0 82px !important;
+    width: 82px !important;
+  }
+
+  .subcat-avatar-wrap {
+    width: 68px !important;
+    height: 68px !important;
+  }
+
+  .subcat-label {
+    font-size: 11px !important;
+  }
+}
+
+/* 5. Product Grid Responsiveness across all breakpoints */
+@media (max-width: 520px) {
+  .product-grid, .collection-product-grid, .grid-4cols, .grid-3cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px 10px !important;
+  }
+
+  .carousel-item-wrap {
+    flex: 0 0 74vw !important;
+    min-width: 74vw !important;
+  }
+}
+
+@media (min-width: 521px) and (max-width: 900px) {
+  .product-grid, .collection-product-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 20px 14px !important;
+  }
+}
+
+@media (min-width: 901px) {
+  .product-grid, .collection-product-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 28px 20px !important;
+  }
+}
+
+/* 6. Product Details / Cart / Checkout / Account Layouts */
+@media (max-width: 840px) {
+  .product-layout, .cart-layout, .checkout-layout, .account-shell, .admin-shell, .video-reassurance-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  .reassurance-2x2-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .white-reassurance-card {
+    padding: 20px !important;
+  }
+
+  .video-card-side {
+    min-height: 380px !important;
+  }
+
+  .summary-card {
+    position: static !important;
+    width: 100% !important;
+  }
+}
+
+/* 7. Footer Responsive Refinements */
+@media (max-width: 992px) {
+  .footer-top-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 36px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .fenty-style-footer {
+    padding-top: 40px !important;
+  }
+
+  .footer-top-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  .footer-bottom-row {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 12px !important;
+  }
+
+  .footer-legal-links {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+}
+
 
 

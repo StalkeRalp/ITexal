@@ -293,36 +293,39 @@ export function SiteLayout({ children }) {
       {/* Main Page Content */}
       <main className="site-main">{children}</main>
 
-      {/* Luxury Modern Footer */}
-      <footer className="fenty-style-footer">
+      {/* Luxury Dior / Gucci Inspired Footer */}
+      <footer className="fenty-style-footer" suppressHydrationWarning>
         <div className="container footer-top-grid">
+          {/* Newsletter Column */}
           <div className="footer-col-newsletter">
-            <h3 className="footer-col-title">DES ENVIE DE PLUS ? ON EST LÀ !</h3>
+            <span className="footer-eyebrow">MAISON ITEXAL — BEAUTÉ & LUXE</span>
+            <h3 className="footer-col-title">Privilèges & Confidentialité</h3>
             <p className="footer-desc-text">
-              Soyez les premiers informés des ventes flash, des nouveautés et des conseils beauté exclusifs ITEXAL.
+              Inscrivez-vous pour recevoir en avant-première nos invitations privées, secrets de soins et nouvelles collections Haute Beauté.
             </p>
             <form onSubmit={(e) => e.preventDefault()} className="footer-forms-stack">
               <div className="footer-input-box">
-                <input type="email" placeholder="Adresse e-mail" required />
-                <button type="submit" aria-label="Envoyer e-mail">
-                  <ArrowRight width={16} height={16} />
+                <input type="email" placeholder="Votre adresse e-mail" required />
+                <button type="submit" aria-label="Envoyer e-mail" title="S'abonner">
+                  <ArrowRight width={15} height={15} />
                 </button>
               </div>
               <div className="footer-input-box">
-                <input type="tel" placeholder="Numéro de téléphone (+237)" />
-                <button type="submit" aria-label="Envoyer téléphone">
-                  <ArrowRight width={16} height={16} />
+                <input type="tel" placeholder="Votre numéro WhatsApp (+237)" />
+                <button type="submit" aria-label="Envoyer téléphone" title="Rejoindre le club VIP">
+                  <ArrowRight width={15} height={15} />
                 </button>
               </div>
             </form>
             <p className="footer-disclaimer">
-              En soumettant votre e-mail ou votre numéro, vous acceptez nos Conditions Générales de Vente et notre Politique de Confidentialité.
+              En soumettant vos coordonnées, vous acceptez nos CGV et notre Politique de Confidentialité. Désinscription à tout moment.
             </p>
           </div>
 
+          {/* Navigation Column */}
           <div className="footer-col-links">
             <h4 className="footer-sub-title">NAVIGATION</h4>
-            <ul>
+            <ul className="footer-menu-list">
               <li><Link href="/catalogue">Tous les Produits</Link></li>
               <li><Link href="/soins">Soins Visage & Corps</Link></li>
               <li><Link href="/maquillage">Maquillage & Teint</Link></li>
@@ -332,9 +335,10 @@ export function SiteLayout({ children }) {
             </ul>
           </div>
 
+          {/* Espace Client Column */}
           <div className="footer-col-links">
             <h4 className="footer-sub-title">ESPACE CLIENT</h4>
-            <ul>
+            <ul className="footer-menu-list">
               <li><Link href="/commandes">Mes Commandes</Link></li>
               <li><Link href="/suivi-commande">Suivi de Colis</Link></li>
               <li><Link href="/notifications">Notifications Privées</Link></li>
@@ -344,24 +348,41 @@ export function SiteLayout({ children }) {
             </ul>
           </div>
 
+          {/* Engagements & Signature Column */}
           <div className="footer-col-links">
             <h4 className="footer-sub-title">ENGAGEMENTS ITEXAL</h4>
             <div className="footer-trust-list">
-              <p><ShieldCheck width={15} /> 100% Produits Authentiques</p>
-              <p><Truck width={15} /> Livraison sous 24h/48h</p>
-              <p><LockKeyhole width={15} /> Paiement MoMo, OM & CB</p>
+              <div className="footer-trust-item">
+                <ShieldCheck width={15} height={15} className="footer-trust-icon" />
+                <span>100% Produits Authentiques</span>
+              </div>
+              <div className="footer-trust-item">
+                <Truck width={15} height={15} className="footer-trust-icon" />
+                <span>Livraison Express 24h/48h</span>
+              </div>
+              <div className="footer-trust-item">
+                <LockKeyhole width={15} height={15} className="footer-trust-icon" />
+                <span>Paiement MoMo, OM & CB</span>
+              </div>
+            </div>
+
+            <div className="footer-brand-signature">
+              <span className="footer-signature-label">Maison ITEXAL Beauté</span>
+              <p className="footer-signature-sub">L'excellence cosmétique au Cameroun</p>
             </div>
           </div>
         </div>
 
+        <div className="footer-divider-glow" />
+
         <div className="container footer-bottom-row">
           <p>© 2026 ITEXAL BEAUTY CAMEROUN — Tous droits réservés. Haute Cosmétique & Luxe.</p>
           <div className="footer-legal-links">
-            <Link href="/cgv">CGV</Link>
-            <span>•</span>
+            <Link href="/conditions">CGV</Link>
+            <span className="footer-dot-sep">•</span>
             <Link href="/confidentialite">Confidentialité</Link>
-            <span>•</span>
-            <Link href="/mentions-legales">Mentions Légales</Link>
+            <span className="footer-dot-sep">•</span>
+            <Link href="/a-propos">À Propos</Link>
           </div>
         </div>
       </footer>

@@ -1,0 +1,1249 @@
+{
+  "categories": [
+    { "id": "cat-soins", "slug": "soins", "name": "Soins du Visage", "description": "Sérums, crèmes et élixirs précieux." },
+    { "id": "cat-maquillage", "slug": "maquillage", "name": "Maquillage", "description": "Palettes, poudres et rouges à lèvres." },
+    { "id": "cat-parfums", "slug": "parfums", "name": "Parfumerie", "description": "Fragrances d'exception et nectars royaux." },
+    { "id": "cat-capillaire", "slug": "capillaire", "name": "Soins Capillaires", "description": "Huiles, masques et sérums fortifiants." },
+    { "id": "cat-nouveautes", "slug": "nouveautes", "name": "Nouveautés", "description": "Les dernières créations beauté." }
+  ],
+  "brands": [
+    { "id": "b-dior", "name": "Christian Dior Prestige", "logo": "/Images/pexels-alesiakozik-7795760.jpg" },
+    { "id": "b-gucci", "name": "Gucci Beauty", "logo": "/Images/pexels-karola-g-4202326.jpg" },
+    { "id": "b-elixir", "name": "L'Élixir", "logo": "/Images/pexels-chidy-31141638.jpg" },
+    { "id": "b-florea", "name": "Floréa", "logo": "/Images/pexels-valeriiamiller-3680203.jpg" },
+    { "id": "b-aurore", "name": "Aurore", "logo": "/Images/pexels-denys-12115040.jpg" },
+    { "id": "b-natura", "name": "Natura", "logo": "/Images/pexels-introspectivedsgn-30836145.jpg" }
+  ],
+  "users": [
+    {
+      "id": "u-admin",
+      "name": "Admin ITEXAL",
+      "firstName": "Admin",
+      "lastName": "ITEXAL",
+      "email": "admin@itexal.cm",
+      "phone": "+237 600 000 000",
+      "role": "ADMIN",
+      "password": "admin123"
+    },
+    {
+      "id": "u-demo",
+      "name": "Client Démo",
+      "firstName": "Client",
+      "lastName": "Démo",
+      "email": "client@demo.cm",
+      "phone": "+237 699 000 000",
+      "role": "CLIENT",
+      "password": "demo123"
+    }
+  ],
+  "addresses": [
+    {
+      "id": "a1",
+      "label": "Maison",
+      "city": "Douala",
+      "address": "Bonamoussadi, repère Carrefour",
+      "phone": "+237 699 000 000"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "rv-1",
+      "productId": "p1",
+      "name": "Aline",
+      "rating": 5,
+      "title": "Très belle couleur",
+      "comment": "Texture agréable et teinte facile à porter.",
+      "createdAt": "2026-08-03T09:00:00.000Z",
+      "approved": true
+    },
+    {
+      "id": "rv-2",
+      "productId": "p2",
+      "name": "Mireille",
+      "rating": 4,
+      "title": "Routine simple",
+      "comment": "J’aime la texture légère et la présentation du produit.",
+      "createdAt": "2026-08-01T12:30:00.000Z",
+      "approved": true
+    },
+    {
+      "id": "rv-3",
+      "productId": "p9",
+      "name": "Carine",
+      "rating": 5,
+      "title": "Pratique au quotidien",
+      "comment": "S’intègre facilement dans ma routine du matin.",
+      "createdAt": "2026-07-30T10:15:00.000Z",
+      "approved": true
+    }
+  ],
+  "notifications": [
+    {
+      "id": "notif-1",
+      "type": "ORDER",
+      "title": "Commande en cours d'expédition",
+      "message": "Votre rituel beauté 'Sérum Hydratant Eclat Intense' de la commande #ITX-2026-8942 a été remis au transporteur à Douala.",
+      "date": "2026-08-13T03:00:00.000Z",
+      "read": false,
+      "link": "/commandes",
+      "linkText": "Suivre mon colis",
+      "icon": "Package"
+    },
+    {
+      "id": "notif-2",
+      "type": "PROMO",
+      "title": "Invitation Exclusive : Ventes Privées Dior",
+      "message": "Bénéficiez de 20% de remise exceptionnelle sur l'ensemble de la gamme Dior Prestige avec le code privilège PRIVILEGE20.",
+      "date": "2026-08-12T03:00:00.000Z",
+      "read": false,
+      "link": "/catalogue?brand=DIOR",
+      "linkText": "Découvrir la sélection",
+      "icon": "Sparkles"
+    },
+    {
+      "id": "notif-3",
+      "type": "ORDER",
+      "title": "Commande confirmée avec succès",
+      "message": "Votre commande #ITX-2026-7815 d'un montant de 32 000 FCFA a bien été enregistrée et est en cours de préparation dans nos ateliers.",
+      "date": "2026-08-10T03:00:00.000Z",
+      "read": true,
+      "link": "/commandes",
+      "linkText": "Voir la commande",
+      "icon": "ShieldCheck"
+    }
+  ],
+  "orders": [
+    {
+      "id": "ITX-2026-8942",
+      "createdAt": "2026-08-12T14:20:00.000Z",
+      "status": "En cours de livraison",
+      "customer": {
+        "name": "Lelica Ange",
+        "email": "lelicaange@gmail.com",
+        "phone": "+237 600 000 000",
+        "city": "Douala",
+        "address": "Bonanjo, Avenue De Gaulle"
+      },
+      "items": [
+        {
+          "productId": "p9",
+          "name": "Sérum Or Régénérant Prestigieux",
+          "price": 34500,
+          "quantity": 1,
+          "image": "https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg?auto=compress&w=900"
+        }
+      ],
+      "subtotal": 34500,
+      "shipping": 2000,
+      "total": 36500
+    }
+  ],
+  "blogPosts": [
+    {
+      "id": "routine-essentielle",
+      "category": "Soins",
+      "readTime": "4 min",
+      "title": "Routine essentielle pour une peau lumineuse",
+      "excerpt": "Découvrez les étapes clés pour un rituel beauté fluide, du nettoyage à l’hydratation.",
+      "image": "https://images.pexels.com/photos/7649269/pexels-photo-7649269.jpeg?auto=compress&w=900",
+      "body": [
+        "Pour une peau éclatante, commencez toujours par un nettoyage doux. C’est l’étape qui prépare la peau à recevoir les soins suivants.",
+        "Ensuite, appliquez un sérum hydratant et un soin adapté à votre type de peau. Ces textures légères assurent une peau confortable et protégée.",
+        "Terminez avec une crème riche ou un baume selon vos besoins, et n’oubliez jamais la protection solaire le matin."
+      ]
+    },
+    {
+      "id": "choisir-parfum",
+      "category": "Parfums",
+      "readTime": "5 min",
+      "title": "Comment choisir un parfum qui vous ressemble",
+      "excerpt": "Quelques conseils pour trouver la fragrance idéale selon votre style et vos envies.",
+      "image": "https://images.pexels.com/photos/7668330/pexels-photo-7668330.jpeg?auto=compress&w=900",
+      "body": [
+        "Un parfum se découvre en plusieurs temps: l’ouverture, le coeur et le sillage. Prenez le temps de le tester sur la peau.",
+        "Privilégiez des notes qui évoquent votre humeur: florales pour la douceur, boisées pour l’élégance, ou fraîches pour le quotidien.",
+        "N’hésitez pas à choisir une fragrance qui évolue avec vous tout au long de la journée."
+      ]
+    },
+    {
+      "id": "maquillage-minimaliste",
+      "category": "Maquillage",
+      "readTime": "3 min",
+      "title": "Maquillage minimaliste: le naturel revisité",
+      "excerpt": "Les astuces pour un maquillage léger, adapté au bureau comme au week-end.",
+      "image": "https://images.pexels.com/photos/7315792/pexels-photo-7315792.jpeg?auto=compress&w=900",
+      "body": [
+        "Un teint naturel passe par une base légère et un correcteur ciblé. Laissez respirer votre peau tout en unifiant le teint.",
+        "Optez pour une touche de couleur sur les lèvres et un fard neutre sur les paupières pour un résultat sophistiqué mais discret.",
+        "Pour un fini frais, appliquez un peu d’enlumineur sur les zones de lumière et un spray fixateur si besoin."
+      ]
+    }
+  ],
+  "infoPages": {
+    "about": {
+      "kicker": "À propos",
+      "title": "ITEXAL Beauty, une expérience pensée pour vous",
+      "lead": "Nous sélectionnons des produits beauté pour un quotidien sensoriel et responsable.",
+      "sections": [
+        ["Notre mission", "Offrir une sélection de cosmétiques et soins qui allient qualité, simplicité et plaisir d’utilisation."],
+        ["Notre engagement", "Favoriser des formules bien tolérées et des ingrédients choisis avec soin pour chaque routine."],
+        ["Notre service", "Accompagner chaque client avec une livraison rapide et une expérience d’achat claire."]
+      ]
+    },
+    "shipping": {
+      "kicker": "Livraison",
+      "title": "Livraison nationale rapide et sécurisée",
+      "lead": "Recevez vos commandes dans les meilleurs délais, où que vous soyez au Cameroun.",
+      "sections": [
+        ["Délais", "Les commandes sont préparées sous 24 heures et expédiées dans les 2 à 3 jours ouvrés."],
+        ["Transport", "Nous travaillons avec des transporteurs fiables pour surveiller chaque livraison."],
+        ["Retours", "Vous pouvez retourner un produit sous 14 jours si vous n’êtes pas satisfait."]
+      ]
+    },
+    "privacy": {
+      "kicker": "Confidentialité",
+      "title": "Vos données personnelles sont protégées",
+      "lead": "Nous respectons votre vie privée et n’utilisons vos informations qu’à des fins de service client.",
+      "sections": [
+        ["Sécurité", "Les informations de votre compte sont stockées de manière sécurisée et ne sont jamais partagées."],
+        ["Utilisation", "Nous utilisons votre adresse et votre téléphone uniquement pour la livraison et les notifications de commande."],
+        ["Transparence", "Vous pouvez demander la modification ou la suppression de vos données à tout moment."]
+      ]
+    },
+    "returns": {
+      "kicker": "Retours",
+      "title": "Retours simples et conditions claires",
+      "lead": "Nous facilitons le retour des articles non conformes ou insatisfaisants.",
+      "sections": [
+        ["Conditions", "Les produits doivent être retournés dans leur emballage d’origine et en bon état."],
+        ["Délais", "Vous disposez de 14 jours après la livraison pour initier un retour."],
+        ["Remboursement", "Une fois le retour validé, le remboursement est effectué rapidement."]
+      ]
+    },
+    "terms": {
+      "kicker": "Conditions générales",
+      "title": "Conditions générales de vente",
+      "lead": "Lisez les engagements liés à votre commande et à l’utilisation de notre service en ligne.",
+      "sections": [
+        ["Commande", "La commande est validée une fois le paiement confirmé et la disponibilité vérifiée."],
+        ["Prix", "Les prix affichés incluent tous les coûts indiqués et sont mis à jour régulièrement."],
+        ["Service client", "Notre équipe reste disponible pour toute question relative à votre achat."]
+      ]
+    },
+    "payments": {
+      "kicker": "Paiements",
+      "title": "Paiement sécurisé et options pratiques",
+      "lead": "Payez en toute confiance avec des méthodes adaptées à votre expérience d’achat.",
+      "sections": [
+        ["Sécurité", "Tous les paiements passent par des plateformes sécurisées pour protéger vos données."],
+        ["Modes", "Carte bancaire, mobile money ou autres moyens disponibles selon votre région."],
+        ["Assistance", "En cas de problème de paiement, notre service client vous aide rapidement."]
+      ]
+    }
+  },
+  "products": [
+    {
+      "id": "p1",
+      "reference": "FLR-01",
+      "brand": "Floréa",
+      "name": "Palette Éclat Naturel",
+      "category": "Maquillage",
+      "price": 26500,
+      "oldPrice": 31000,
+      "rating": 4.8,
+      "reviews": 72,
+      "stock": 14,
+      "new": false,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/7215383/pexels-photo-7215383.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/7215383/pexels-photo-7215383.jpeg?auto=compress&w=900",
+        "https://images.pexels.com/photos/1159675/pexels-photo-1159675.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Une palette de teintes douces et modulables pour un maquillage lumineux et naturel.",
+      "description": "Palette multi-usages enrichie en pigments naturels pour un rendu lumineux et facile à travailler.",
+      "size": "10 g",
+      "benefits": [
+        "Teintes modulables pour tous les looks",
+        "Texture veloutée et longue tenue",
+        "Formule douce pour la peau"
+      ],
+      "composition": "Pigments minéraux, beurre de karité, vitamine E.",
+      "usage": "Appliquer sur les paupières et les pommettes selon l’intensité souhaitée.",
+      "precautions": "Éviter tout contact avec les yeux. En cas d’irritation, rincer à l’eau claire."
+    },
+    {
+      "id": "p2",
+      "reference": "NAT-12",
+      "brand": "Natura",
+      "name": "Sérum Hydratation Intense",
+      "category": "Soins",
+      "price": 19500,
+      "oldPrice": null,
+      "rating": 4.6,
+      "reviews": 38,
+      "stock": 22,
+      "new": false,
+      "promo": false,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/5946118/pexels-photo-5946118.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/5946118/pexels-photo-5946118.jpeg?auto=compress&w=900",
+        "https://images.pexels.com/photos/7061373/pexels-photo-7061373.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un sérum léger qui hydrate profondément et illumine le teint.",
+      "description": "Concentré en acide hyaluronique et extraits de fleur d’eau pour une peau visiblement repulpée.",
+      "size": "30 ml",
+      "benefits": [
+        "Hydratation durable 24h",
+        "Texture fluide et non grasse",
+        "Teint plus lisse et confortable"
+      ],
+      "composition": "Acide hyaluronique, extrait de calendula, aloe vera.",
+      "usage": "Appliquer matin et soir sur peau propre avant la crème.",
+      "precautions": "Usage externe uniquement. Conserver à l’abri de la chaleur."
+    },
+    {
+      "id": "p3",
+      "reference": "AUR-05",
+      "brand": "Aurore",
+      "name": "Eau de Parfum Sensuelle",
+      "category": "Parfums",
+      "price": 42000,
+      "oldPrice": 48000,
+      "rating": 4.9,
+      "reviews": 55,
+      "stock": 11,
+      "new": false,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&w=900",
+        "https://images.pexels.com/photos/755992/pexels-photo-755992.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Une fragrance chaude, fleurie et sensuelle qui enveloppe la peau.",
+      "description": "Notes de jasmin, bois de santal et vanille pour un sillage durable et sophistiqué.",
+      "size": "50 ml",
+      "benefits": [
+        "Sillage riche et équilibré",
+        "Parfum longue tenue",
+        "Flacon élégant à poser"
+      ],
+      "composition": "Notes de tête citron, rose, notes de cœur jasmin et bois, notes de fond vanille.",
+      "usage": "Vaporiser sur les points de pulsation: cou, poignets et derrière les oreilles.",
+      "precautions": "Éviter le contact direct avec les yeux. Ne pas appliquer sur une peau irritée."
+    },
+    {
+      "id": "p4",
+      "reference": "ECL-09",
+      "brand": "Éclat",
+      "name": "Crème de Nuit Réparatrice",
+      "category": "Soins",
+      "price": 28500,
+      "oldPrice": null,
+      "rating": 4.7,
+      "reviews": 29,
+      "stock": 7,
+      "new": false,
+      "promo": false,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/7785764/pexels-photo-7785764.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/7785764/pexels-photo-7785764.jpeg?auto=compress&w=900",
+        "https://images.pexels.com/photos/760508/pexels-photo-760508.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Répare la peau pendant la nuit et révèle un teint plus frais au matin.",
+      "description": "Riche en actifs régénérants, cette crème nourrit intensément tout en respectant l’équilibre cutané.",
+      "size": "50 ml",
+      "benefits": [
+        "Régénère la peau pendant la nuit",
+        "Hydrate sans film gras",
+        "Peau plus douce au réveil"
+      ],
+      "composition": "Beurre de karité, peptide réparateur, complexe antioxydant.",
+      "usage": "Appliquer en couche fine sur le visage et le cou après le sérum du soir.",
+      "precautions": "Éviter le contact avec les yeux. Ne pas utiliser sur peau cassée."
+    },
+    {
+      "id": "p5",
+      "reference": "BEL-22",
+      "brand": "Belle",
+      "name": "Rouge à Lèvres Satiné",
+      "category": "Maquillage",
+      "price": 13500,
+      "oldPrice": null,
+      "rating": 4.4,
+      "reviews": 13,
+      "stock": 18,
+      "new": true,
+      "promo": false,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/3861338/pexels-photo-3861338.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/3861338/pexels-photo-3861338.jpeg?auto=compress&w=900",
+        "https://images.pexels.com/photos/3760436/pexels-photo-3760436.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un rouge à lèvres satiné et longue tenue pour lèvres hydratées.",
+      "description": "Formule douce enrichie en huile d’amande pour des lèvres confortables toute la journée.",
+      "size": "3.4 g",
+      "benefits": [
+        "Fini satiné et lumineux",
+        "Confort immédiat",
+        "Parfum délicat"
+      ],
+      "composition": "Huile d’amande douce, pigments minéraux, cire de jojoba.",
+      "usage": "Appliquer directement ou au pinceau pour un contour précis.",
+      "precautions": "Ne pas partager le produit. En cas d’irritation, cesser l’utilisation."
+    },
+    {
+      "id": "p6",
+      "reference": "AIM-14",
+      "brand": "Aime",
+      "name": "Brume d’Ambiance Fleur Blanche",
+      "category": "Parfums",
+      "price": 17500,
+      "oldPrice": null,
+      "rating": 4.5,
+      "reviews": 41,
+      "stock": 9,
+      "new": false,
+      "promo": false,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/5473265/pexels-photo-5473265.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/5473265/pexels-photo-5473265.jpeg?auto=compress&w=900",
+        "https://images.pexels.com/photos/6403754/pexels-photo-6403754.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un nuage frais de parfum floral pour la maison et les vêtements.",
+      "description": "Brume aux notes de magnolia et néroli, spécialement conçue pour rafraîchir l’ambiance.",
+      "size": "100 ml",
+      "benefits": [
+        "Diffuse une atmosphère délicate",
+        "Notes florales subtiles",
+        "S’emploie sur tissus et textiles"
+      ],
+      "composition": "Extrait de néroli, eau de rose, alcool dénaturé.",
+      "usage": "Pulvériser à distance sur l’air, les textiles ou la literie.",
+      "precautions": "Tenir hors de portée des enfants. Ne pas inhaler directement."
+    },
+    {
+      "id": "p7",
+      "reference": "CLR-18",
+      "brand": "Clarité",
+      "name": "Masque Purifiant Argile Verte",
+      "category": "Soins",
+      "price": 14900,
+      "oldPrice": null,
+      "rating": 4.3,
+      "reviews": 24,
+      "stock": 16,
+      "new": false,
+      "promo": false,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/1121791/pexels-photo-1121791.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/1121791/pexels-photo-1121791.jpeg?auto=compress&w=900",
+        "https://images.pexels.com/photos/3932367/pexels-photo-3932367.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un masque purifiant qui détoxifie la peau et resserre les pores.",
+      "description": "Masque à l’argile verte et à l’extrait d’arbre à thé pour une peau nette et moins terne.",
+      "size": "75 ml",
+      "benefits": [
+        "Absorbe l’excès de sébum",
+        "Affiche un teint plus clair",
+        "Sensations d’apaisement"
+      ],
+      "composition": "Argile verte, arbre à thé, aloe vera.",
+      "usage": "Appliquer sur peau propre, laisser poser 10-12 minutes puis rincer.",
+      "precautions": "Éviter le contour des yeux. Ne pas utiliser sur peau irritée."
+    },
+    {
+      "id": "p8",
+      "reference": "FLR-24",
+      "brand": "Floréa",
+      "name": "Kit Teint Lumière",
+      "category": "Nouveautés",
+      "price": 39500,
+      "oldPrice": null,
+      "rating": 4.9,
+      "reviews": 17,
+      "stock": 20,
+      "new": true,
+      "promo": false,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/6419405/pexels-photo-6419405.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/6419405/pexels-photo-6419405.jpeg?auto=compress&w=900",
+        "https://images.pexels.com/photos/4060970/pexels-photo-4060970.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un kit maquillage pour un teint frais et lumineux, pensé pour toutes les peaux.",
+      "description": "Kit complet comprenant fond de teint, enlumineur et poudre libre pour un fini éclatant.",
+      "size": "30 ml + 5 g + 10 g",
+      "benefits": [
+        "Teint unifié et radieux",
+        "Texture légère et modulable",
+        "Convient aux peaux sensibles"
+      ],
+      "composition": "Extrait de fleur d’oranger, mica minéral, pigment naturel.",
+      "usage": "Appliquer le fond de teint suivi de l’enlumineur et de la poudre selon le rendu désiré.",
+      "precautions": "Tester au préalable sur une petite zone si peau sensible."
+    },
+    {
+      "id": "p9",
+      "reference": "DIOR-SKIN-01",
+      "brand": "L'Élixir",
+      "name": "Sérum Or Régénérant Prestigieux",
+      "category": "Soins",
+      "price": 34500,
+      "oldPrice": 39000,
+      "rating": 5,
+      "reviews": 64,
+      "stock": 15,
+      "new": true,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un soin précieux au concentré d'or végétal pour un teint divinement lisse.",
+      "description": "Élixir d'exception aux micro-particules illuminatrices et à l'acide hyaluronique pur.",
+      "size": "30 ml",
+      "benefits": ["Éclat immédiat", "Action anti-âge globale", "Texture évanescente"],
+      "composition": "Huile de rose rare, peptides d'or, acide hyaluronique.",
+      "usage": "Quelques gouttes au creux de la main avant le soin de jour.",
+      "precautions": "Conserver au frais et à l'abri de la lumière direct."
+    },
+    {
+      "id": "p10",
+      "reference": "DIOR-SKIN-02",
+      "brand": "Aurore",
+      "name": "Huile Botanique Sublime",
+      "category": "Soins",
+      "price": 29000,
+      "oldPrice": null,
+      "rating": 4.9,
+      "reviews": 48,
+      "stock": 12,
+      "new": true,
+      "promo": false,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/6621323/pexels-photo-6621323.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/6621323/pexels-photo-6621323.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Nectar d'huiles précieuses qui nourrit et illumine les peaux sèches.",
+      "description": "Formule d'exception composée à 99% d'ingrédients d'origine naturelle.",
+      "size": "50 ml",
+      "benefits": ["Nutrition suprême", "Fini satiné non gras", "Parfum envoûtant"],
+      "composition": "Huile d'argan bio, fleur d'oranger, vitamine E.",
+      "usage": "Chauffer 3 gouttes et lisser sur le visage et le décolleté.",
+      "precautions": "Éviter le contact direct avec les yeux."
+    },
+    {
+      "id": "p11",
+      "reference": "DIOR-SKIN-03",
+      "brand": "Clarité",
+      "name": "Baume Botanique Cellulaire",
+      "category": "Soins",
+      "price": 22000,
+      "oldPrice": 26000,
+      "rating": 4.8,
+      "reviews": 33,
+      "stock": 19,
+      "new": false,
+      "promo": true,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/3685530/pexels-photo-3685530.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/3685530/pexels-photo-3685530.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un baume réconfortant qui répare les épidermes fragilisés.",
+      "description": "Soin intense infusé au beurre de karité bio et extraits de camomille sauvage.",
+      "size": "60 ml",
+      "benefits": ["Apaisement immédiat", "Protection barrière cutanée", "Douceur extrême"],
+      "composition": "Beurre de karité, cire d'abeille, extrait de camomille.",
+      "usage": "Appliquer en couche généreuse sur le visage ou zones sèches.",
+      "precautions": "Usage externe uniquement."
+    },
+    {
+      "id": "p12",
+      "reference": "DIOR-SKIN-04",
+      "brand": "Éclat",
+      "name": "Lotion Éclat & Jeunesse",
+      "category": "Soins",
+      "price": 24500,
+      "oldPrice": null,
+      "rating": 4.7,
+      "reviews": 41,
+      "stock": 25,
+      "new": false,
+      "promo": false,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/5946117/pexels-photo-5946117.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/5946117/pexels-photo-5946117.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Lotion fraîche micro-exfoliante pour affiner le grain de peau.",
+      "description": "Clarifie le teint et prépare idéalement la peau à recevoir la routine de soins.",
+      "size": "150 ml",
+      "benefits": ["Grain de peau affiné", "Fraîcheur vivifiante", "Teint unifié"],
+      "composition": "Acides de fruits douces, eau de rose de damas.",
+      "usage": "Tapoter sur le visage à l'aide d'un coton le matin et le soir.",
+      "precautions": "Utiliser une protection solaire en journée."
+    },
+    {
+      "id": "p13",
+      "reference": "DIOR-PRF-01",
+      "brand": "Aurore",
+      "name": "Nectar Impérial Rose Royale",
+      "category": "Parfums",
+      "price": 65000,
+      "oldPrice": 72000,
+      "rating": 5,
+      "reviews": 82,
+      "stock": 15,
+      "new": true,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/1961795/pexels-photo-1961795.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/1961795/pexels-photo-1961795.jpeg?auto=compress&w=900",
+        "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un parfum majestueux aux notes de rose centifolia et d'ambre précieux.",
+      "description": "Une fragrance d'exception élaborée selon la tradition des grandes maisons de parfumerie française.",
+      "size": "100 ml",
+      "benefits": ["Sillage royal d'une tenue remarquable", "Flacon gravé au design haute couture", "Notes rares et veloutées"],
+      "composition": "Rose Centifolia, Bois d'Oud raffiné, Vanille Bourbon.",
+      "usage": "Vaporiser sur le cou, le buste et les creux des poignets.",
+      "precautions": "Conserver à l'abri de la lumière et des sources de chaleur."
+    },
+    {
+      "id": "p14",
+      "reference": "DIOR-PRF-02",
+      "brand": "L'Élixir",
+      "name": "Extrait de Parfum Bois Absolu",
+      "category": "Parfums",
+      "price": 58000,
+      "oldPrice": 64000,
+      "rating": 4.9,
+      "reviews": 67,
+      "stock": 8,
+      "new": false,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/2587370/pexels-photo-2587370.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/2587370/pexels-photo-2587370.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un sillage boisé ambré envoûtant pour hommes et femmes d'exception.",
+      "description": "Un jus intense où se mêlent bois de cèdre fumé, baume de Tolu et musc blanc.",
+      "size": "75 ml",
+      "benefits": ["Tenue supérieure à 24 heures", "Sillage captivant et mystérieux", "Formule concentrée"],
+      "composition": "Cèdre de l'Atlas, Ambre sombre, Musc Végétal.",
+      "usage": "Application sur les points chauds du corps.",
+      "precautions": "Éviter le contact direct avec le visage."
+    },
+    {
+      "id": "p15",
+      "reference": "DIOR-PRF-03",
+      "brand": "Floréa",
+      "name": "Eau de Fleur d'Oranger d'Orient",
+      "category": "Parfums",
+      "price": 38000,
+      "oldPrice": null,
+      "rating": 4.7,
+      "reviews": 44,
+      "stock": 20,
+      "new": true,
+      "promo": false,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/755992/pexels-photo-755992.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/755992/pexels-photo-755992.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "La fraîcheur lumineuse de la fleur d'oranger gorgée de soleil.",
+      "description": "Une eau solaire florale et joyeuse évoquant la douceur des jardins méditerranéens.",
+      "size": "100 ml",
+      "benefits": ["Fraîcheur vivifiante", "Parfum délicat et apaisant", "Flacon nomade sérigraphié"],
+      "composition": "Néroli, Fleur d'Oranger, Zeste de Mandarine.",
+      "usage": "Vaporiser généreusement matin et soir.",
+      "precautions": "Usage externe."
+    },
+    {
+      "id": "p16",
+      "reference": "DIOR-PRF-04",
+      "brand": "Aurore",
+      "name": "Essence de Jasmin & Ambre Végétal",
+      "category": "Parfums",
+      "price": 49000,
+      "oldPrice": null,
+      "rating": 4.8,
+      "reviews": 39,
+      "stock": 14,
+      "new": true,
+      "promo": false,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/8450502/pexels-photo-8450502.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/8450502/pexels-photo-8450502.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un bouquet nocturne de jasmin sambac rehaussé d'ambre liquide.",
+      "description": "La sensualité incarnée dans une bouteille sculpturale aux reflets ambrés.",
+      "size": "50 ml",
+      "benefits": ["Sillage féminin irrésistible", "Longue tenue garantie", "Édition limitée studio"],
+      "composition": "Jasmin Sambac, Bergamote, Ambre Végétal.",
+      "usage": "Vaporiser sur le décolleté et les cheveux.",
+      "precautions": "Éviter les projections dans les yeux."
+    },
+    {
+      "id": "p17",
+      "reference": "DIOR-PRF-05",
+      "brand": "L'Élixir",
+      "name": "Eau de Toilette Cèdre Noble",
+      "category": "Parfums",
+      "price": 44000,
+      "oldPrice": 50000,
+      "rating": 4.6,
+      "reviews": 28,
+      "stock": 10,
+      "new": false,
+      "promo": true,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/3059609/pexels-photo-3059609.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/3059609/pexels-photo-3059609.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "L'élégance intemporelle des bois nobles et du poivre frais.",
+      "description": "Une fragrance masculine et raffinée aux accents boisés et épicés.",
+      "size": "100 ml",
+      "benefits": ["Caractère affirmé", "Fraîcheur boisée élégante", "Flacon lourd au touché mat"],
+      "composition": "Cèdre, Poivre Noir, Vétiver de Haïti.",
+      "usage": "Vaporiser sur la peau ou les revers de veste.",
+      "precautions": "Produit inflammable."
+    },
+    {
+      "id": "p18",
+      "reference": "DIOR-MKP-06",
+      "brand": "Éclat",
+      "name": "Fond de Teint Haute Couvrance Solaire",
+      "category": "Maquillage",
+      "price": 29500,
+      "oldPrice": 34000,
+      "rating": 4.9,
+      "reviews": 73,
+      "stock": 22,
+      "new": false,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/2688992/pexels-photo-2688992.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/2688992/pexels-photo-2688992.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un teint zéro défaut 24h avec protection SPF30 intégrée.",
+      "description": "Formule fluide et respirante qui unifie le teint tout en protégeant des rayons UV.",
+      "size": "40 ml",
+      "benefits": ["Résistant à l'humidité", "Couvrance modulable", "Fini naturel lumineux"],
+      "composition": "Filtres solaires minéraux, eau de bambou, pigments micronisés.",
+      "usage": "Étirer au pinceau ou à l'éponge du centre vers l'extérieur du visage.",
+      "precautions": "Agiter avant emploi."
+    },
+    {
+      "id": "p19",
+      "reference": "DIOR-MKP-07",
+      "brand": "Belle",
+      "name": "Poudre Libre Matifiante Velours",
+      "category": "Maquillage",
+      "price": 21000,
+      "oldPrice": null,
+      "rating": 4.7,
+      "reviews": 51,
+      "stock": 16,
+      "new": true,
+      "promo": false,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/458766/pexels-photo-458766.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/458766/pexels-photo-458766.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Poudre aérienne impalpable qui fixe le teint sans assécher.",
+      "description": "Floute les imperfections et matifie délicatement pour un grain de peau lissé.",
+      "size": "15 g",
+      "benefits": ["Effet filtre flouteur", "Ne marque pas les zones de sécheresse", "Boîtier tamis avec houpette"],
+      "composition": "Poudre de soie, silice minérale, extrait d'Iris.",
+      "usage": "Appliquer la poudre à la houpette sur la zone T.",
+      "precautions": "Ne pas inhaler la poudre fine."
+    },
+    {
+      "id": "p20",
+      "reference": "DIOR-MKP-08",
+      "brand": "Floréa",
+      "name": "Mascara Volumateur Noir Intense",
+      "category": "Maquillage",
+      "price": 18500,
+      "oldPrice": null,
+      "rating": 4.8,
+      "reviews": 62,
+      "stock": 25,
+      "new": true,
+      "promo": false,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/3373736/pexels-photo-3373736.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/3373736/pexels-photo-3373736.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un volume cil à cil vertigineux enrichi en huiles fortifiantes.",
+      "description": "Sa brosse sablier gaine chaque cil d'un noir profond sans faire de paquets.",
+      "size": "10 ml",
+      "benefits": ["Volume XXL immédiat", "Effet faux-cils sans bavure", "Enrichi en huile de ricin"],
+      "composition": "Cire de carnauba, huile de ricin bio, pigments carbone pur.",
+      "usage": "Appliquer de la racine à la pointe des cils en mouvement de zigzag.",
+      "precautions": "Remplacer 3 mois après ouverture."
+    },
+    {
+      "id": "p21",
+      "reference": "DIOR-MKP-09",
+      "brand": "Aurore",
+      "name": "Enlumineur Liquide Gouttes d'Or",
+      "category": "Maquillage",
+      "price": 24000,
+      "oldPrice": 28000,
+      "rating": 4.9,
+      "reviews": 47,
+      "stock": 14,
+      "new": false,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/2533266/pexels-photo-2533266.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/2533266/pexels-photo-2533266.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Des gouttes de pure lumière pour irradier de fraîcheur.",
+      "description": "Concentré d'or liquide à mélanger au fond de teint ou à tapoter en touches d'éclat.",
+      "size": "15 ml",
+      "benefits": ["Éclat sur-mesure", "Formule universelle scintillante", "Pipette compte-gouttes ultra précise"],
+      "composition": "Nacres d'or rosé, huile de jojoba, squalane végétal.",
+      "usage": "Déposer 1 à 2 gouttes sur les pommettes et l'arcade sourcilière.",
+      "precautions": "Tenir bien fermé."
+    },
+    {
+      "id": "p22",
+      "reference": "DIOR-SKN-10",
+      "brand": "L'Élixir",
+      "name": "Elixir Anti-Âge aux Cellules Rares",
+      "category": "Soins",
+      "price": 48000,
+      "oldPrice": null,
+      "rating": 5,
+      "reviews": 89,
+      "stock": 12,
+      "new": true,
+      "promo": false,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/5217898/pexels-photo-5217898.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/5217898/pexels-photo-5217898.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Soin suprême de jeunesse régénérant le grain de peau en profondeur.",
+      "description": "Technologie cellulaire d'avant-garde ciblant la fermeté, la souplesse et la clarté.",
+      "size": "50 ml",
+      "benefits": ["Rides visiblement lissées", "Densité et fermeté restaurées", "Flacon pompe en verre opalin"],
+      "composition": "Cellules souches de Rose d'Or, Niacinamide 5%, Collagène marin.",
+      "usage": "Appliquer matin et soir sur le visage et le cou parfaitement nettoyés.",
+      "precautions": "Éviter les yeux."
+    },
+    {
+      "id": "p23",
+      "reference": "DIOR-SKN-11",
+      "brand": "Natura",
+      "name": "Contour des Yeux Éclat Jeunesse",
+      "category": "Soins",
+      "price": 23500,
+      "oldPrice": null,
+      "rating": 4.8,
+      "reviews": 36,
+      "stock": 18,
+      "new": false,
+      "promo": false,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/5946083/pexels-photo-5946083.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/5946083/pexels-photo-5946083.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Soin ciblé anti-cernes et anti-poches à l'embout cryo-massant.",
+      "description": "Formule décongestionnante qui réveille immédiatement le regard et lisse les ridules.",
+      "size": "15 ml",
+      "benefits": ["Regard reposé et lumineux", "Action anti-poches immédiate", "Embout métal rafraîchissant"],
+      "composition": "Cafféine pure, extrait de bleuet bio, acide hyaluronique.",
+      "usage": "Masser le contour des yeux du coin interne vers l'extérieur.",
+      "precautions": "Ne pas faire pénétrer dans l'œil."
+    },
+    {
+      "id": "p24",
+      "reference": "DIOR-CAP-01",
+      "brand": "Natura",
+      "name": "Huile Sublimatrice Cheveux Soie",
+      "category": "Capillaire",
+      "price": 22500,
+      "oldPrice": 26000,
+      "rating": 4.9,
+      "reviews": 57,
+      "stock": 20,
+      "new": true,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Huile sèche nutritive qui apporte brillance miroir et douceur infinie.",
+      "description": "Sublime toutes les chevelures sans jamais les alourdir. Discipline les frisottis.",
+      "size": "100 ml",
+      "benefits": ["Toucher soie non gras", "Protège contre la chaleur", "Senteur orientale envoûtante"],
+      "composition": "Huile de marula, huile de camélia précieux, vitamine F.",
+      "usage": "Déposer 2 pressions sur cheveux humides ou secs sur les longueurs.",
+      "precautions": "Conserver à température ambiante."
+    },
+    {
+      "id": "p25",
+      "reference": "DIOR-CAP-02",
+      "brand": "Éclat",
+      "name": "Masque Nourrissant Argan & Kératine",
+      "category": "Capillaire",
+      "price": 19000,
+      "oldPrice": null,
+      "rating": 4.7,
+      "reviews": 43,
+      "stock": 15,
+      "new": false,
+      "promo": false,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/4041391/pexels-photo-4041391.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/4041391/pexels-photo-4041391.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Bain de nutrition intense pour réparer les cheveux abîmés ou déshydratés.",
+      "description": "Pénètre au cœur de la fibre capillaire pour restaurer sa résistance naturelle.",
+      "size": "250 ml",
+      "benefits": ["Démêlage instantané", "Cheveux renforcés et brillants", "Formule riche et onctueuse"],
+      "composition": "Huile d'argan du Maroc, kératine végétale, protéine de blé.",
+      "usage": "Laisser poser 5 à 10 minutes après le shampooing puis rincer abondamment.",
+      "precautions": "Rincer immédiatement en cas de contact avec les yeux."
+    },
+    {
+      "id": "p26",
+      "reference": "DIOR-CAP-03",
+      "brand": "Floréa",
+      "name": "Sérum Fortifiant Cuir Chevelu & Longueurs",
+      "category": "Capillaire",
+      "price": 32000,
+      "oldPrice": 38000,
+      "rating": 5,
+      "reviews": 65,
+      "stock": 10,
+      "new": true,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/2533267/pexels-photo-2533267.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/2533267/pexels-photo-2533267.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Un soin activateur de repousse et de densité au complexe de peptides.",
+      "description": "Stimule la microcirculation du cuir chevelu pour une chevelure plus dense, forte et brillante.",
+      "size": "50 ml",
+      "benefits": ["Densité capillaire visible", "Ralentit la chute des cheveux", "Fini sec non gras"],
+      "composition": "Peptides fortifiants, biotine, extrait de gingembre bio.",
+      "usage": "Appliquer quelques gouttes directement sur le cuir chevelu et masser.",
+      "precautions": "Éviter le contact avec les yeux."
+    },
+    {
+      "id": "p27",
+      "reference": "DIOR-CAP-04",
+      "brand": "Aurore",
+      "name": "Brume Parfumée Cheveux & Soie",
+      "category": "Capillaire",
+      "price": 26000,
+      "oldPrice": 30000,
+      "rating": 4.9,
+      "reviews": 41,
+      "stock": 14,
+      "new": true,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/6621323/pexels-photo-6621323.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/6621323/pexels-photo-6621323.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Brume légère rafraîchissante qui parfume délicatement la chevelure.",
+      "description": "Formule protectrice anti-pollution infusée à l'eau de rose et huiles essentielles.",
+      "size": "100 ml",
+      "benefits": ["Sillage floral envoûtant", "Anti-odeurs et anti-pollution", "Brillance instantanée"],
+      "composition": "Protéines de soie, néroli, eau de rose.",
+      "usage": "Vaporiser à 20 cm de la chevelure.",
+      "precautions": "Usage externe uniquement."
+    },
+    {
+      "id": "p28",
+      "reference": "DIOR-CAP-05",
+      "brand": "L'Élixir",
+      "name": "Shampooing Crème Régénérant Suprême",
+      "category": "Capillaire",
+      "price": 21500,
+      "oldPrice": 25000,
+      "rating": 4.8,
+      "reviews": 38,
+      "stock": 18,
+      "new": false,
+      "promo": true,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/5217898/pexels-photo-5217898.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/5217898/pexels-photo-5217898.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Bain lavant onctueux sans sulfates qui lave en douceur et nourrit.",
+      "description": "Nettoie délicatement tout en infusant la fibre de précieux lipides régénérants.",
+      "size": "200 ml",
+      "benefits": ["Sans sulfates ni parabènes", "Mousse généreuse et douce", "Nourrit dès le premier lavage"],
+      "composition": "Huile de macadamia, phytokératine, beurre de karité.",
+      "usage": "Emulsionner sur cuir chevelu mouillé puis rincer.",
+      "precautions": "Rincer en cas de contact oculaire."
+    },
+    {
+      "id": "p29",
+      "reference": "DIOR-CAP-06",
+      "brand": "Belle",
+      "name": "Bain d'Huiles Précieuses d'Orient",
+      "category": "Capillaire",
+      "price": 27500,
+      "oldPrice": 33000,
+      "rating": 4.9,
+      "reviews": 52,
+      "stock": 12,
+      "new": true,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Soin avant-shampooing réparateur intense pour cheveux secs.",
+      "description": "Un cocktail d'huiles rares qui restaure l'élasticité et l'éclat des chevelures dévitalisées.",
+      "size": "150 ml",
+      "benefits": ["Nutrition profonde", "Douceur extrême", "Facilite le coiffage"],
+      "composition": "Huile de cumin noir, argan, sésame grillé.",
+      "usage": "Laisser poser 20 minutes avant le shampooing.",
+      "precautions": "Tester sur une petite zone."
+    },
+    {
+      "id": "p30",
+      "reference": "DIOR-FLS-01",
+      "brand": "L'Élixir",
+      "name": "Coffret Rituel Solaire d'Or",
+      "category": "Soins",
+      "price": 39000,
+      "oldPrice": 48000,
+      "rating": 5,
+      "reviews": 94,
+      "stock": 15,
+      "new": true,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/4041392/pexels-photo-4041392.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Sérum + Crème de jour en coffret privilège prestige.",
+      "description": "Le duo iconique pour illuminer et lisser les traits dès la première application.",
+      "size": "50 ml + 30 ml",
+      "benefits": ["Offre Vente Flash exclusive", "Éclat immédiat", "Coffret rigide d'exception"],
+      "composition": "Peptides d'or, rose noire, acide hyaluronique.",
+      "usage": "Utiliser le sérum puis la crème matin et soir.",
+      "precautions": "Usage externe."
+    },
+    {
+      "id": "p31",
+      "reference": "DIOR-FLS-02",
+      "brand": "Floréa",
+      "name": "Palette Ombres Couture Midnight",
+      "category": "Maquillage",
+      "price": 31500,
+      "oldPrice": 38000,
+      "rating": 4.8,
+      "reviews": 58,
+      "stock": 10,
+      "new": false,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/7215383/pexels-photo-7215383.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/7215383/pexels-photo-7215383.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "12 teintes velours et métallisées pour un regard hypnotique.",
+      "description": "Des pigments intenses et crémeux pour créer des looks du jour à la nuit.",
+      "size": "18 g",
+      "benefits": ["Tenue 16 heures sans filage", "Boîtier avec miroir géant", "Haute pigmentation"],
+      "composition": "Mica minéral, pigments fins, huile de jojoba.",
+      "usage": "Appliquer au pinceau ou au doigt.",
+      "precautions": "Éviter tout contact oculaire interne."
+    },
+    {
+      "id": "p32",
+      "reference": "DIOR-FLS-03",
+      "brand": "Aurore",
+      "name": "Nectar Parfum Cacao & Orchidée",
+      "category": "Parfums",
+      "price": 52000,
+      "oldPrice": 62000,
+      "rating": 4.9,
+      "reviews": 71,
+      "stock": 12,
+      "new": true,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Une empreinte orientale gourmande et envoûtante.",
+      "description": "L'union rare de la fève de cacao torréfiée et de l'orchidée noire sauvage.",
+      "size": "100 ml",
+      "benefits": ["Sillage gourmand et chic", "Tenue d'exception", "Flacon facetté main"],
+      "composition": "Cacao, Orchidée Noire, Patchouli.",
+      "usage": "Vaporiser à volonté sur la peau.",
+      "precautions": "Tenir éloigné des flammes."
+    },
+    {
+      "id": "p33",
+      "reference": "DIOR-CAP-07",
+      "brand": "Natura",
+      "name": "Masque Hydratant Beurre de Shea",
+      "category": "Capillaire",
+      "price": 18000,
+      "oldPrice": 22000,
+      "rating": 4.7,
+      "reviews": 35,
+      "stock": 20,
+      "new": false,
+      "promo": true,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/4041391/pexels-photo-4041391.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/4041391/pexels-photo-4041391.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Soin crémeux ultra-nourrissant pour boucles et cheveux frisés.",
+      "description": "Apporte souplesse, définition et nutrition aux chevelures les plus assoiffées.",
+      "size": "300 ml",
+      "benefits": ["Définition des boucles", "Anti-casse", "Parfum coco gourmand"],
+      "composition": "Beurre de karité pur, huile d'avocat, provitamine B5.",
+      "usage": "Laisser poser 15 minutes sous charlotte puis rincer.",
+      "precautions": "Rincer immédiatement si contact avec les yeux."
+    },
+    {
+      "id": "p34",
+      "reference": "DIOR-CAP-08",
+      "brand": "Clarité",
+      "name": "Lotion Tonique Cuir Chevelu Apaisante",
+      "category": "Capillaire",
+      "price": 22000,
+      "oldPrice": 27000,
+      "rating": 4.8,
+      "reviews": 29,
+      "stock": 14,
+      "new": true,
+      "promo": true,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/5946083/pexels-photo-5946083.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/5946083/pexels-photo-5946083.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Calme les démangeaisons et rééquilibre le cuir chevelu sensible.",
+      "description": "Formule sans rincage infusée à la menthe poivrée et à la menthe aquatique.",
+      "size": "125 ml",
+      "benefits": ["Action fraîcheur instantanée", "Assainit sans assécher", "Application facile avec embout flacon"],
+      "composition": "Menthe aquatique, gel d'aloe vera, zinc PCA.",
+      "usage": "Séparer les cheveux en raies et appliquer sur le cuir chevelu.",
+      "precautions": "Éviter les projections faciales."
+    },
+    {
+      "id": "p35",
+      "reference": "DIOR-CAP-09",
+      "brand": "Floréa",
+      "name": "Sérum Anti-Frisottis Brillance Satin",
+      "category": "Capillaire",
+      "price": 25000,
+      "oldPrice": 31000,
+      "rating": 4.9,
+      "reviews": 46,
+      "stock": 16,
+      "new": true,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/3738341/pexels-photo-3738341.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Fini miroir et domptage des frisottis par temps humide.",
+      "description": "Gaine le cheveu d'un voile de soie impalpable sans laisser aucun résidu gras.",
+      "size": "75 ml",
+      "benefits": ["Protection humidité 48h", "Toucher fluide de soie", "Flacon pompe élégant"],
+      "composition": "Huile de jojoba bio, silicones végétaux, filtre UV.",
+      "usage": "Appliquer 1 à 2 gouttes sur les longueurs avant ou après lissage.",
+      "precautions": "Ne pas surcharger les racines."
+    },
+    {
+      "id": "p36",
+      "reference": "DIOR-CAP-10",
+      "brand": "Natura",
+      "name": "Huile Précieuse d'Hibiscus & Ricin",
+      "category": "Capillaire",
+      "price": 19500,
+      "oldPrice": 24000,
+      "rating": 4.8,
+      "reviews": 60,
+      "stock": 22,
+      "new": false,
+      "promo": true,
+      "featured": true,
+      "image": "https://images.pexels.com/photos/6621323/pexels-photo-6621323.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/6621323/pexels-photo-6621323.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Stimule la croissance et fortifie la fibre de la racine à la pointe.",
+      "description": "Elixir botanique ancestral réputé pour gainer les cheveux cassants et raviver leur brillance.",
+      "size": "100 ml",
+      "benefits": ["Fortifie les racines", "Favorise la pousse", "Senteur florale raffinée"],
+      "composition": "Extrait de fleur d'hibiscus, huile de ricin pure, vitamine E.",
+      "usage": "Masser en bain d'huile 1 fois par semaine.",
+      "precautions": "Usage externe."
+    },
+    {
+      "id": "p37",
+      "reference": "DIOR-CAP-11",
+      "brand": "Éclat",
+      "name": "Shampooing Purifiant Argile & Menthe",
+      "category": "Capillaire",
+      "price": 17000,
+      "oldPrice": 21000,
+      "rating": 4.6,
+      "reviews": 31,
+      "stock": 19,
+      "new": false,
+      "promo": true,
+      "featured": false,
+      "image": "https://images.pexels.com/photos/5946117/pexels-photo-5946117.jpeg?auto=compress&w=900",
+      "images": [
+        "https://images.pexels.com/photos/5946117/pexels-photo-5946117.jpeg?auto=compress&w=900"
+      ],
+      "shortDescription": "Elimine les résidus de pollution et l'excès de sébum.",
+      "description": "Apporte une vague de fraîcheur détoxifiante pour un cuir chevelu purifié et léger.",
+      "size": "250 ml",
+      "benefits": ["Cheveux légers et aérés", "Sensation de fraîcheur pure", "Retarde le regraissage"],
+      "composition": "Argile blanche purifiante, huile essentielle de menthe poivrée.",
+      "usage": "Utiliser 2 fois par semaine sur cheveux mouillés.",
+      "precautions": "Éviter les yeux."
+    }
+  ]
+}

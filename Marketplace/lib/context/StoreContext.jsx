@@ -1,71 +1,26 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { PRODUCT_SEED } from "@/lib/data/initial-seed";
+import { getProducts, getUsers, getOrders, getReviews, getNotifications } from "@/lib/services/api";
+import db from "@/db.json";
 
 const StoreContext = createContext(null);
-const defaultUsers = [
-  { id: "u-admin", name: "Admin ITEXAL", email: "admin@itexal.cm", phone: "+237 600 000 000", role: "ADMIN", password: "admin123" },
-  { id: "u-demo", name: "Client Démo", email: "client@demo.cm", phone: "+237 699 000 000", role: "CLIENT", password: "demo123" },
-];
-const defaultAddresses = [{ id: "a1", label: "Maison", city: "Douala", address: "Bonamoussadi, repère Carrefour", phone: "+237 699 000 000" }];
-const defaultReviews = [
-  { id: "rv-1", productId: "p1", name: "Aline", rating: 5, title: "Très belle couleur", comment: "Texture agréable et teinte facile à porter.", createdAt: "2026-08-03T09:00:00.000Z", approved: true },
-  { id: "rv-2", productId: "p2", name: "Mireille", rating: 4, title: "Routine simple", comment: "J’aime la texture légère et la présentation du produit.", createdAt: "2026-08-01T12:30:00.000Z", approved: true },
-  { id: "rv-3", productId: "p9", name: "Carine", rating: 5, title: "Pratique au quotidien", comment: "S’intègre facilement dans ma routine du matin.", createdAt: "2026-07-30T10:15:00.000Z", approved: true },
-];
 
 function read(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
   catch { return fallback; }
 }
 
-const INITIAL_NOTIFICATIONS = [
-  {
-    id: "notif-1",
-    type: "ORDER",
-    title: "Commande en cours d'expédition",
-    message: "Votre rituel beauté 'Sérum Hydratant Eclat Intense' de la commande #ITX-2026-8942 a été remis au transporteur à Douala.",
-    date: new Date().toISOString(),
-    read: false,
-    link: "/commandes",
-    linkText: "Suivre mon colis",
-    icon: "Package"
-  },
-  {
-    id: "notif-2",
-    type: "PROMO",
-    title: "Invitation Exclusive : Ventes Privées Dior",
-    message: "Bénéficiez de 20% de remise exceptionnelle sur l'ensemble de la gamme Dior Prestige avec le code privilège PRIVILEGE20.",
-    date: new Date(Date.now() - 3600000 * 24).toISOString(),
-    read: false,
-    link: "/catalogue?brand=DIOR",
-    linkText: "Découvrir la sélection",
-    icon: "Sparkles"
-  },
-  {
-    id: "notif-3",
-    type: "ORDER",
-    title: "Commande confirmée avec succès",
-    message: "Votre commande #ITX-2026-7815 d'un montant de 32 000 FCFA a bien été enregistrée et est en cours de préparation dans nos ateliers.",
-    date: new Date(Date.now() - 3600000 * 72).toISOString(),
-    read: true,
-    link: "/commandes",
-    linkText: "Voir la commande",
-    icon: "ShieldCheck"
-  }
-];
-
 export function StoreProvider({ children }) {
-  const [products, setProducts] = useState(PRODUCT_SEED);
+  const [products, setProducts] = useState(db.products || []);
   const [cart, setCart] = useState({});
   const [wishlist, setWishlist] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
-  const [users, setUsers] = useState(defaultUsers);
+  const [orders, setOrders] = useState(db.orders || []);
+  const [notifications, setNotifications] = useState(db.notifications || []);
+  const [users, setUsers] = useState(db.users || []);
   const [user, setUser] = useState(null);
-  const [addresses, setAddresses] = useState(defaultAddresses);
-  const [reviews, setReviews] = useState(defaultReviews);
+  const [addresses, setAddresses] = useState(db.addresses || []);
+  const [reviews, setReviews] = useState(db.reviews || []);
   const [productRequests, setProductRequests] = useState([]);
   const [recentProducts, setRecentProducts] = useState([]);
   const [hydrated, setHydrated] = useState(false);
@@ -76,12 +31,13 @@ export function StoreProvider({ children }) {
   const [resetTokens, setResetTokens] = useState({});
 
   useEffect(() => {
-    const cachedProducts = read("itexal.products", PRODUCT_SEED);
+    const seedProducts = db.products || [];
+    const cachedProducts = read("itexal.products", seedProducts);
     const existingIds = new Set(cachedProducts.map(p => p.id));
-    const missingSeedItems = PRODUCT_SEED.filter(s => !existingIds.has(s.id));
+    const missingSeedItems = seedProducts.filter(s => !existingIds.has(s.id));
     const merged = [...cachedProducts, ...missingSeedItems];
     const updatedProducts = merged.map(p => {
-      const seed = PRODUCT_SEED.find(s => s.id === p.id);
+      const seed = seedProducts.find(s => s.id === p.id);
       if (seed) {
         return {
           ...p,
@@ -100,14 +56,14 @@ export function StoreProvider({ children }) {
     setProducts(updatedProducts);
     setCart(read("itexal.cart", {}));
     setWishlist(read("itexal.wishlist", []));
-    setOrders(read("itexal.orders", []));
-    setNotifications(read("itexal.notifications", INITIAL_NOTIFICATIONS));
-    setUsers(read("itexal.users", defaultUsers));
+    setOrders(read("itexal.orders", db.orders || []));
+    setNotifications(read("itexal.notifications", db.notifications || []));
+    setUsers(read("itexal.users", db.users || []));
     setUser(read("itexal.user", null));
     setPendingVerification(read("itexal.pendingVerification", null));
     setResetTokens(read("itexal.resetTokens", {}));
-    setAddresses(read("itexal.addresses", defaultAddresses));
-    setReviews(read("itexal.reviews", defaultReviews));
+    setAddresses(read("itexal.addresses", db.addresses || []));
+    setReviews(read("itexal.reviews", db.reviews || []));
     setProductRequests(read("itexal.productRequests", []));
     setRecentProducts(read("itexal.recentProducts", []));
     setHydrated(true);

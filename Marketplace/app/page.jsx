@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, Play, Sparkles, Flame, ArrowRight, ShieldCheck, Heart, Truck, Phone, Gem } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ProductCard } from "@/composants/ProductCard";
+import { ScrollReveal, ParallaxWrap } from "@/composants/ScrollReveal";
 import { useStore } from "@/lib/store";
 
 const campaigns = [
@@ -97,10 +98,15 @@ function HorizontalProductCarousel({ products }) {
       </button>
 
       <div className="horizontal-carousel-rail" ref={railRef}>
-        {products.map((product) => (
-          <div className="carousel-item-wrap" key={product.id}>
+        {products.map((product, idx) => (
+          <ScrollReveal
+            key={product.id}
+            animation="zoom-in"
+            delay={Math.min(idx * 55, 400)}
+            className="carousel-item-wrap"
+          >
             <ProductCard product={product} />
-          </div>
+          </ScrollReveal>
         ))}
       </div>
 
@@ -129,18 +135,11 @@ export default function HomePage() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const moveProducts = (direction) => {
-    newestRef.current?.scrollBy({
-      left: direction * Math.max(newestRef.current.clientWidth / 3, 280),
-      behavior: "smooth"
-    });
-  };
-
   const currentCampaign = campaigns[heroIndex];
 
   return (
     <main className="modern-home">
-      {/* Sleek Subnav Ribbon Bar (Matching Reference Image) */}
+      {/* Sleek Subnav Ribbon Bar */}
       <section className="subnav-ribbon-bar">
         <div className="container subnav-ribbon-container">
           <div className="subnav-links-group">
@@ -156,24 +155,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Hero Page Slider with Horizontal Sliding Track & Transparent Right-Aligned Content */}
+      {/* Hero Page Slider with Parallax & Smooth Content Entrance */}
       <section className="hero-page-slider" aria-label="Offres et nouveautés ITEXAL">
-        {/* Horizontal Sliding Image Track */}
-        <div
-          className="hero-slider-track"
-          style={{ transform: `translateX(-${heroIndex * 100}%)` }}
-        >
-          {campaigns.map((c, idx) => (
-            <div key={idx} className="hero-slide-item">
-              <img src={c.image} alt={c.title} className="hero-slide-bg-img" />
-            </div>
-          ))}
-        </div>
+        {/* Horizontal Sliding Image Track with Parallax */}
+        <ParallaxWrap speed={0.06} style={{ height: "100%", width: "100%", position: "absolute", top: 0, left: 0 }}>
+          <div
+            className="hero-slider-track"
+            style={{ transform: `translateX(-${heroIndex * 100}%)` }}
+          >
+            {campaigns.map((c, idx) => (
+              <div key={idx} className="hero-slide-item">
+                <img src={c.image} alt={c.title} className="hero-slide-bg-img" />
+              </div>
+            ))}
+          </div>
+        </ParallaxWrap>
 
         {/* Transparent Content Box Positioned on the Right Side */}
         <div className="hero-right-overlay">
           <div className="container hero-right-container">
-            <div className="hero-right-content-box">
+            <ScrollReveal animation="fade-up" duration={850} className="hero-right-content-box">
               <h1 className="hero-serif-title right-title">{currentCampaign.title}</h1>
               <p className="hero-subtitle right-subtitle">{currentCampaign.subtitle}</p>
               <div className="hero-actions-group right-actions">
@@ -192,7 +193,7 @@ export default function HomePage() {
                 </div>
                 <span><strong>+12 000 clients satisfaits</strong> à Douala, Yaoundé & tout le Cameroun</span>
               </div>
-            </div>
+            </ScrollReveal>
           </div>
 
           {/* Navigation Arrows */}
@@ -228,58 +229,59 @@ export default function HomePage() {
       {/* Featured Editorial Selections Grid with Infinite Continuous Marquee */}
       <section className="section-padded selections-section">
         <div className="container">
-          <header className="selections-head-luxury">
-            <h2>Inspirations & Sélections ITEXAL</h2>
-            <p>Des routines clés en main conçues pour sublimer votre peau au quotidien.</p>
-          </header>
+          <ScrollReveal animation="fade-up">
+            <header className="selections-head-luxury">
+              <h2>Inspirations & Sélections ITEXAL</h2>
+              <p>Des routines clés en main conçues pour sublimer votre peau au quotidien.</p>
+            </header>
+          </ScrollReveal>
         </div>
 
         {/* Infinite Continuous Marquee Track */}
-        <div className="marquee-infinite-container">
-          <div className="marquee-track">
-            {[...selections, ...selections, ...selections].map((item, index) => (
-              <article key={`${item.kicker}-${index}`} className="uiverse-hover-card marquee-card">
-                <Link href={item.href} className="uiverse-card-link">
-                  {/* Invisible trigger layer for smooth peer hover effect */}
-                  <div className="uiverse-peer-trigger" />
-
-                  {/* Base Card Background Image & Content */}
-                  <div className="uiverse-card-base">
-                    <img src={item.image} alt={item.title} />
-                    <span className="uiverse-kicker">{item.kicker}</span>
-                    <h3 className="uiverse-base-title">{item.title}</h3>
-                  </div>
-
-                  {/* Top-Left Expanding Bubble */}
-                  <div className="uiverse-bubble-top" />
-
-                  {/* Bottom-Right Expanding Reveal Content */}
-                  <div className="uiverse-bubble-reveal">
-                    <span className="uiverse-reveal-eyebrow">DÉCOUVRIR LA COLLECTION</span>
-                    <h4 className="uiverse-reveal-title">{item.title}</h4>
-                    <span className="uiverse-reveal-btn">Explorer →</span>
-                  </div>
-                </Link>
-              </article>
-            ))}
+        <ScrollReveal animation="fade-in" delay={150}>
+          <div className="marquee-infinite-container">
+            <div className="marquee-track">
+              {[...selections, ...selections, ...selections].map((item, index) => (
+                <article key={`${item.kicker}-${index}`} className="uiverse-hover-card marquee-card">
+                  <Link href={item.href} className="uiverse-card-link">
+                    <div className="uiverse-peer-trigger" />
+                    <div className="uiverse-card-base">
+                      <img src={item.image} alt={item.title} />
+                      <span className="uiverse-kicker">{item.kicker}</span>
+                      <h3 className="uiverse-base-title">{item.title}</h3>
+                    </div>
+                    <div className="uiverse-bubble-top" />
+                    <div className="uiverse-bubble-reveal">
+                      <span className="uiverse-reveal-eyebrow">DÉCOUVRIR LA COLLECTION</span>
+                      <h4 className="uiverse-reveal-title">{item.title}</h4>
+                      <span className="uiverse-reveal-btn">Explorer →</span>
+                    </div>
+                  </Link>
+                </article>
+              ))}
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
       </section>
 
-      {/* Special Offers / Full-Bleed Dior Luxury Section with Background Image */}
+      {/* Special Offers / Full-Bleed Dior Luxury Section with Parallax Background */}
       {promoProducts.length > 0 && (
         <section className="section-padded flash-deals-dior-section">
-          <div className="flash-deals-dior-bg-overlay" />
+          <ParallaxWrap speed={0.1} style={{ position: "absolute", inset: 0 }}>
+            <div className="flash-deals-dior-bg-overlay" style={{ height: "120%" }} />
+          </ParallaxWrap>
           <div className="container relative z-10">
-            <header className="dior-section-header">
-              <div className="dior-title-group">
-                <span className="dior-eyebrow-tag">OFFRES PRIVILÈGES & SÉLECTION EN PROMOTION</span>
-                <h2 className="dior-serif-heading">Les Ventes Flash & Offres Spéciales</h2>
-              </div>
-              <Link href="/promotions" className="dior-see-all-link">
-                Découvrir toutes les offres →
-              </Link>
-            </header>
+            <ScrollReveal animation="fade-up">
+              <header className="dior-section-header">
+                <div className="dior-title-group">
+                  <span className="dior-eyebrow-tag">OFFRES PRIVILÈGES & SÉLECTION EN PROMOTION</span>
+                  <h2 className="dior-serif-heading">Les Ventes Flash & Offres Spéciales</h2>
+                </div>
+                <Link href="/promotions" className="dior-see-all-link">
+                  Découvrir toutes les offres →
+                </Link>
+              </header>
+            </ScrollReveal>
 
             <HorizontalProductCarousel products={promoProducts} />
           </div>
@@ -289,65 +291,77 @@ export default function HomePage() {
       {/* Nouveautés Horizontal Carousel Slider */}
       <section className="section-padded new-arrivals-section">
         <div className="container">
-          <header className="section-head-between">
-            <div>
-              <span className="eyebrow">ARRIVAGES RÉCENTS</span>
-              <h2>Nos Nouveautés Beauté</h2>
-            </div>
-            <Link href="/nouveautes" className="see-all-link-styled">
-              Voir toutes les nouveautés →
-            </Link>
-          </header>
+          <ScrollReveal animation="fade-up">
+            <header className="section-head-between">
+              <div>
+                <span className="eyebrow">ARRIVAGES RÉCENTS</span>
+                <h2>Nos Nouveautés Beauté</h2>
+              </div>
+              <Link href="/nouveautes" className="see-all-link-styled">
+                Voir toutes les nouveautés →
+              </Link>
+            </header>
+          </ScrollReveal>
 
           <HorizontalProductCarousel products={newest} />
         </div>
       </section>
 
-      {/* Store Intro & Category Circles (Full-Bleed 100vw Banner) */}
+      {/* Store Intro & Category Circles (Full-Bleed 100vw Banner with Parallax) */}
       <section className="store-intro-section full-bleed-banner-wrap">
         <div className="store-intro-banner full-bleed-banner">
-          <video autoPlay muted loop playsInline preload="metadata" poster="https://images.pexels.com/photos/31552020/pexels-photo-31552020.jpeg?auto=compress&w=1800">
-            <source src="https://videos.pexels.com/video-files/7754395/7754395-hd_1080_1920_30fps.mp4" type="video/mp4" />
-          </video>
+          <ParallaxWrap speed={0.08} style={{ width: "100%", height: "100%", position: "absolute", top: 0, left: 0 }}>
+            <video autoPlay muted loop playsInline preload="metadata" poster="https://images.pexels.com/photos/31552020/pexels-photo-31552020.jpeg?auto=compress&w=1800">
+              <source src="https://videos.pexels.com/video-files/7754395/7754395-hd_1080_1920_30fps.mp4" type="video/mp4" />
+            </video>
+          </ParallaxWrap>
           <div className="banner-overlay-text full-bleed-overlay">
-            <span className="banner-eyebrow">HAUTE COUTURE BEAUTÉ</span>
-            <h2>L'Excellence Beauté au Cameroun</h2>
-            <p>Une sélection minutieuse de marques réputées pour prendre soin de votre teint, cheveux et corps.</p>
+            <ScrollReveal animation="zoom-in" duration={800}>
+              <span className="banner-eyebrow">HAUTE COUTURE BEAUTÉ</span>
+              <h2>L'Excellence Beauté au Cameroun</h2>
+              <p>Une sélection minutieuse de marques réputées pour prendre soin de votre teint, cheveux et corps.</p>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
-      {/* Sub-Category Circle Avatars Row (Luxury Dior / Gucci Bubble Bar) */}
+      {/* Sub-Category Circle Avatars Row */}
       <section className="section-padded container subcat-circles-section">
         <div className="subcat-circles-row luxury-dior-circles">
-          {beautyCategories.map(([label, href, image]) => (
-            <Link href={href} key={label} className="subcat-circle-item">
-              <div className="subcat-avatar-wrap">
-                <img src={image} alt={label} />
-              </div>
-              <span className="subcat-label">{label}</span>
-            </Link>
+          {beautyCategories.map(([label, href, image], idx) => (
+            <ScrollReveal key={label} animation="zoom-in" delay={idx * 65}>
+              <Link href={href} className="subcat-circle-item">
+                <div className="subcat-avatar-wrap">
+                  <img src={image} alt={label} />
+                </div>
+                <span className="subcat-label">{label}</span>
+              </Link>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
-      {/* Maquillage Full-Bleed Luxury Section with Background Image */}
+      {/* Maquillage Full-Bleed Luxury Section */}
       {(() => {
         const maquillageItems = products.filter((p) => p.category === "Maquillage");
         if (!maquillageItems.length) return null;
         return (
           <section className="section-padded category-fullbleed-section maquillage-bg-section">
-            <div className="category-bg-overlay" />
+            <ParallaxWrap speed={0.08} style={{ position: "absolute", inset: 0 }}>
+              <div className="category-bg-overlay" style={{ height: "120%" }} />
+            </ParallaxWrap>
             <div className="container relative z-10">
-              <header className="dior-section-header">
-                <div className="dior-title-group">
-                  <span className="dior-eyebrow-tag">HAUTE COUTURE & TEINT ÉCLATANT</span>
-                  <h2 className="dior-serif-heading">Maquillage</h2>
-                </div>
-                <Link href="/maquillage" className="dior-see-all-link">
-                  Voir tout Maquillage ({maquillageItems.length}) →
-                </Link>
-              </header>
+              <ScrollReveal animation="fade-up">
+                <header className="dior-section-header">
+                  <div className="dior-title-group">
+                    <span className="dior-eyebrow-tag">HAUTE COUTURE & TEINT ÉCLATANT</span>
+                    <h2 className="dior-serif-heading">Maquillage</h2>
+                  </div>
+                  <Link href="/maquillage" className="dior-see-all-link">
+                    Voir tout Maquillage ({maquillageItems.length}) →
+                  </Link>
+                </header>
+              </ScrollReveal>
 
               <HorizontalProductCarousel products={maquillageItems} />
             </div>
@@ -370,23 +384,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Soins (Skincare) Full-Bleed Luxury Section with Background Image */}
+      {/* Soins (Skincare) Full-Bleed Luxury Section */}
       {(() => {
         const soinsItems = products.filter((p) => p.category === "Soins");
         if (!soinsItems.length) return null;
         return (
           <section className="section-padded category-fullbleed-section soins-bg-section">
-            <div className="category-bg-overlay" />
+            <ParallaxWrap speed={0.08} style={{ position: "absolute", inset: 0 }}>
+              <div className="category-bg-overlay" style={{ height: "120%" }} />
+            </ParallaxWrap>
             <div className="container relative z-10">
-              <header className="dior-section-header">
-                <div className="dior-title-group">
-                  <span className="dior-eyebrow-tag">L'ART DU SOIN BOTANIQUE & CELLULAIRE</span>
-                  <h2 className="dior-serif-heading">Rituels & Soins d'Exception</h2>
-                </div>
-                <Link href="/soins" className="dior-see-all-link">
-                  Découvrir toute la gamme Soins ({soinsItems.length}) →
-                </Link>
-              </header>
+              <ScrollReveal animation="fade-up">
+                <header className="dior-section-header">
+                  <div className="dior-title-group">
+                    <span className="dior-eyebrow-tag">L'ART DU SOIN BOTANIQUE & CELLULAIRE</span>
+                    <h2 className="dior-serif-heading">Rituels & Soins d'Exception</h2>
+                  </div>
+                  <Link href="/soins" className="dior-see-all-link">
+                    Découvrir toute la gamme Soins ({soinsItems.length}) →
+                  </Link>
+                </header>
+              </ScrollReveal>
 
               <HorizontalProductCarousel products={soinsItems} />
             </div>
@@ -394,23 +412,27 @@ export default function HomePage() {
         );
       })()}
 
-      {/* Capillaire Full-Bleed Luxury Section with Background Image */}
+      {/* Capillaire Full-Bleed Luxury Section */}
       {(() => {
         const capillaireItems = products.filter((p) => p.category === "Capillaire");
         if (!capillaireItems.length) return null;
         return (
           <section className="section-padded category-fullbleed-section capillaire-bg-section">
-            <div className="category-bg-overlay" />
+            <ParallaxWrap speed={0.08} style={{ position: "absolute", inset: 0 }}>
+              <div className="category-bg-overlay" style={{ height: "120%" }} />
+            </ParallaxWrap>
             <div className="container relative z-10">
-              <header className="dior-section-header">
-                <div className="dior-title-group">
-                  <span className="dior-eyebrow-tag">NUTRITION & ÉCLAT CAPILLAIRE PRÉCIEUX</span>
-                  <h2 className="dior-serif-heading">Soins & Rituels Capillaires</h2>
-                </div>
-                <Link href="/capillaire" className="dior-see-all-link">
-                  Découvrir toute la gamme Capillaire ({capillaireItems.length}) →
-                </Link>
-              </header>
+              <ScrollReveal animation="fade-up">
+                <header className="dior-section-header">
+                  <div className="dior-title-group">
+                    <span className="dior-eyebrow-tag">NUTRITION & ÉCLAT CAPILLAIRE PRÉCIEUX</span>
+                    <h2 className="dior-serif-heading">Soins & Rituels Capillaires</h2>
+                  </div>
+                  <Link href="/capillaire" className="dior-see-all-link">
+                    Découvrir toute la gamme Capillaire ({capillaireItems.length}) →
+                  </Link>
+                </header>
+              </ScrollReveal>
 
               <HorizontalProductCarousel products={capillaireItems} />
             </div>
@@ -418,7 +440,7 @@ export default function HomePage() {
         );
       })()}
 
-      {/* Remaining Category Showcase Rows (Parfums, etc.) */}
+      {/* Remaining Category Showcase Rows */}
       <section className="section-padded category-products-showcase container">
         {Object.keys(categoryRoutes)
           .filter((cat) => cat !== "Maquillage" && cat !== "Soins" && cat !== "Capillaire")
@@ -427,12 +449,14 @@ export default function HomePage() {
             if (!items.length) return null;
             return (
               <div className="category-showcase-row" key={category}>
-                <header className="section-head-between image2-head">
-                  <h2 className="serif-category-title">{category}</h2>
-                  <Link href={categoryRoutes[category]} className="see-all-link-styled">
-                    Voir tout {category} →
-                  </Link>
-                </header>
+                <ScrollReveal animation="fade-up">
+                  <header className="section-head-between image2-head">
+                    <h2 className="serif-category-title">{category}</h2>
+                    <Link href={categoryRoutes[category]} className="see-all-link-styled">
+                      Voir tout {category} →
+                    </Link>
+                  </header>
+                </ScrollReveal>
 
                 <HorizontalProductCarousel products={items} />
               </div>
@@ -443,8 +467,8 @@ export default function HomePage() {
       {/* Split Showcase: Video Card (Left) + 4 Reassurance Feature Cards (Right) */}
       <section className="section-padded container video-reassurance-split-section">
         <div className="video-reassurance-grid">
-          {/* Left Column: Video Card with Glass Overlay (Image 2 reference) */}
-          <div className="video-card-side">
+          {/* Left Column: Video Card with Glass Overlay */}
+          <ScrollReveal animation="slide-right" className="video-card-side">
             <video
               autoPlay
               muted
@@ -470,11 +494,11 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
 
-          {/* Right Column: 2x2 Grid of 4 White Reassurance Cards (Image 3 reference) */}
+          {/* Right Column: 2x2 Grid of 4 White Reassurance Cards */}
           <div className="reassurance-2x2-grid">
-            <div className="white-reassurance-card">
+            <ScrollReveal animation="slide-left" delay={0} className="white-reassurance-card">
               <div className="card-icon-pill">
                 <Truck width={24} height={24} />
               </div>
@@ -482,9 +506,9 @@ export default function HomePage() {
               <p className="card-desc">
                 Profitez d'une livraison express et soignée sur toutes vos commandes à Douala, Yaoundé et dans tout le Cameroun.
               </p>
-            </div>
+            </ScrollReveal>
 
-            <div className="white-reassurance-card">
+            <ScrollReveal animation="slide-left" delay={90} className="white-reassurance-card">
               <div className="card-icon-pill">
                 <Phone width={24} height={24} />
               </div>
@@ -492,9 +516,9 @@ export default function HomePage() {
               <p className="card-desc">
                 Notre équipe d'experts beauté est disponible à tout moment pour répondre à vos questions et vous conseiller.
               </p>
-            </div>
+            </ScrollReveal>
 
-            <div className="white-reassurance-card">
+            <ScrollReveal animation="slide-left" delay={180} className="white-reassurance-card">
               <div className="card-icon-pill">
                 <ShieldCheck width={24} height={24} />
               </div>
@@ -502,9 +526,9 @@ export default function HomePage() {
               <p className="card-desc">
                 Produits 100% certifiés et authentiques provenant directement des marques officielles et distributeurs agréés.
               </p>
-            </div>
+            </ScrollReveal>
 
-            <div className="white-reassurance-card">
+            <ScrollReveal animation="slide-left" delay={270} className="white-reassurance-card">
               <div className="card-icon-pill">
                 <Gem width={24} height={24} />
               </div>
@@ -512,11 +536,10 @@ export default function HomePage() {
               <p className="card-desc">
                 Rejoignez notre club privilège pour accumuler des points à chaque achat et débloquer des cadeaux exclusifs.
               </p>
-            </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
     </main>
   );
 }
-

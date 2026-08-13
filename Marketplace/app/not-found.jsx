@@ -1,5 +1,25 @@
 import Link from "next/link";
 
 export default function NotFound() {
-  return <main className="section container"><div className="empty-state"><h1>Page introuvable</h1><p>Cette page n’existe pas ou a été déplacée.</p><Link className="btn btn-dark" href="/">Retour à l’accueil</Link></div></main>;
+  return (
+    <main className="not-found-container">
+      <div id="clouds">
+        <div className="cloud x1"></div>
+        <div className="cloud x1_5"></div>
+        <div className="cloud x2"></div>
+        <div className="cloud x3"></div>
+        <div className="cloud x4"></div>
+        <div className="cloud x5"></div>
+      </div>
+      <div className="c">
+        <div className="_404">404</div>
+        <hr />
+        <div className="_1">THE PAGE</div>
+        <div className="_2">WAS NOT FOUND</div>
+        <Link className="btn" href="/">
+          BACK TO MARS
+        </Link>
+      </div>
+    </main>
+  );
 }

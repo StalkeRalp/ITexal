@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useStore } from "@/lib/store";
+import { useRequireAuth } from "@/composants/RequireAuth";
 import { AccountShell } from "@/composants/AccountShell";
 import { Check, Save, ShieldCheck, Upload, Camera } from "lucide-react";
 
@@ -13,6 +14,7 @@ const AVATAR_PRESETS = [
 ];
 
 export default function ProfilPage() {
+  const { user: authUser, hydrated } = useRequireAuth();
   const { user, updateUserProfile } = useStore();
   const fileInputRef = useRef(null);
 

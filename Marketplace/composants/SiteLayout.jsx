@@ -8,6 +8,95 @@ import { useStore } from "@/lib/store";
 import { money } from "@/lib/format";
 import { LogoutModal } from "@/composants/LogoutModal";
 
+function HeaderActionButtons({ setShowLogoutModal }) {
+  const [mounted, setMounted] = useState(false);
+  const { user, wishlist, orders, itemCount, unreadNotificationsCount } = useStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const ordersCount = orders ? orders.length : 0;
+
+  if (!mounted) {
+    return (
+      <>
+        <Link 
+          href="/panier" 
+          className="action-circle-btn cart-circle-btn" 
+          aria-label="Voir le panier"
+        >
+          <ShoppingBag width={18} height={18} />
+        </Link>
+        <Link href="/connexion" className="header-exact-login-btn" title="Se connecter / Créer un compte">
+          <span>CONNEXION</span>
+          <ArrowRight width={14} height={14} />
+        </Link>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {user && (
+        <>
+          <Link href="/notifications" className="action-circle-btn" aria-label="Notifications">
+            <Bell width={18} height={18} />
+            {unreadNotificationsCount > 0 && (
+              <span className="action-counter badge-coral">{unreadNotificationsCount}</span>
+            )}
+          </Link>
+
+          <Link href="/favoris" className="action-circle-btn" aria-label="Voir la liste d'envies">
+            <Heart width={18} height={18} />
+            {wishlist.length > 0 && (
+              <span className="action-counter badge-coral">{wishlist.length}</span>
+            )}
+          </Link>
+
+          <Link href="/commandes" className="action-circle-btn" aria-label="Mes commandes">
+            <Package width={18} height={18} />
+            {ordersCount > 0 && (
+              <span className="action-counter badge-coral">{ordersCount}</span>
+            )}
+          </Link>
+        </>
+      )}
+
+      <Link href="/panier" className="action-circle-btn cart-circle-btn" aria-label="Voir le panier">
+        <ShoppingBag width={18} height={18} />
+        {itemCount > 0 && (
+          <span className="action-counter badge-purple">{itemCount}</span>
+        )}
+      </Link>
+
+      {user ? (
+        <div className="user-menu-pill">
+          <Link href="/profil" className="user-btn" title="Gérer mon profil & paramètres">
+            {user.avatar ? (
+              <img src={user.avatar} alt={user.name || user.firstName} className="user-nav-avatar-img" />
+            ) : (
+              <span className="user-avatar-badge">
+                {(user.firstName || user.name || "U").charAt(0).toUpperCase()}
+              </span>
+            )}
+            <span className="user-nav-name">{user.name || user.firstName || "Mon Compte"}</span>
+          </Link>
+          <button className="logout-link" onClick={() => setShowLogoutModal(true)} title="Se déconnecter">
+            <LogOut width={12} height={12} />
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      ) : (
+        <Link href="/connexion" className="header-exact-login-btn" title="Se connecter / Créer un compte">
+          <span>CONNEXION</span>
+          <ArrowRight width={14} height={14} />
+        </Link>
+      )}
+    </>
+  );
+}
+
 export function SiteLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -17,6 +106,10 @@ export function SiteLayout({ children }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  // Mounted guard — resolves footer hydration mismatch from browser translation extensions
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -204,86 +297,8 @@ export function SiteLayout({ children }) {
               </form>
             </div>
 
-            {/* Notifications Link */}
-            <Link 
-              href="/notifications" 
-              className="action-circle-btn" 
-              aria-label="Notifications"
-              onClick={(e) => {
-                e.preventDefault();
-                router.push("/notifications");
-              }}
-            >
-              <Bell width={18} height={18} />
-              <span className="action-counter badge-coral">{unreadNotificationsCount > 0 ? unreadNotificationsCount : 2}</span>
-            </Link>
-
-            {/* Wishlist Link */}
-            <Link 
-              href="/favoris" 
-              className="action-circle-btn" 
-              aria-label="Voir la liste d'envies"
-              onClick={(e) => {
-                e.preventDefault();
-                router.push("/favoris");
-              }}
-            >
-              <Heart width={18} height={18} />
-              <span className="action-counter badge-coral">{wishlist.length > 0 ? wishlist.length : 2}</span>
-            </Link>
-
-            {/* Orders Icon */}
-            <Link 
-              href="/commandes" 
-              className="action-circle-btn" 
-              aria-label="Mes commandes"
-              onClick={(e) => {
-                e.preventDefault();
-                router.push("/commandes");
-              }}
-            >
-              <Package width={18} height={18} />
-              <span className="action-counter badge-coral">{ordersCount > 0 ? ordersCount : 3}</span>
-            </Link>
-
-            {/* Cart Link */}
-            <Link 
-              href="/panier" 
-              className="action-circle-btn cart-circle-btn" 
-              aria-label="Voir le panier"
-              onClick={(e) => {
-                e.preventDefault();
-                router.push("/panier");
-              }}
-            >
-              <ShoppingBag width={18} height={18} />
-              <span className="action-counter badge-purple">{itemCount}</span>
-            </Link>
-
-            {/* Dynamic User / Account Pill or CONNEXION Button */}
-            {user ? (
-              <div className="user-menu-pill">
-                <Link href="/profil" className="user-btn" title="Gérer mon profil & paramètres">
-                  {user.avatar ? (
-                    <img src={user.avatar} alt={user.name || user.firstName} className="user-nav-avatar-img" />
-                  ) : (
-                    <span className="user-avatar-badge">
-                      {(user.firstName || user.name || "U").charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                  <span className="user-nav-name">{user.name || user.firstName || "Mon Compte"}</span>
-                </Link>
-                <button className="logout-link" onClick={() => setShowLogoutModal(true)} title="Se déconnecter">
-                  <LogOut width={12} height={12} />
-                  <span>Déconnexion</span>
-                </button>
-              </div>
-            ) : (
-              <Link href="/connexion" className="header-exact-login-btn" title="Se connecter / Créer un compte">
-                <span>CONNEXION</span>
-                <ArrowRight width={14} height={14} />
-              </Link>
-            )}
+            {/* Action buttons (panier, notifications, favoris, compte) gérés par HeaderActionButtons pour zéro mismatch d'hydratation */}
+            <HeaderActionButtons setShowLogoutModal={setShowLogoutModal} />
           </div>
 
           <LogoutModal isOpen={showLogoutModal} onClose={() => setShowLogoutModal(false)} />
@@ -293,99 +308,106 @@ export function SiteLayout({ children }) {
       {/* Main Page Content */}
       <main className="site-main">{children}</main>
 
-      {/* Luxury Dior / Gucci Inspired Footer */}
-      <footer className="fenty-style-footer" suppressHydrationWarning>
-        <div className="container footer-top-grid" suppressHydrationWarning>
-          {/* Newsletter Column */}
-          <div className="footer-col-newsletter" suppressHydrationWarning>
-            <span className="footer-eyebrow" suppressHydrationWarning>MAISON ITEXAL — BEAUTÉ & LUXE</span>
-            <h3 className="footer-col-title" suppressHydrationWarning>Privilèges & Confidentialité</h3>
-            <p className="footer-desc-text">
-              Inscrivez-vous pour recevoir en avant-première nos invitations privées, secrets de soins et nouvelles collections Haute Beauté.
-            </p>
-            <form onSubmit={(e) => e.preventDefault()} className="footer-forms-stack">
-              <div className="footer-input-box">
-                <input type="email" placeholder="Votre adresse e-mail" required />
-                <button type="submit" aria-label="Envoyer e-mail" title="S'abonner">
-                  <ArrowRight width={15} height={15} />
-                </button>
-              </div>
-              <div className="footer-input-box">
-                <input type="tel" placeholder="Votre numéro WhatsApp (+237)" />
-                <button type="submit" aria-label="Envoyer téléphone" title="Rejoindre le club VIP">
-                  <ArrowRight width={15} height={15} />
-                </button>
-              </div>
-            </form>
-            <p className="footer-disclaimer">
-              En soumettant vos coordonnées, vous acceptez nos CGV et notre Politique de Confidentialité. Désinscription à tout moment.
-            </p>
-          </div>
-
-          {/* Navigation Column */}
-          <div className="footer-col-links">
-            <h4 className="footer-sub-title">NAVIGATION</h4>
-            <ul className="footer-menu-list">
-              <li><Link href="/catalogue">Tous les Produits</Link></li>
-              <li><Link href="/soins">Soins Visage & Corps</Link></li>
-              <li><Link href="/maquillage">Maquillage & Teint</Link></li>
-              <li><Link href="/parfums">Parfumerie Haute</Link></li>
-              <li><Link href="/capillaire">Soins Capillaires</Link></li>
-              <li><Link href="/marques">Nos Marques d'Exception</Link></li>
-            </ul>
-          </div>
-
-          {/* Espace Client Column */}
-          <div className="footer-col-links">
-            <h4 className="footer-sub-title">ESPACE CLIENT</h4>
-            <ul className="footer-menu-list">
-              <li><Link href="/commandes">Mes Commandes</Link></li>
-              <li><Link href="/suivi-commande">Suivi de Colis</Link></li>
-              <li><Link href="/notifications">Notifications Privées</Link></li>
-              <li><Link href="/favoris">Sélection Privée (Wishlist)</Link></li>
-              <li><Link href="/faq">Foire aux Questions</Link></li>
-              <li><Link href="/contact">Nous Contacter</Link></li>
-            </ul>
-          </div>
-
-          {/* Engagements & Signature Column */}
-          <div className="footer-col-links">
-            <h4 className="footer-sub-title">ENGAGEMENTS ITEXAL</h4>
-            <div className="footer-trust-list">
-              <div className="footer-trust-item">
-                <ShieldCheck width={15} height={15} className="footer-trust-icon" />
-                <span>100% Produits Authentiques</span>
-              </div>
-              <div className="footer-trust-item">
-                <Truck width={15} height={15} className="footer-trust-icon" />
-                <span>Livraison Express 24h/48h</span>
-              </div>
-              <div className="footer-trust-item">
-                <LockKeyhole width={15} height={15} className="footer-trust-icon" />
-                <span>Paiement MoMo, OM & CB</span>
-              </div>
+      {/* Luxury Dior / Gucci Inspired Footer — rendu client-side uniquement (mounted guard)
+          pour éviter définitivement les erreurs d'hydratation React dues aux extensions
+          de traduction (Google Translate, DeepL...) qui modifient les text nodes après SSR. */}
+      {mounted && (
+        <footer className="fenty-style-footer">
+          <div className="container footer-top-grid">
+            {/* Newsletter Column */}
+            <div className="footer-col-newsletter">
+              <h3 className="footer-col-title">
+                <span className="footer-eyebrow">MAISON ITEXAL — BEAUTÉ & LUXE</span>
+                Privilèges & Confidentialité
+              </h3>
+              <p className="footer-desc-text">
+                Inscrivez-vous pour recevoir en avant-première nos invitations privées, secrets de soins et nouvelles collections Haute Beauté.
+              </p>
+              <form onSubmit={(e) => e.preventDefault()} className="footer-forms-stack">
+                <div className="footer-input-box">
+                  <input type="email" placeholder="Votre adresse e-mail" required />
+                  <button type="submit" aria-label="Envoyer e-mail" title="S'abonner">
+                    <ArrowRight width={15} height={15} />
+                  </button>
+                </div>
+                <div className="footer-input-box">
+                  <input type="tel" placeholder="Votre numéro WhatsApp (+237)" />
+                  <button type="submit" aria-label="Envoyer téléphone" title="Rejoindre le club VIP">
+                    <ArrowRight width={15} height={15} />
+                  </button>
+                </div>
+              </form>
+              <p className="footer-disclaimer">
+                En soumettant vos coordonnées, vous acceptez nos CGV et notre Politique de Confidentialité. Désinscription à tout moment.
+              </p>
             </div>
 
-            <div className="footer-brand-signature">
-              <span className="footer-signature-label">Maison ITEXAL Beauté</span>
-              <p className="footer-signature-sub">L'excellence cosmétique au Cameroun</p>
+            {/* Navigation Column */}
+            <div className="footer-col-links">
+              <h4 className="footer-sub-title">NAVIGATION</h4>
+              <ul className="footer-menu-list">
+                <li><Link href="/catalogue">Tous les Produits</Link></li>
+                <li><Link href="/soins">Soins Visage & Corps</Link></li>
+                <li><Link href="/maquillage">Maquillage & Teint</Link></li>
+                <li><Link href="/parfums">Parfumerie Haute</Link></li>
+                <li><Link href="/capillaire">Soins Capillaires</Link></li>
+                <li><Link href="/marques">Nos Marques d&apos;Exception</Link></li>
+              </ul>
+            </div>
+
+            {/* Espace Client Column */}
+            <div className="footer-col-links">
+              <h4 className="footer-sub-title">ESPACE CLIENT</h4>
+              <ul className="footer-menu-list">
+                <li><Link href="/commandes">Mes Commandes</Link></li>
+                <li><Link href="/suivi-commande">Suivi de Colis</Link></li>
+                <li><Link href="/notifications">Notifications Privées</Link></li>
+                <li><Link href="/favoris">Sélection Privée (Wishlist)</Link></li>
+                <li><Link href="/faq">Foire aux Questions</Link></li>
+                <li><Link href="/contact">Nous Contacter</Link></li>
+              </ul>
+            </div>
+
+            {/* Engagements & Signature Column */}
+            <div className="footer-col-links">
+              <h4 className="footer-sub-title">ENGAGEMENTS ITEXAL</h4>
+              <div className="footer-trust-list">
+                <div className="footer-trust-item">
+                  <ShieldCheck width={15} height={15} className="footer-trust-icon" />
+                  <span>100% Produits Authentiques</span>
+                </div>
+                <div className="footer-trust-item">
+                  <Truck width={15} height={15} className="footer-trust-icon" />
+                  <span>Livraison Express 24h/48h</span>
+                </div>
+                <div className="footer-trust-item">
+                  <LockKeyhole width={15} height={15} className="footer-trust-icon" />
+                  <span>Paiement MoMo, OM & CB</span>
+                </div>
+              </div>
+
+              <div className="footer-brand-signature">
+                <span className="footer-signature-label">Maison ITEXAL Beauté</span>
+                <p className="footer-signature-sub">L&apos;excellence cosmétique au Cameroun</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="footer-divider-glow" />
+          <div className="footer-divider-glow" />
 
-        <div className="container footer-bottom-row">
-          <p>© 2026 ITEXAL BEAUTY CAMEROUN — Tous droits réservés. Haute Cosmétique & Luxe.</p>
-          <div className="footer-legal-links">
-            <Link href="/conditions">CGV</Link>
-            <span className="footer-dot-sep">•</span>
-            <Link href="/confidentialite">Confidentialité</Link>
-            <span className="footer-dot-sep">•</span>
-            <Link href="/a-propos">À Propos</Link>
+          <div className="container footer-bottom-row">
+            <p>© 2026 ITEXAL BEAUTY CAMEROUN — Tous droits réservés. Haute Cosmétique & Luxe.</p>
+            <div className="footer-legal-links">
+              <Link href="/conditions">CGV</Link>
+              <span className="footer-dot-sep">•</span>
+              <Link href="/confidentialite">Confidentialité</Link>
+              <span className="footer-dot-sep">•</span>
+              <Link href="/a-propos">À Propos</Link>
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      )}
+
 
       {/* Back To Top Floating Action Button */}
       {showBackToTop && (

@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { Heart, ShoppingBag, Trash2, Share2, Sparkles, ArrowRight, Check, ShieldCheck, Star } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { useRequireAuth } from "@/composants/RequireAuth";
 
 const SUGGESTIONS = [
   {
@@ -41,6 +42,7 @@ const SUGGESTIONS = [
 ];
 
 export default function FavorisPage() {
+  const { user, hydrated } = useRequireAuth();
   const { products, wishlist, toggleWishlist, addToCart, notify } = useStore();
   const [addedNotice, setAddedNotice] = useState(null);
 

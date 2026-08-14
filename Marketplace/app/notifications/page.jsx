@@ -42,8 +42,10 @@ const INITIAL_NOTIFICATIONS = [
 ];
 
 import { useStore } from "@/lib/store";
+import { useRequireAuth } from "@/composants/RequireAuth";
 
 export default function NotificationsPage() {
+  const { user, hydrated } = useRequireAuth();
   const { 
     notifications, 
     unreadNotificationsCount, 

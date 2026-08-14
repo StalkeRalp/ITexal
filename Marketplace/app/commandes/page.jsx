@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Package, Truck, CheckCircle2, Clock, ArrowRight, RefreshCw, Download, ExternalLink, ShieldCheck, ShoppingBag } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { money, dateFr } from "@/lib/format";
+import { useRequireAuth } from "@/composants/RequireAuth";
+
 
 const SAMPLE_ORDERS = [
   {
@@ -60,6 +62,7 @@ const SAMPLE_ORDERS = [
 ];
 
 export default function CommandesPage() {
+  const { user, hydrated } = useRequireAuth();
   const { orders: storeOrders, addToCart, notify } = useStore();
   const [filter, setFilter] = useState("ALL");
 

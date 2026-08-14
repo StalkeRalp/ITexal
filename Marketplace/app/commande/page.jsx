@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { useStore } from "@/lib/store";
 import { money } from "@/lib/format";
+import { useRequireAuth } from "@/composants/RequireAuth";
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { user, hydrated } = useRequireAuth("/connexion?redirect=/commande");
   const { lines, subtotal, shipping, total, checkout } = useStore();
   const [step, setStep] = useState(1);
   const [processing, setProcessing] = useState(false);
@@ -25,6 +27,18 @@ export default function CheckoutPage() {
     address: "",
     payment: "MTN Mobile Money"
   });
+
+  // Auto-fill logged in user info
+  useEffect(() => {
+    if (user) {
+      setData(prev => ({
+        ...prev,
+        name: prev.name || user.name || `${user.firstName || ""} ${user.lastName || ""}`.trim() || "",
+        email: prev.email || user.email || "",
+        phone: prev.phone || user.phone || ""
+      }));
+    }
+  }, [user]);
 
   const [paymentPhone, setPaymentPhone] = useState("");
   const [momoModalOpen, setMomoModalOpen] = useState(false);

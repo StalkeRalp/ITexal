@@ -81,10 +81,7 @@ export default function ForgotPasswordPage() {
                 Un e-mail de réinitialisation a été transmis à <strong>{email}</strong>.
               </p>
               
-              <div className="auth-otp-demo-badge-pill" style={{ marginBottom: "16px", alignSelf: "center", background: "#fdf2fd", border: "1px solid #f2c7ea" }}>
-                Code de démo : <strong>{resetSent.token}</strong>
-              </div>
-
+             
               <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
                 <Link 
                   href={`/reinitialisation-mot-de-passe?token=${resetSent.token}`} 
